@@ -1,0 +1,13 @@
+const express = require('express');
+const { createBooking, getMyBookings, getHallBookings, updateBookingPlayers } = require('../controllers/bookingController');
+const { authMiddleware, roleMiddleware } = require('../middlewares/authMiddleware');
+
+const router = express.Router();
+
+router.get('/my', authMiddleware, getMyBookings);
+router.get('/hall', authMiddleware, roleMiddleware(['owner', 'admin']), getHallBookings);
+router.post('/', authMiddleware, createBooking);
+router.patch('/:bookingId/players', authMiddleware, roleMiddleware(['owner', 'admin']), updateBookingPlayers);
+
+module.exports = router;
+
