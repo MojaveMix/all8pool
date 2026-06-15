@@ -15,28 +15,73 @@ const createPoolHall = async (req, res) => {
     });
     res.status(201).json(poolHall);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 const getMyPoolHalls = async (req, res) => {
   try {
+    const { role, id } = req.user;
+    let where = {};
+
+    // Admin sees all, Owner sees only theirs
+    if (role === 'owner') {
+      where.ownerId = id;
+    } else if (role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
     const poolHalls = await PoolHall.findAll({
-      where: { ownerId: req.user.id },
+      where,
       include: [{ model: Table, as: 'tables' }],
     });
     res.json(poolHalls);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 const getAllPoolHalls = async (req, res) => {
   try {
-    const poolHalls = await PoolHall.findAll();
+    const poolHalls = await PoolHall.findAll({
+      include: [{ model: Table, as: 'tables' }],
+    });
     res.json(poolHalls);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const updatePoolHall = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { 
+      name, address, city, phone, description, 
+      openingTime, closingTime, 
+      promotionType, promotionValue 
+    } = req.body;
+
+    const poolHall = await PoolHall.findByPk(id);
+    if (!poolHall) return res.status(404).json({ message: 'Pool Hall not found' });
+
+    // Check ownership
+    if (req.user.role === 'owner' && poolHall.ownerId !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    await poolHall.update({
+      name, address, city, phone, description, 
+      openingTime, closingTime, 
+      promotionType, promotionValue
+    });
+
+    res.json(poolHall);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -44,4 +89,5 @@ module.exports = {
   createPoolHall,
   getMyPoolHalls,
   getAllPoolHalls,
+  updatePoolHall,
 };

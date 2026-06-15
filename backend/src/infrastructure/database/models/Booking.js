@@ -60,6 +60,13 @@ const Booking = sequelize.define('Booking', {
   totalPrice: {
     type: DataTypes.DECIMAL(10, 2),
   },
+  appliedPromotion: {
+    type: DataTypes.STRING, // e.g., "50% OFF" or "FREE"
+  },
+  discountAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+  },
 }, {
   timestamps: true,
 });

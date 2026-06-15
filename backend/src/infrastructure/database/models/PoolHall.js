@@ -47,6 +47,14 @@ const PoolHall = sequelize.define('PoolHall', {
   lng: {
     type: DataTypes.DECIMAL(11, 8),
   },
+  promotionType: {
+    type: DataTypes.ENUM('none', 'percentage', 'free'),
+    defaultValue: 'none',
+  },
+  promotionValue: {
+    type: DataTypes.INTEGER, // e.g., 10, 50, 60
+    defaultValue: 0,
+  },
 }, {
   timestamps: true,
 });

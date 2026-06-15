@@ -74,8 +74,8 @@ const Match = sequelize.define('Match', {
     defaultValue: 0,
   },
   status: {
-    type: DataTypes.ENUM('live', 'finished', 'cancelled'),
-    defaultValue: 'live',
+    type: DataTypes.ENUM('open', 'matched', 'live', 'finished', 'cancelled'),
+    defaultValue: 'open',
   },
   startTime: {
     type: DataTypes.DATE,
@@ -86,6 +86,21 @@ const Match = sequelize.define('Match', {
   },
   winnerId: {
     type: DataTypes.UUID,
+  },
+  isPaid: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
+  totalPrice: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+  },
+  appliedPromotion: {
+    type: DataTypes.STRING,
+  },
+  discountAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
   },
 }, {
   timestamps: true,

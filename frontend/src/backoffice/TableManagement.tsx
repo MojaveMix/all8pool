@@ -254,24 +254,43 @@ const TableManagement = () => {
                     type="text"
                     placeholder="Guest Name"
                     className="flex-1 bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const val = (e.target as HTMLInputElement).value;
-                        if (activePlayerIndex === 1) { setPlayer1Name(val); setPlayer1Id(null); }
-                        else { setPlayer2Name(val); setPlayer2Id(null); }
-                        (e.target as HTMLInputElement).value = '';
-                      }
+                    value={activePlayerIndex === 1 ? (player1Id ? '' : player1Name) : (player2Id ? '' : player2Name)}
+                    onChange={(e) => {
+                      if (activePlayerIndex === 1) { setPlayer1Name(e.target.value); setPlayer1Id(null); }
+                      else { setPlayer2Name(e.target.value); setPlayer2Id(null); }
                     }}
                   />
-                  <button className="bg-gray-800 px-6 rounded-2xl font-bold text-xs uppercase hover:bg-gray-700">Add</button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      // Guest name is already updated via onChange
+                      setSearchQuery('');
+                      setSearchResults([]);
+                    }}
+                    className="bg-gray-800 px-6 rounded-2xl font-bold text-xs uppercase hover:bg-gray-700"
+                  >
+                    Set
+                  </button>
                 </div>
               </div>
 
               <div className="flex gap-4 pt-4">
-                <button onClick={() => setShowMatchModal(null)} className="flex-1 bg-gray-800 text-white font-bold py-4 rounded-2xl hover:bg-gray-700 transition-colors">Cancel</button>
+                <button onClick={() => {
+                  setShowMatchModal(null);
+                  setPlayer1Name('');
+                  setPlayer1Id(null);
+                  setPlayer2Name('');
+                  setPlayer2Id(null);
+                }} className="flex-1 bg-gray-800 text-white font-bold py-4 rounded-2xl hover:bg-gray-700 transition-colors">Cancel</button>
                 <button 
-                  onClick={startMatch}
-                  disabled={!player1Name || !player2Name}
+                  onClick={async () => {
+                    await startMatch();
+                    setPlayer1Name('');
+                    setPlayer1Id(null);
+                    setPlayer2Name('');
+                    setPlayer2Id(null);
+                  }}
+                  disabled={!player1Name}
                   className="flex-1 bg-accent text-primary font-black py-4 rounded-2xl shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50"
                 >
                   START MATCH

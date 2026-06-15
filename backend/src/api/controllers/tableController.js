@@ -18,7 +18,8 @@ const addTable = async (req, res) => {
     });
     res.status(201).json(table);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -42,7 +43,8 @@ const updateTableStatus = async (req, res) => {
     
     res.json(table);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 

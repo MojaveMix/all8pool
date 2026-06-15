@@ -1,85 +1,172 @@
-import { Routes, Route, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../store/AuthContext';
-import HallManagement from './HallManagement';
-import TableManagement from './TableManagement';
-import DashboardOverview from './DashboardOverview';
-import BookingsPage from './BookingsPage';
-import LiveMatchesPage from './LiveMatchesPage';
-import TournamentsPage from './TournamentsPage';
-import FinancePage from './FinancePage';
-import CustomersPage from './CustomersPage';
-import AnalyticsPage from './AnalyticsPage';
-import SettingsPage from './SettingsPage';
-import { 
-  LayoutDashboard, 
-  LogOut, 
-  ChevronRight, 
-  Table as TableIcon, 
-  Calendar, 
-  Trophy, 
-  DollarSign, 
+import {
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useSearchParams,
+  Navigate,
+} from "react-router-dom";
+import { useAuth } from "../store/AuthContext";
+import HallManagement from "./HallManagement";
+import TableManagement from "./TableManagement";
+import DashboardOverview from "./DashboardOverview";
+import BookingsPage from "./BookingsPage";
+import LiveMatchesPage from "./LiveMatchesPage";
+import TournamentsPage from "./TournamentsPage";
+import FinancePage from "./FinancePage";
+import CustomersPage from "./CustomersPage";
+import AnalyticsPage from "./AnalyticsPage";
+import SettingsPage from "./SettingsPage";
+import {
+  LayoutDashboard,
+  LogOut,
+  ChevronRight,
+  Table as TableIcon,
+  Calendar,
+  Trophy,
+  DollarSign,
   Activity,
   Settings,
   Users as UsersIcon,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+} from "lucide-react";
 
 const BackofficeApp = () => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const hallId = searchParams.get('hallId');
+  const hallId = searchParams.get("hallId");
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, path: `/backoffice/dashboard?hallId=${hallId}` },
-    { label: 'Tables', icon: TableIcon, path: `/backoffice/tables?hallId=${hallId}` },
-    { label: 'Bookings', icon: Calendar, path: `/backoffice/bookings?hallId=${hallId}` },
-    { label: 'Live Matches', icon: Activity, path: `/backoffice/matches?hallId=${hallId}` },
-    { label: 'Tournaments', icon: Trophy, path: `/backoffice/tournaments?hallId=${hallId}` },
-    { label: 'Finance', icon: DollarSign, path: `/backoffice/finance?hallId=${hallId}` },
-    { label: 'Customers', icon: UsersIcon, path: `/backoffice/customers?hallId=${hallId}` },
-    { label: 'Analytics', icon: BarChart3, path: `/backoffice/analytics?hallId=${hallId}` },
-    { label: 'Settings', icon: Settings, path: `/backoffice/settings?hallId=${hallId}` },
+    {
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: hallId ? `/backoffice/dashboard?hallId=${hallId}` : "/backoffice",
+    },
+    {
+      label: "Tables",
+      icon: TableIcon,
+      path: hallId ? `/backoffice/tables?hallId=${hallId}` : "/backoffice",
+    },
+    {
+      label: "Bookings",
+      icon: Calendar,
+      path: hallId ? `/backoffice/bookings?hallId=${hallId}` : "/backoffice",
+    },
+    {
+      label: "Live Matches",
+      icon: Activity,
+      path: hallId ? `/backoffice/matches?hallId=${hallId}` : "/backoffice",
+    },
+    {
+      label: "Tournaments",
+      icon: Trophy,
+      path: hallId ? `/backoffice/tournaments?hallId=${hallId}` : "/backoffice",
+    },
+    {
+      label: "Finance",
+      icon: DollarSign,
+      path: hallId ? `/backoffice/finance?hallId=${hallId}` : "/backoffice",
+    },
+    {
+      label: "Customers",
+      icon: UsersIcon,
+      path: hallId ? `/backoffice/customers?hallId=${hallId}` : "/backoffice",
+    },
+    {
+      label: "Analytics",
+      icon: BarChart3,
+      path: hallId ? `/backoffice/analytics?hallId=${hallId}` : "/backoffice",
+    },
+    {
+      label: "Settings",
+      icon: Settings,
+      path: hallId ? `/backoffice/settings?hallId=${hallId}` : "/backoffice",
+    },
   ];
+
+  const isActive = (path: string) => {
+    if (path === "/backoffice" && window.location.pathname === "/backoffice")
+      return true;
+    const itemPath = path.split("?")[0].replace("/backoffice/", "");
+    return window.location.pathname.includes(itemPath) && itemPath !== "";
+  };
 
   return (
     <div className="min-h-screen bg-primary flex text-white font-sans selection:bg-accent selection:text-primary">
       {/* Sidebar */}
+
       <aside className="w-72 bg-secondary border-r border-gray-800 flex flex-col sticky top-0 h-screen">
         <div className="p-8">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/backoffice')}>
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => navigate("/backoffice")}
+          >
             <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(0,255,136,0.2)]">
               <div className="w-5 h-5 bg-primary rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]" />
             </div>
             <div>
-              <h1 className="text-2xl font-black text-white tracking-tighter italic leading-none">ALL 8</h1>
-              <p className="text-[10px] text-accent uppercase font-black mt-1 tracking-widest">Partner Pro</p>
+              <h1 className="text-2xl font-black text-white tracking-tighter italic leading-none">
+                ALL 8
+              </h1>
+              <p className="text-[10px] text-accent uppercase font-black mt-1 tracking-widest">
+                Partner Pro
+              </p>
             </div>
           </div>
         </div>
 
         <nav className="flex-1 px-4 space-y-1 mt-4 overflow-y-auto">
-          <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4">Management</p>
+          <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4">
+            Management
+          </p>
+          <Link
+            to="/backoffice"
+            className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all group ${
+              window.location.pathname === "/backoffice"
+                ? "bg-accent text-primary shadow-[0_10px_20px_rgba(0,255,136,0.1)]"
+                : "hover:bg-primary text-gray-400 hover:text-white"
+            }`}
+          >
+            <LayoutDashboard
+              size={20}
+              className={
+                window.location.pathname === "/backoffice"
+                  ? ""
+                  : "group-hover:text-accent"
+              }
+            />
+            <span className="font-bold text-sm tracking-tight">Halls List</span>
+          </Link>
+
           {navItems.map((item) => (
-            <Link 
+            <Link
               key={item.label}
-              to={hallId ? item.path : '/backoffice'} 
+              to={item.path}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all group ${
-                window.location.pathname.includes(item.label.toLowerCase().replace(' ', '-')) 
-                ? 'bg-accent text-primary shadow-[0_10px_20px_rgba(0,255,136,0.1)]' 
-                : 'hover:bg-primary text-gray-400 hover:text-white'
-              }`}
+                isActive(item.path)
+                  ? "bg-accent text-primary shadow-[0_10px_20px_rgba(0,255,136,0.1)]"
+                  : "hover:bg-primary text-gray-400 hover:text-white"
+              } ${!hallId ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
             >
-              <item.icon size={20} className={window.location.pathname.includes(item.label.toLowerCase().replace(' ', '-')) ? '' : 'group-hover:text-accent'} />
-              <span className="font-bold text-sm tracking-tight">{item.label}</span>
-              <ChevronRight size={14} className={`ml-auto opacity-0 group-hover:opacity-100 transition-opacity ${
-                window.location.pathname.includes(item.label.toLowerCase().replace(' ', '-')) ? 'hidden' : ''
-              }`} />
+              <item.icon
+                size={20}
+                className={isActive(item.path) ? "" : "group-hover:text-accent"}
+              />
+              <span className="font-bold text-sm tracking-tight">
+                {item.label}
+              </span>
+              <ChevronRight
+                size={14}
+                className={`ml-auto opacity-0 group-hover:opacity-100 transition-opacity ${
+                  isActive(item.path) ? "hidden" : ""
+                }`}
+              />
             </Link>
           ))}
         </nav>
@@ -91,13 +178,22 @@ const BackofficeApp = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-black truncate">{user?.name}</p>
-              <p className="text-[10px] text-accent font-bold truncate uppercase tracking-tighter">Verified Owner</p>
+              <p className="text-[10px] text-accent font-bold truncate uppercase tracking-tighter">
+                {user?.role === "admin" ? "System Admin" : "Verified Owner"}
+              </p>
             </div>
-            <Link to={`/backoffice/settings?hallId=${hallId}`}>
-              <Settings size={16} className="text-gray-600 cursor-pointer hover:text-white transition-colors" />
+            <Link
+              to={
+                hallId ? `/backoffice/settings?hallId=${hallId}` : "/backoffice"
+              }
+            >
+              <Settings
+                size={16}
+                className={`text-gray-600 cursor-pointer hover:text-white transition-colors ${!hallId ? "opacity-50 pointer-events-none" : ""}`}
+              />
             </Link>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-danger/10 text-danger font-bold text-sm hover:bg-danger hover:text-white transition-all border border-danger/20"
           >
@@ -109,24 +205,60 @@ const BackofficeApp = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-12 overflow-auto bg-[radial-gradient(circle_at_top_right,_#1a1a1a,_#121212)]">
-        {!hallId && window.location.pathname !== '/backoffice' && (
+        {!hallId && window.location.pathname !== "/backoffice" && (
           <div className="bg-warning/10 border border-warning/20 text-warning p-4 rounded-2xl mb-8 font-bold text-sm flex items-center gap-3">
             <Activity size={18} />
-            Please select a pool hall from the dashboard to view detailed management options.
+            Please select a pool hall from the dashboard to view detailed
+            management options.
           </div>
         )}
-        
+
         <Routes>
           <Route path="/" element={<HallManagement />} />
-          <Route path="/dashboard" element={<DashboardOverview />} />
-          <Route path="/tables" element={<TableManagement />} />
-          <Route path="/bookings" element={<BookingsPage />} />
-          <Route path="/matches" element={<LiveMatchesPage />} />
-          <Route path="/tournaments" element={<TournamentsPage />} />
-          <Route path="/finance" element={<FinancePage />} />
-          <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              hallId ? <DashboardOverview /> : <Navigate to="/backoffice" />
+            }
+          />
+          <Route
+            path="/tables"
+            element={
+              hallId ? <TableManagement /> : <Navigate to="/backoffice" />
+            }
+          />
+          <Route
+            path="/bookings"
+            element={hallId ? <BookingsPage /> : <Navigate to="/backoffice" />}
+          />
+          <Route
+            path="/matches"
+            element={
+              hallId ? <LiveMatchesPage /> : <Navigate to="/backoffice" />
+            }
+          />
+          <Route
+            path="/tournaments"
+            element={
+              hallId ? <TournamentsPage /> : <Navigate to="/backoffice" />
+            }
+          />
+          <Route
+            path="/finance"
+            element={hallId ? <FinancePage /> : <Navigate to="/backoffice" />}
+          />
+          <Route
+            path="/customers"
+            element={hallId ? <CustomersPage /> : <Navigate to="/backoffice" />}
+          />
+          <Route
+            path="/analytics"
+            element={hallId ? <AnalyticsPage /> : <Navigate to="/backoffice" />}
+          />
+          <Route
+            path="/settings"
+            element={hallId ? <SettingsPage /> : <Navigate to="/backoffice" />}
+          />
         </Routes>
       </main>
     </div>

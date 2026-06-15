@@ -1,0 +1,137 @@
+import React from 'react';
+import { Trophy, Users, Star, Calendar, ChevronRight, Medal } from 'lucide-react';
+
+const PlayerTournamentsPage = () => {
+  // Mock tournaments data for a high-end feel
+  const tournaments = [
+    {
+      id: '1',
+      name: 'Emerald City 8-Ball Open',
+      status: 'registration',
+      date: 'June 20, 2026',
+      players: 12,
+      maxPlayers: 16,
+      prize: '$500',
+      entry: '$25',
+      image: 'bg-emerald-500/10'
+    },
+    {
+      id: '2',
+      name: 'Midnight Snooker Masters',
+      status: 'ongoing',
+      date: 'Live Now',
+      players: 8,
+      maxPlayers: 8,
+      prize: '$1,200',
+      entry: '$50',
+      image: 'bg-blue-500/10'
+    },
+    {
+      id: '3',
+      name: 'Rookie 9-Ball Challenge',
+      status: 'upcoming',
+      date: 'June 25, 2026',
+      players: 4,
+      maxPlayers: 32,
+      prize: '$200',
+      entry: '$10',
+      image: 'bg-purple-500/10'
+    }
+  ];
+
+  return (
+    <div className="space-y-10 animate-in fade-in duration-700">
+      {/* Hero Header */}
+      <div className="relative h-48 rounded-[3rem] bg-gradient-to-r from-emerald-600/20 to-primary border border-white/5 flex items-center px-12 overflow-hidden">
+         <div className="absolute right-0 top-0 opacity-10 scale-150 translate-x-1/4 -translate-y-1/4">
+            <Trophy size={300} />
+         </div>
+         <div className="relative z-10">
+            <h2 className="text-5xl font-black italic tracking-tighter uppercase">Championship Arena</h2>
+            <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-xs mt-2">Where legends are forged in green felt</p>
+         </div>
+      </div>
+
+      {/* Featured Tournament */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+         {tournaments.map((t) => (
+            <div key={t.id} className="group relative bg-secondary rounded-[2.5rem] border border-gray-800 hover:border-accent transition-all overflow-hidden flex flex-col">
+               <div className={`h-32 ${t.image} flex items-center justify-center border-b border-white/5 group-hover:bg-accent/5 transition-colors`}>
+                  <Medal size={48} className="text-white/20 group-hover:text-accent/30 transition-colors" />
+               </div>
+
+               <div className="p-8 space-y-6 flex-1 flex flex-col">
+                  <div className="flex justify-between items-start">
+                     <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${
+                        t.status === 'ongoing' ? 'bg-success/10 text-success border-success/20' : 
+                        t.status === 'registration' ? 'bg-accent/10 text-accent border-accent/20' : 
+                        'bg-gray-800 text-gray-500 border-white/5'
+                     }`}>
+                        {t.status}
+                     </span>
+                     <span className="text-[10px] font-black italic text-gray-500 uppercase">{t.date}</span>
+                  </div>
+
+                  <h3 className="text-2xl font-black italic text-white leading-tight uppercase tracking-tighter group-hover:text-accent transition-colors">
+                     {t.name}
+                  </h3>
+
+                  <div className="flex gap-4">
+                     <div className="flex items-center gap-2 text-gray-500">
+                        <Users size={14} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">{t.players}/{t.maxPlayers} Spots</span>
+                     </div>
+                     <div className="flex items-center gap-2 text-accent">
+                        <Star size={14} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">{t.prize} Pool</span>
+                     </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2">
+                     <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-gray-600">
+                        <span>Registration Progress</span>
+                        <span>{Math.round((t.players / t.maxPlayers) * 100)}%</span>
+                     </div>
+                     <div className="h-1.5 bg-primary rounded-full overflow-hidden border border-white/5">
+                        <div 
+                           className="h-full bg-accent shadow-[0_0_10px_rgba(0,255,136,0.3)] transition-all duration-1000" 
+                           style={{ width: `${(t.players / t.maxPlayers) * 100}%` }}
+                        />
+                     </div>
+                  </div>
+
+                  <div className="pt-6 mt-auto">
+                     <button className="w-full flex items-center justify-center gap-2 bg-primary border border-gray-800 py-4 rounded-2xl font-black uppercase tracking-tighter text-xs group-hover:bg-accent group-hover:text-primary transition-all">
+                        {t.status === 'ongoing' ? 'View Live Bracket' : 'Join Tournament'}
+                        <ChevronRight size={16} />
+                     </button>
+                  </div>
+               </div>
+            </div>
+         ))}
+      </div>
+
+      {/* Stats Overview */}
+      <div className="bg-secondary/40 rounded-[3rem] p-12 border border-white/5 flex flex-col md:flex-row gap-12 items-center justify-between">
+         <div className="space-y-4 text-center md:text-left">
+            <h3 className="text-3xl font-black italic uppercase tracking-tighter">Become a Pro</h3>
+            <p className="text-gray-500 font-medium max-w-md">Join sanctioned tournaments to earn professional rating points and climb the global All 8 Pool leaderboard.</p>
+         </div>
+         <div className="flex gap-8">
+            <StatItem label="Total Tournaments" value="124" />
+            <StatItem label="Active Players" value="1.2k" />
+            <StatItem label="Total Prizes" value="$45k" />
+         </div>
+      </div>
+    </div>
+  );
+};
+
+const StatItem = ({ label, value }: { label: string, value: string }) => (
+   <div className="text-center space-y-1">
+      <p className="text-4xl font-black italic text-white tracking-tighter">{value}</p>
+      <p className="text-[8px] font-black uppercase tracking-widest text-gray-600">{label}</p>
+   </div>
+);
+
+export default PlayerTournamentsPage;

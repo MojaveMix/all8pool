@@ -30,6 +30,22 @@ const User = sequelize.define('User', {
   avatar: {
     type: DataTypes.STRING,
   },
+  wins: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  losses: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  rating: {
+    type: DataTypes.DECIMAL(3, 2),
+    defaultValue: 3.00,
+  },
+  unpaidCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
 }, {
   timestamps: true,
 });
