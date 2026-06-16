@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { useAuth } from '../store/AuthContext';
 import { Gift, Coins, Coffee, Package, Tag, CheckCircle, AlertCircle, ShoppingBag } from 'lucide-react';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 interface Reward {
   id: string;
@@ -72,7 +73,11 @@ const RewardsPage = () => {
     }
   };
 
-  if (loading) return <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">Loading Rewards...</div>;
+  if (loading) return (
+    <div className="py-20">
+      <LoadingSpinner message="Loading Rewards..." />
+    </div>
+  );
 
   return (
     <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in duration-1000">

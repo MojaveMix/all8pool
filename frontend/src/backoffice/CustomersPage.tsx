@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 const CustomersPage = () => {
   const [searchParams] = useSearchParams();
@@ -31,7 +32,7 @@ const CustomersPage = () => {
     setLoading(false);
   }, [hallId]);
 
-  if (loading) return <div className="text-accent animate-pulse">Loading Customers...</div>;
+  if (loading) return <LoadingSpinner message="Loading Customers..." />;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">

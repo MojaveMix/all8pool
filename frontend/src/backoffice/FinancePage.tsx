@@ -25,6 +25,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 const FinancePage = () => {
   const [searchParams] = useSearchParams();
@@ -57,7 +58,7 @@ const FinancePage = () => {
     setTimeout(() => setLoading(false), 1000);
   }, [hallId]);
 
-  if (loading) return <div className="text-accent animate-pulse">Analyzing Financial Data...</div>;
+  if (loading) return <LoadingSpinner message="Analyzing Financial Data..." />;
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">

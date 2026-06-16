@@ -24,6 +24,26 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@keyframes ball-bounce {
+  0%, 100% { 
+    transform: translateY(0) scale(1.05, 0.95);
+  }
+  50% { 
+    transform: translateY(-20px) scale(0.95, 1.05);
+  }
+}
+
+@keyframes shadow-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  50% { 
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
+}
+
 body {
   margin: 0;
   display: flex;

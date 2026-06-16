@@ -23,6 +23,7 @@ import {
   AreaChart, 
   Area 
 } from 'recharts';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 const DashboardOverview = () => {
   const [searchParams] = useSearchParams();
@@ -45,7 +46,7 @@ const DashboardOverview = () => {
     }
   };
 
-  if (loading || !data) return <div className="text-accent animate-pulse">Loading Dashboard...</div>;
+  if (loading || !data) return <LoadingSpinner message="Loading Dashboard..." />;
 
   const { summary, liveTables, peakHours } = data;
 

@@ -3,6 +3,7 @@ import api from '../api';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Star, TrendingUp, Medal, Users, Coins } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 interface Player {
   id: string;
@@ -50,7 +51,11 @@ const RankingPage = () => {
     );
   };
 
-  if (loading) return <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">{t('common.loading')}</div>;
+  if (loading) return (
+    <div className="py-20">
+      <LoadingSpinner message={t('common.loading')} />
+    </div>
+  );
 
   const topThree = players.slice(0, 3);
   const rest = players.slice(3);

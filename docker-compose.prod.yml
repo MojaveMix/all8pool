@@ -1,0 +1,48 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: all8pool-db-prod
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-all8pool}
+      MYSQL_ROOT_PASSWORD: ${DB_PASS:-root}
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASS:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: all8pool-backend-prod
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DB_NAME=${DB_NAME:-all8pool}
+      - DB_USER=root
+      - DB_PASS=${DB_PASS:-root}
+      - DB_HOST=db
+      - JWT_SECRET=${JWT_SECRET:-all8pool_secure_secret}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: all8pool-frontend-prod
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_prod_data:

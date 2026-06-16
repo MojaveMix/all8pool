@@ -4,11 +4,12 @@ import ClientApp from './client/ClientApp';
 import Login from './shared/Login';
 import Register from './shared/Register';
 import { useAuth } from './store/AuthContext';
+import LoadingSpinner from './shared/LoadingSpinner';
 
 function App() {
   const { user, loading } = useAuth();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner fullScreen />;
 
   return (
     <Router>

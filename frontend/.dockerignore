@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.env
+.git
+.gitignore
+README.md
+dist
+build
+.vscode
+.eslint.config.js
+tsconfig*.json
+vite.config.ts

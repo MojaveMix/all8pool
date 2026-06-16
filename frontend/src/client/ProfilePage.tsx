@@ -15,6 +15,7 @@ import {
   Coins,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../shared/LoadingSpinner";
 
 interface UserProfile {
   id: string;
@@ -90,8 +91,8 @@ const ProfilePage = () => {
 
   if (loading)
     return (
-      <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">
-        {t('profile.loading')}
+      <div className="py-20">
+        <LoadingSpinner message={t('profile.loading')} />
       </div>
     );
   if (!profile)

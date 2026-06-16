@@ -27,6 +27,7 @@ import {
   PieChart,
   Pie
 } from 'recharts';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 const AnalyticsPage = () => {
   const [searchParams] = useSearchParams();
@@ -67,7 +68,7 @@ const AnalyticsPage = () => {
     setTimeout(() => setLoading(false), 800);
   }, [hallId]);
 
-  if (loading) return <div className="text-accent animate-pulse">Computing Analytics Hub...</div>;
+  if (loading) return <LoadingSpinner message="Computing Analytics Hub..." />;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
