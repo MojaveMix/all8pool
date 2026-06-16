@@ -3,7 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../store/AuthContext";
 import { useTranslation } from "react-i18next";
-import { MapPin, Clock, Circle, ArrowLeft, CheckCircle, Users, User, Search, Plus, Mail, X as XIcon } from "lucide-react";
+import {
+  MapPin,
+  Clock,
+  Circle,
+  ArrowLeft,
+  CheckCircle,
+  Users,
+  User,
+  Search,
+  Plus,
+  Mail,
+  X as XIcon,
+} from "lucide-react";
 
 interface Table {
   id: string;
@@ -22,7 +34,7 @@ interface Hall {
   openingTime: string;
   closingTime: string;
   tables: Table[];
-  promotionType: 'none' | 'percentage' | 'free';
+  promotionType: "none" | "percentage" | "free";
   promotionValue: number;
 }
 
@@ -39,11 +51,16 @@ const HallDetails = () => {
   const { user } = useAuth();
 
   // Opponent Selection State
-  const [opponentType, setOpponentType] = useState<'open' | 'account' | 'guest'>('open');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [opponentType, setOpponentType] = useState<
+    "open" | "account" | "guest"
+  >("open");
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [selectedOpponent, setSelectedOpponent] = useState<{id: string, name: string} | null>(null);
-  const [guestData, setGuestData] = useState({ name: '', email: '' });
+  const [selectedOpponent, setSelectedOpponent] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [guestData, setGuestData] = useState({ name: "", email: "" });
 
   useEffect(() => {
     fetchHall();
@@ -69,15 +86,17 @@ const HallDetails = () => {
     }
   };
 
-  const [bookingDate, setBookingDate] = useState(new Date().toISOString().split('T')[0]);
-  const [bookingTime, setBookingTime] = useState('12:00');
+  const [bookingDate, setBookingDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+  const [bookingTime, setBookingTime] = useState("12:00");
   const [duration, setDuration] = useState(1); // Hours
 
   const calculateTotalPrice = () => {
     if (!selectedTable || !hall) return 0;
     const basePrice = selectedTable.pricePerHour * duration;
-    if (hall.promotionType === 'free') return 0;
-    if (hall.promotionType === 'percentage') {
+    if (hall.promotionType === "free") return 0;
+    if (hall.promotionType === "percentage") {
       return basePrice * (1 - hall.promotionValue / 100);
     }
     return basePrice;
@@ -98,57 +117,66 @@ const HallDetails = () => {
   };
 
   const handleBooking = async () => {
+    if (!user) {
+      location.href = "/login";
+      return;
+    }
     if (!selectedTable) return;
 
     // Simple validation
     const start = new Date(`${bookingDate}T${bookingTime}`);
     if (isNaN(start.getTime())) {
-      alert(t('common.error'));
+      alert(t("common.error"));
       return;
     }
     if (start < new Date()) {
-      alert(t('common.error'));
+      alert(t("common.error"));
       return;
     }
 
-    if (opponentType === 'guest' && (!guestData.name || !guestData.email)) {
-      alert(t('common.error'));
+    if (opponentType === "guest" && (!guestData.name || !guestData.email)) {
+      alert(t("common.error"));
       return;
     }
-    if (opponentType === 'account' && !selectedOpponent) {
-      alert(t('common.error'));
+    if (opponentType === "account" && !selectedOpponent) {
+      alert(t("common.error"));
       return;
     }
 
-    setBookingStatus('loading');
+    setBookingStatus("loading");
     try {
       const endTime = new Date(start.getTime() + duration * 60 * 60 * 1000);
 
-      await api.post('/bookings', {
+      await api.post("/bookings", {
         tableId: selectedTable.id,
         startTime: start,
         endTime: endTime,
-        player2Id: opponentType === 'account' ? selectedOpponent?.id : null,
-        player2Name: opponentType === 'account' ? selectedOpponent?.name : (opponentType === 'guest' ? guestData.name : null),
-        player2Email: opponentType === 'guest' ? guestData.email : null,
+        player2Id: opponentType === "account" ? selectedOpponent?.id : null,
+        player2Name:
+          opponentType === "account"
+            ? selectedOpponent?.name
+            : opponentType === "guest"
+              ? guestData.name
+              : null,
+        player2Email: opponentType === "guest" ? guestData.email : null,
       });
 
-      setBookingStatus('success');
+      setBookingStatus("success");
       setTimeout(() => {
-        setBookingStatus('idle');
+        setBookingStatus("idle");
         setSelectedTable(null);
         fetchHall();
-        setOpponentType('open');
+        setOpponentType("open");
         setSelectedOpponent(null);
-        setGuestData({ name: '', email: '' });
+        setGuestData({ name: "", email: "" });
       }, 3000);
     } catch (err: any) {
-      alert(err.response?.data?.message || t('common.error'));
-      setBookingStatus('idle');
+      alert(err.response?.data?.message || t("common.error"));
+      setBookingStatus("idle");
     }
   };
 
-    const handleJoinMatch = async (matchId: string) => {
+  const handleJoinMatch = async (matchId: string) => {
     if (user?.role !== "player") {
       alert("Only players can join matches.");
       return;
@@ -163,7 +191,11 @@ const HallDetails = () => {
   };
 
   if (!hall)
-    return <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">{t('common.loading')}</div>;
+    return (
+      <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">
+        {t("common.loading")}
+      </div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in duration-700">
@@ -171,13 +203,13 @@ const HallDetails = () => {
         onClick={() => navigate("/arena")}
         className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors uppercase font-black text-[10px] tracking-widest"
       >
-        <ArrowLeft size={16} /> {t('hall.back_discovery')}
+        <ArrowLeft size={16} /> {t("hall.back_discovery")}
       </button>
 
       {/* Hall Hero Header */}
       <div className="bg-secondary/50 rounded-[3rem] p-12 border border-white/10 flex flex-col md:flex-row justify-between items-start gap-10 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-12 opacity-5">
-           <MapPin size={240} />
+          <MapPin size={240} />
         </div>
         <div className="relative">
           <h2 className="text-6xl font-black italic tracking-tighter text-white uppercase leading-none">
@@ -185,23 +217,25 @@ const HallDetails = () => {
           </h2>
           <div className="flex flex-wrap gap-4 mt-6">
             <span className="flex items-center gap-2 bg-primary px-4 py-2 rounded-xl text-xs font-bold border border-white/5">
-              <MapPin size={16} className="text-accent" /> {hall.address}, {hall.city}
+              <MapPin size={16} className="text-accent" /> {hall.address},{" "}
+              {hall.city}
             </span>
             <span className="flex items-center gap-2 bg-primary px-4 py-2 rounded-xl text-xs font-bold border border-white/5">
-              <Clock size={16} className="text-accent" /> {hall.openingTime} - {hall.closingTime}
+              <Clock size={16} className="text-accent" /> {hall.openingTime} -{" "}
+              {hall.closingTime}
             </span>
           </div>
         </div>
         <div className="text-right relative">
           <p className="text-gray-500 uppercase font-black text-[10px] tracking-[0.3em] mb-2">
-            {t('hall.arena_status')}
+            {t("hall.arena_status")}
           </p>
           <div className="text-5xl font-black text-white italic">
             {hall.tables?.filter((t) => t.status === "available").length} /{" "}
             {hall.tables?.length}
           </div>
           <p className="text-accent text-xs font-black uppercase tracking-widest mt-2">
-            {t('arena.tables_ready')}
+            {t("arena.tables_ready")}
           </p>
         </div>
       </div>
@@ -214,7 +248,7 @@ const HallDetails = () => {
               size={14}
               className="fill-accent text-accent animate-pulse"
             />{" "}
-            {t('hall.open_challenges')}
+            {t("hall.open_challenges")}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {matches
@@ -227,10 +261,10 @@ const HallDetails = () => {
                   <div>
                     <div className="flex justify-between items-start mb-6">
                       <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                        {t('hall.table_unit')} #{match.table?.number}
+                        {t("hall.table_unit")} #{match.table?.number}
                       </span>
                       <div className="flex items-center gap-1.5 bg-accent/10 text-accent px-3 py-1 rounded-lg text-[10px] font-black uppercase italic">
-                        <Users size={12} /> {t('hall.live_call')}
+                        <Users size={12} /> {t("hall.live_call")}
                       </div>
                     </div>
                     <div className="flex items-center gap-4 mb-8">
@@ -242,7 +276,7 @@ const HallDetails = () => {
                           {match.player1?.name || match.player1Name}
                         </p>
                         <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                          {t('hall.awaiting_challenger')}
+                          {t("hall.awaiting_challenger")}
                         </p>
                       </div>
                     </div>
@@ -252,7 +286,7 @@ const HallDetails = () => {
                       onClick={() => handleJoinMatch(match.id)}
                       className="w-full bg-accent text-primary py-4 rounded-2xl text-sm font-black uppercase tracking-tighter hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-accent/20"
                     >
-                      {t('arena.accept_challenge')}
+                      {t("arena.accept_challenge")}
                     </button>
                   )}
                 </div>
@@ -306,8 +340,12 @@ const HallDetails = () => {
                   {table.type}
                 </p>
                 <div className="flex items-baseline gap-1">
-                   <span className="text-2xl font-black text-accent">${table.pricePerHour}</span>
-                   <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">/ Hour</span>
+                  <span className="text-2xl font-black text-accent">
+                    ${table.pricePerHour}
+                  </span>
+                  <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">
+                    / Hour
+                  </span>
                 </div>
               </div>
 
@@ -324,20 +362,24 @@ const HallDetails = () => {
 
         {/* Booking Sidebar */}
         <div className="bg-secondary/40 rounded-[3rem] p-10 border border-white/10 h-fit sticky top-28 shadow-2xl">
-          <h3 className="text-2xl font-black italic text-white uppercase tracking-tight mb-8">{t('hall.reservation_info')}</h3>
+          <h3 className="text-2xl font-black italic text-white uppercase tracking-tight mb-8">
+            {t("hall.reservation_info")}
+          </h3>
 
           {selectedTable ? (
             <div className="space-y-8">
               <div className="flex justify-between items-center bg-primary p-6 rounded-[2rem] border border-white/5">
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">
-                    {t('hall.table_unit')}
+                    {t("hall.table_unit")}
                   </p>
-                  <p className="text-3xl font-black italic text-white">#{selectedTable.number}</p>
+                  <p className="text-3xl font-black italic text-white">
+                    #{selectedTable.number}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">
-                    {t('hall.match_rate')}
+                    {t("hall.match_rate")}
                   </p>
                   <p className="text-accent font-black text-xl italic">
                     ${selectedTable.pricePerHour}/hr
@@ -348,18 +390,22 @@ const HallDetails = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">{t('hall.event_date')}</label>
-                    <input 
-                      type="date" 
+                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
+                      {t("hall.event_date")}
+                    </label>
+                    <input
+                      type="date"
                       value={bookingDate}
                       onChange={(e) => setBookingDate(e.target.value)}
                       className="w-full bg-primary border border-white/10 rounded-2xl px-4 py-4 text-sm text-white font-bold focus:border-accent outline-none transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">{t('hall.break_time')}</label>
-                    <input 
-                      type="time" 
+                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
+                      {t("hall.break_time")}
+                    </label>
+                    <input
+                      type="time"
                       value={bookingTime}
                       onChange={(e) => setBookingTime(e.target.value)}
                       className="w-full bg-primary border border-white/10 rounded-2xl px-4 py-4 text-sm text-white font-bold focus:border-accent outline-none transition-colors"
@@ -368,128 +414,189 @@ const HallDetails = () => {
                 </div>
 
                 <div>
-                  <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">{t('hall.session_duration')}</label>
-                  <select 
+                  <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
+                    {t("hall.session_duration")}
+                  </label>
+                  <select
                     value={duration}
                     onChange={(e) => setDuration(Number(e.target.value))}
                     className="w-full bg-primary border border-white/10 rounded-2xl px-4 py-4 text-sm text-white font-bold focus:border-accent outline-none transition-colors appearance-none"
                   >
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map(h => (
-                      <option key={h} value={h}>{h} {h === 1 ? 'Hour' : 'Hours'} Session</option>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((h) => (
+                      <option key={h} value={h}>
+                        {h} {h === 1 ? "Hour" : "Hours"} Session
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 {/* Opponent Selection UI */}
                 <div className="pt-6 border-t border-white/5 space-y-6 text-left">
-                   <div>
-                      <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-4 block ml-1">{t('hall.opponent_pref')}</label>
-                      <div className="grid grid-cols-3 gap-2">
-                         {[
-                           { id: 'open', label: t('hall.opponent_types.open'), icon: <Users size={14}/> },
-                           { id: 'account', label: t('hall.opponent_types.platform'), icon: <User size={14}/> },
-                           { id: 'guest', label: t('hall.opponent_types.guest'), icon: <Mail size={14}/> }
-                         ].map(opt => (
-                           <button
-                             key={opt.id}
-                             onClick={() => setOpponentType(opt.id as any)}
-                             className={`flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${opponentType === opt.id ? 'bg-accent/10 border-accent text-accent' : 'bg-primary border-white/5 text-gray-500 hover:text-white hover:border-white/10'}`}
-                           >
-                             {opt.icon}
-                             <span className="text-[8px] font-black uppercase tracking-tighter">{opt.label}</span>
-                           </button>
-                         ))}
-                      </div>
-                   </div>
+                  <div>
+                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-4 block ml-1">
+                      {t("hall.opponent_pref")}
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        {
+                          id: "open",
+                          label: t("hall.opponent_types.open"),
+                          icon: <Users size={14} />,
+                        },
+                        {
+                          id: "account",
+                          label: t("hall.opponent_types.platform"),
+                          icon: <User size={14} />,
+                        },
+                        {
+                          id: "guest",
+                          label: t("hall.opponent_types.guest"),
+                          icon: <Mail size={14} />,
+                        },
+                      ].map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => setOpponentType(opt.id as any)}
+                          className={`flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${opponentType === opt.id ? "bg-accent/10 border-accent text-accent" : "bg-primary border-white/5 text-gray-500 hover:text-white hover:border-white/10"}`}
+                        >
+                          {opt.icon}
+                          <span className="text-[8px] font-black uppercase tracking-tighter">
+                            {opt.label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                   {opponentType === 'account' && (
-                     <div className="space-y-4 animate-in slide-in-from-top-2">
-                        <div className="relative">
-                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                          <input 
-                            type="text" 
-                            placeholder={t('hall.search_player')}
-                            value={searchQuery}
-                            onChange={(e) => handleSearchUsers(e.target.value)}
-                            className="w-full bg-primary border border-white/10 pl-12 pr-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
-                          />
+                  {opponentType === "account" && (
+                    <div className="space-y-4 animate-in slide-in-from-top-2">
+                      <div className="relative">
+                        <Search
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+                          size={16}
+                        />
+                        <input
+                          type="text"
+                          placeholder={t("hall.search_player")}
+                          value={searchQuery}
+                          onChange={(e) => handleSearchUsers(e.target.value)}
+                          className="w-full bg-primary border border-white/10 pl-12 pr-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
+                        />
+                      </div>
+                      {selectedOpponent && (
+                        <div className="bg-accent/10 p-3 rounded-xl border border-accent/20 flex justify-between items-center">
+                          <span className="text-xs font-black text-accent uppercase">
+                            {selectedOpponent.name}
+                          </span>
+                          <button
+                            onClick={() => setSelectedOpponent(null)}
+                            className="text-accent hover:text-white"
+                          >
+                            <XIcon size={14} />
+                          </button>
                         </div>
-                        {selectedOpponent && (
-                           <div className="bg-accent/10 p-3 rounded-xl border border-accent/20 flex justify-between items-center">
-                              <span className="text-xs font-black text-accent uppercase">{selectedOpponent.name}</span>
-                              <button onClick={() => setSelectedOpponent(null)} className="text-accent hover:text-white"><XIcon size={14}/></button>
-                           </div>
-                        )}
-                        {searchQuery && searchResults.length > 0 && !selectedOpponent && (
+                      )}
+                      {searchQuery &&
+                        searchResults.length > 0 &&
+                        !selectedOpponent && (
                           <div className="bg-primary rounded-xl border border-white/5 overflow-hidden divide-y divide-white/5">
-                             {searchResults.map(p => (
-                               <button 
-                                 key={p.id}
-                                 onClick={() => {
-                                   setSelectedOpponent({ id: p.id, name: p.name });
-                                   setSearchQuery('');
-                                 }}
-                                 className="w-full text-left p-3 hover:bg-accent/5 transition-colors text-xs font-bold"
-                               >
-                                 {p.name}
-                               </button>
-                             ))}
+                            {searchResults.map((p) => (
+                              <button
+                                key={p.id}
+                                onClick={() => {
+                                  setSelectedOpponent({
+                                    id: p.id,
+                                    name: p.name,
+                                  });
+                                  setSearchQuery("");
+                                }}
+                                className="w-full text-left p-3 hover:bg-accent/5 transition-colors text-xs font-bold"
+                              >
+                                {p.name}
+                              </button>
+                            ))}
                           </div>
                         )}
-                     </div>
-                   )}
+                    </div>
+                  )}
 
-                   {opponentType === 'guest' && (
-                     <div className="space-y-3 animate-in slide-in-from-top-2">
-                        <input 
-                          type="text" 
-                          placeholder={t('hall.guest_name')}
-                          value={guestData.name}
-                          onChange={(e) => setGuestData({ ...guestData, name: e.target.value })}
-                          className="w-full bg-primary border border-white/10 px-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
-                        />
-                        <input 
-                          type="email" 
-                          placeholder={t('hall.guest_email')}
-                          value={guestData.email}
-                          onChange={(e) => setGuestData({ ...guestData, email: e.target.value })}
-                          className="w-full bg-primary border border-white/10 px-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
-                        />
-                        <p className="text-[9px] text-gray-600 font-bold uppercase text-center">{t('hall.guest_note')}</p>
-                     </div>
-                   )}
+                  {opponentType === "guest" && (
+                    <div className="space-y-3 animate-in slide-in-from-top-2">
+                      <input
+                        type="text"
+                        placeholder={t("hall.guest_name")}
+                        value={guestData.name}
+                        onChange={(e) =>
+                          setGuestData({ ...guestData, name: e.target.value })
+                        }
+                        className="w-full bg-primary border border-white/10 px-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
+                      />
+                      <input
+                        type="email"
+                        placeholder={t("hall.guest_email")}
+                        value={guestData.email}
+                        onChange={(e) =>
+                          setGuestData({ ...guestData, email: e.target.value })
+                        }
+                        className="w-full bg-primary border border-white/10 px-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
+                      />
+                      <p className="text-[9px] text-gray-600 font-bold uppercase text-center">
+                        {t("hall.guest_note")}
+                      </p>
+                    </div>
+                  )}
 
-                   {opponentType === 'open' && (
-                     <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10 text-center animate-in fade-in">
-                        <p className="text-[10px] text-accent font-black uppercase tracking-widest">{t('hall.broadcast_note')}</p>
-                        <p className="text-[9px] text-gray-500 mt-1">{t('hall.broadcast_desc')}</p>
-                     </div>
-                   )}
+                  {opponentType === "open" && (
+                    <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10 text-center animate-in fade-in">
+                      <p className="text-[10px] text-accent font-black uppercase tracking-widest">
+                        {t("hall.broadcast_note")}
+                      </p>
+                      <p className="text-[9px] text-gray-500 mt-1">
+                        {t("hall.broadcast_desc")}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-6 border-t border-white/10 space-y-3 text-left">
                   <div className="flex justify-between items-center">
-                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">{t('hall.subtotal')}</p>
-                    <p className="text-white font-black text-2xl italic tabular-nums">${selectedTable.pricePerHour * duration}</p>
+                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">
+                      {t("hall.subtotal")}
+                    </p>
+                    <p className="text-white font-black text-2xl italic tabular-nums">
+                      ${selectedTable.pricePerHour * duration}
+                    </p>
                   </div>
-                  {hall.promotionType !== 'none' && (
+                  {hall.promotionType !== "none" && (
                     <div className="flex justify-between items-center text-accent animate-pulse">
-                      <p className="text-[10px] font-black uppercase tracking-widest">{t('hall.member_reward')}: {hall.promotionType === 'free' ? 'FREE MATCH' : `${hall.promotionValue}% OFF`}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest">
+                        {t("hall.member_reward")}:{" "}
+                        {hall.promotionType === "free"
+                          ? "FREE MATCH"
+                          : `${hall.promotionValue}% OFF`}
+                      </p>
                       <p className="text-sm font-black italic">
-                        -{hall.promotionType === 'free' ? `$${selectedTable.pricePerHour * duration}` : `$${(selectedTable.pricePerHour * duration * hall.promotionValue) / 100}`}
+                        -
+                        {hall.promotionType === "free"
+                          ? `$${selectedTable.pricePerHour * duration}`
+                          : `$${(selectedTable.pricePerHour * duration * hall.promotionValue) / 100}`}
                       </p>
                     </div>
                   )}
                   <div className="flex justify-between items-center pt-4 border-t border-white/5">
-                    <p className="text-xs text-white font-black uppercase tracking-[0.3em]">{t('hall.final_price')}</p>
-                    <p className="text-accent font-black text-4xl italic tabular-nums">${calculateTotalPrice()}</p>
+                    <p className="text-xs text-white font-black uppercase tracking-[0.3em]">
+                      {t("hall.final_price")}
+                    </p>
+                    <p className="text-accent font-black text-4xl italic tabular-nums">
+                      ${calculateTotalPrice()}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {bookingStatus === "success" ? (
                 <div className="bg-emerald-500/10 text-emerald-500 p-6 rounded-[2rem] flex items-center gap-4 font-black uppercase tracking-widest text-xs border border-emerald-500/20 shadow-lg shadow-emerald-500/10 animate-in zoom-in-95">
-                  <CheckCircle size={24} /> {t('hall.secured')}
+                  <CheckCircle size={24} /> {t("hall.secured")}
                 </div>
               ) : (
                 <button
@@ -498,13 +605,13 @@ const HallDetails = () => {
                   className="w-full bg-accent text-primary py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm italic hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-accent/20 disabled:opacity-50"
                 >
                   {bookingStatus === "loading"
-                    ? t('hall.securing')
-                    : t('hall.confirm_btn')}
+                    ? t("hall.securing")
+                    : t("hall.confirm_btn")}
                 </button>
               )}
 
               <p className="text-[9px] text-gray-600 text-center uppercase font-black tracking-[0.4em] leading-relaxed mt-4">
-                {t('hall.payment_note')}
+                {t("hall.payment_note")}
               </p>
             </div>
           ) : (
@@ -513,7 +620,9 @@ const HallDetails = () => {
                 <Circle size={32} className="text-gray-800" />
               </div>
               <p className="text-xs font-black uppercase tracking-widest leading-relaxed">
-                Choose an available table<br/>to start your journey
+                Choose an available table
+                <br />
+                to start your journey
               </p>
             </div>
           )}
