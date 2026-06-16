@@ -27,6 +27,7 @@ services:
       - DB_PASS=${DB_PASS:-root}
       - DB_HOST=db
       - JWT_SECRET=${JWT_SECRET:-all8pool_secure_secret}
+      - PORT=8080
     depends_on:
       db:
         condition: service_healthy
@@ -40,7 +41,7 @@ services:
     container_name: all8pool-frontend-prod
     restart: always
     ports:
-      - "80:80"
+      - "3000:3000"
     depends_on:
       - backend
 
