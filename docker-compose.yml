@@ -21,37 +21,32 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: all8pool-backend
+    restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "8080:5000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - DB_NAME=all8pool
       - DB_USER=root
       - DB_PASS=root
       - DB_HOST=db
       - JWT_SECRET=all8pool@@@
-    volumes:
-      - ./backend/src:/app/src
     depends_on:
       db:
         condition: service_healthy
-    command: npm run dev
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: all8pool-frontend
+    restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "3000:5173"
     environment:
-      - VITE_API_URL=http://localhost:5000/api
-    volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/public:/app/public
+      - VITE_API_URL=http://84.8.222.138:8080/api
     depends_on:
       - backend
-    command: npm run dev
 
 volumes:
   mysql_data:
