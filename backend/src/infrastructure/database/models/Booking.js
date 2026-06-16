@@ -21,6 +21,10 @@ const Booking = sequelize.define('Booking', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  player1Email: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   player2Id: {
     type: DataTypes.UUID,
     allowNull: true,
@@ -32,6 +36,10 @@ const Booking = sequelize.define('Booking', {
     onUpdate: 'CASCADE'
   },
   player2Name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  player2Email: {
     type: DataTypes.STRING,
     allowNull: true,
   },

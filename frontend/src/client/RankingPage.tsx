@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Trophy, Star, TrendingUp, Medal, Users } from 'lucide-react';
+import { Trophy, Star, TrendingUp, Medal, Users, Coins } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Player {
@@ -10,6 +10,7 @@ interface Player {
   wins: number;
   losses: number;
   rating: number;
+  virtualMoney: number;
 }
 
 const RankingPage = () => {
@@ -108,6 +109,12 @@ const RankingPage = () => {
               </div>
 
               <div className="hidden md:flex gap-10 text-right pr-4">
+                 <div className="space-y-1 text-yellow-500">
+                    <p className="text-[8px] font-black uppercase tracking-widest">Fortune</p>
+                    <p className="text-xl font-black italic flex items-center justify-end gap-1">
+                      <Coins size={14} /> {player.virtualMoney.toLocaleString()}
+                    </p>
+                 </div>
                  <div className="space-y-1">
                     <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Mastery</p>
                     <p className="text-xl font-black text-accent italic">{parseFloat(player.rating.toString()).toFixed(1)}</p>
@@ -152,8 +159,14 @@ const PodiumPosition = ({ player, rank, color, bgColor, height, stars, isGold }:
          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
          <span className={`text-6xl font-black italic ${color}`}>#{rank}</span>
          <div className="text-center relative z-10">
-            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">Palmares</p>
-            <p className="text-xl font-black text-white italic">{player.wins} Wins</p>
+            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">Fortune</p>
+            <p className="text-xl font-black text-yellow-500 italic flex items-center justify-center gap-1">
+              <Coins size={16} /> {player.virtualMoney.toLocaleString()}
+            </p>
+         </div>
+         <div className="text-center relative z-10 pt-2 opacity-50">
+            <p className="text-[8px] font-black text-gray-600 uppercase tracking-[0.3em]">Palmares</p>
+            <p className="text-sm font-black text-white italic">{player.wins} Wins</p>
          </div>
       </div>
    </div>

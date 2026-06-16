@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/me', authMiddleware, getProfile);
 router.get('/rankings', getRankings);
-router.get('/:id', authMiddleware, getUserProfile);
+router.get('/:id', getUserProfile);
 router.get('/', authMiddleware, roleMiddleware(['owner', 'admin']), getUsers);
 
 module.exports = router;

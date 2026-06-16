@@ -3,7 +3,17 @@ const { Op } = require('sequelize');
 
 const createBooking = async (req, res) => {
   try {
-    const { tableId, startTime, endTime, player2Id, player2Name, player1Name } = req.body;
+    const { 
+      tableId, 
+      startTime, 
+      endTime, 
+      player1Id,
+      player1Name, 
+      player1Email,
+      player2Id, 
+      player2Name,
+      player2Email 
+    } = req.body;
     
     // Check if table exists
     const table = await Table.findByPk(tableId);
@@ -50,10 +60,12 @@ const createBooking = async (req, res) => {
     }
 
     const booking = await Booking.create({
-      userId: (req.user.role === 'player') ? req.user.id : (req.body.userId || null),
+      userId: player1Id || (req.user.role === 'player' ? req.user.id : null),
       player1Name: player1Name || (req.user.role === 'player' ? req.user.name : 'Guest'),
+      player1Email: player1Email || (req.user.role === 'player' ? req.user.email : null),
       player2Id,
       player2Name,
+      player2Email,
       tableId,
       startTime,
       endTime,
@@ -80,8 +92,8 @@ const getMyBookings = async (req, res) => {
           as: 'table',
           include: [{ model: PoolHall, as: 'poolHall' }]
         },
-        { model: User, as: 'user', attributes: ['name'] },
-        { model: User, as: 'player2', attributes: ['name'] }
+        { model: User, as: 'user', attributes: ['id', 'name'] },
+        { model: User, as: 'player2', attributes: ['id', 'name'] }
       ],
     });
     res.json(bookings);
@@ -111,8 +123,8 @@ const getHallBookings = async (req, res) => {
           as: 'table',
           where: { poolHallId: hallId }
         },
-        { model: User, as: 'user', attributes: ['name'] },
-        { model: User, as: 'player2', attributes: ['name'] }
+        { model: User, as: 'user', attributes: ['id', 'name'] },
+        { model: User, as: 'player2', attributes: ['id', 'name'] }
       ],
       order: [['startTime', 'ASC']]
     });
@@ -126,15 +138,17 @@ const getHallBookings = async (req, res) => {
 const updateBookingPlayers = async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const { userId, player1Name, player2Id, player2Name } = req.body;
+    const { userId, player1Name, player1Email, player2Id, player2Name, player2Email } = req.body;
 
     const booking = await Booking.findByPk(bookingId);
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
     if (userId !== undefined) booking.userId = userId;
-    if (player1Name) booking.player1Name = player1Name;
+    if (player1Name !== undefined) booking.player1Name = player1Name;
+    if (player1Email !== undefined) booking.player1Email = player1Email;
     if (player2Id !== undefined) booking.player2Id = player2Id;
     if (player2Name !== undefined) booking.player2Name = player2Name;
+    if (player2Email !== undefined) booking.player2Email = player2Email;
 
     await booking.save();
     res.json(booking);
@@ -147,7 +161,7 @@ const updateBookingPlayers = async (req, res) => {
 const assignPlayer = async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const { playerIndex, userId, name } = req.body;
+    const { playerIndex, userId, name, email } = req.body;
 
     const booking = await Booking.findByPk(bookingId);
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
@@ -155,9 +169,11 @@ const assignPlayer = async (req, res) => {
     if (playerIndex === 1) {
       booking.userId = userId || null;
       booking.player1Name = name;
+      booking.player1Email = email || null;
     } else if (playerIndex === 2) {
       booking.player2Id = userId || null;
       booking.player2Name = name;
+      booking.player2Email = email || null;
     } else {
       return res.status(400).json({ message: 'Invalid player index' });
     }

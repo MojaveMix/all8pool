@@ -21,6 +21,10 @@ const Match = sequelize.define('Match', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  player1Email: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   player2Id: {
     type: DataTypes.UUID,
     allowNull: true,
@@ -32,6 +36,10 @@ const Match = sequelize.define('Match', {
     onUpdate: 'CASCADE'
   },
   player2Name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  player2Email: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -100,6 +108,10 @@ const Match = sequelize.define('Match', {
   },
   discountAmount: {
     type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+  },
+  stake: {
+    type: DataTypes.INTEGER,
     defaultValue: 0,
   },
 }, {

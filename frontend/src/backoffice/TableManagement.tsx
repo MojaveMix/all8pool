@@ -42,6 +42,9 @@ const TableManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [activePlayerIndex, setActivePlayerIndex] = useState<1 | 2>(1);
+  const [isQuickResult, setIsQuickResult] = useState(false);
+  const [score1, setScore1] = useState(0);
+  const [score2, setScore2] = useState(0);
 
   useEffect(() => {
     if (hallId) fetchTables();
@@ -86,13 +89,19 @@ const TableManagement = () => {
         player1Id,
         player1Name,
         player2Id,
-        player2Name
+        player2Name,
+        status: isQuickResult ? 'finished' : undefined,
+        score1: isQuickResult ? score1 : 0,
+        score2: isQuickResult ? score2 : 0
       });
       setShowMatchModal(null);
+      setIsQuickResult(false);
+      setScore1(0);
+      setScore2(0);
       fetchTables();
-      alert('Match started!');
+      alert(isQuickResult ? 'Result recorded!' : 'Match started!');
     } catch (err) {
-      alert('Failed to start match');
+      alert('Failed to process match');
     }
   };
 
@@ -203,19 +212,51 @@ const TableManagement = () => {
       {showMatchModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-secondary w-full max-w-lg p-10 rounded-[2.5rem] border border-gray-800 shadow-2xl animate-in zoom-in-95 duration-300">
-            <h3 className="text-2xl font-black italic text-accent mb-8 tracking-tight uppercase">
-              Start Match - Table #{showMatchModal.number}
-            </h3>
+            <div className="flex justify-between items-center mb-8">
+               <h3 className="text-2xl font-black italic text-accent tracking-tight uppercase">
+                {isQuickResult ? 'Record Result' : 'Start Match'} - Table #{showMatchModal.number}
+              </h3>
+              <button 
+                onClick={() => setIsQuickResult(!isQuickResult)}
+                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase border transition-all ${isQuickResult ? 'bg-accent text-primary border-accent' : 'bg-primary text-gray-500 border-gray-800'}`}
+              >
+                {isQuickResult ? 'Switch to Live Match' : 'Switch to Quick Result'}
+              </button>
+            </div>
             
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className={`p-4 rounded-2xl border-2 transition-all cursor-pointer ${activePlayerIndex === 1 ? 'border-accent bg-accent/5' : 'border-gray-800 bg-primary'}`} onClick={() => setActivePlayerIndex(1)}>
                   <p className="text-[10px] font-black text-gray-500 uppercase mb-2">Player 1</p>
                   <p className="text-lg font-black">{player1Name || 'Set Player 1'}</p>
+                  {isQuickResult && (
+                    <div className="mt-4">
+                       <label className="text-[8px] font-black text-gray-500 uppercase block mb-1">Final Score</label>
+                       <input 
+                        type="number" 
+                        className="w-full bg-secondary border border-gray-800 p-2 rounded-lg text-white font-black text-center"
+                        value={score1}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => setScore1(Number(e.target.value))}
+                       />
+                    </div>
+                  )}
                 </div>
                 <div className={`p-4 rounded-2xl border-2 transition-all cursor-pointer ${activePlayerIndex === 2 ? 'border-accent bg-accent/5' : 'border-gray-800 bg-primary'}`} onClick={() => setActivePlayerIndex(2)}>
                   <p className="text-[10px] font-black text-gray-500 uppercase mb-2">Player 2</p>
                   <p className="text-lg font-black">{player2Name || 'Set Player 2'}</p>
+                  {isQuickResult && (
+                    <div className="mt-4">
+                       <label className="text-[8px] font-black text-gray-500 uppercase block mb-1">Final Score</label>
+                       <input 
+                        type="number" 
+                        className="w-full bg-secondary border border-gray-800 p-2 rounded-lg text-white font-black text-center"
+                        value={score2}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => setScore2(Number(e.target.value))}
+                       />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -277,10 +318,13 @@ const TableManagement = () => {
               <div className="flex gap-4 pt-4">
                 <button onClick={() => {
                   setShowMatchModal(null);
+                  setIsQuickResult(false);
                   setPlayer1Name('');
                   setPlayer1Id(null);
                   setPlayer2Name('');
                   setPlayer2Id(null);
+                  setScore1(0);
+                  setScore2(0);
                 }} className="flex-1 bg-gray-800 text-white font-bold py-4 rounded-2xl hover:bg-gray-700 transition-colors">Cancel</button>
                 <button 
                   onClick={async () => {
@@ -290,10 +334,10 @@ const TableManagement = () => {
                     setPlayer2Name('');
                     setPlayer2Id(null);
                   }}
-                  disabled={!player1Name}
+                  disabled={!player1Name || (isQuickResult && !player2Name)}
                   className="flex-1 bg-accent text-primary font-black py-4 rounded-2xl shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50"
                 >
-                  START MATCH
+                  {isQuickResult ? 'RECORD RESULT' : 'START MATCH'}
                 </button>
               </div>
             </div>

@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { Activity, Users, Trophy, Clock, ChevronRight, Plus, Minus, Square, Search, Check } from 'lucide-react';
+import { Activity, Users, Trophy, Clock, ChevronRight, Plus, Minus, Square, Search, Check, Mail } from 'lucide-react';
 
 interface Match {
   id: string;
   table: { number: number };
-  player1: { name: string; id: string } | null;
+  player1: { name: string; id: string, email: string } | null;
   player1Name: string | null;
+  player1Email: string | null;
   player1Id?: string | null;
-  player2: { name: string; id: string } | null;
+  player2: { name: string; id: string, email: string } | null;
   player2Name: string | null;
+  player2Email: string | null;
   player2Id?: string | null;
   score1: number;
   score2: number;
@@ -25,7 +27,7 @@ const LiveMatchesPage = () => {
   const [showPlayerModal, setShowPlayerModal] = useState<{ matchId: string, playerIndex: 1 | 2 } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [guestName, setGuestName] = useState('');
+  const [guestData, setGuestData] = useState({ name: '', email: '' });
 
   useEffect(() => {
     if (hallId) fetchMatches();
@@ -64,23 +66,25 @@ const LiveMatchesPage = () => {
     }
   };
 
-  const assignPlayer = async (userId: string | null, name: string) => {
+  const assignPlayer = async (userId: string | null, name: string, email?: string) => {
     if (!showPlayerModal) return;
     try {
       const payload: any = {};
       if (showPlayerModal.playerIndex === 1) {
         payload.player1Id = userId;
         payload.player1Name = name;
+        payload.player1Email = email || null;
       } else {
         payload.player2Id = userId;
         payload.player2Name = name;
+        payload.player2Email = email || null;
       }
 
       await api.patch(`/matches/${showPlayerModal.matchId}/score`, payload);
       setShowPlayerModal(null);
       setSearchQuery('');
       setSearchResults([]);
-      setGuestName('');
+      setGuestData({ name: '', email: '' });
       fetchMatches();
     } catch (err) {
       console.error(err);
@@ -88,15 +92,22 @@ const LiveMatchesPage = () => {
   };
 
   const updateScore = async (matchId: string, score1: number, score2: number) => {
+    // Optimistic Update
+    setMatches(prev => prev.map(m => m.id === matchId ? { ...m, score1, score2 } : m));
     try {
       await api.patch(`/matches/${matchId}/score`, { score1, score2 });
-      fetchMatches();
     } catch (err) {
       console.error(err);
+      fetchMatches(); // Revert on error
     }
   };
 
   const endMatch = async (matchId: string) => {
+    const match = matches.find(m => m.id === matchId);
+    if (!match) return;
+
+    if (!window.confirm(`End match at Table #${match.table.number}? Final Score ${match.score1}:${match.score2}`)) return;
+
     try {
       await api.patch(`/matches/${matchId}/score`, { status: 'finished' });
       fetchMatches();
@@ -164,7 +175,7 @@ const LiveMatchesPage = () => {
                   {searchResults.map((user) => (
                     <button 
                       key={user.id}
-                      onClick={() => assignPlayer(user.id, user.name)}
+                      onClick={() => assignPlayer(user.id, user.name, user.email)}
                       className="w-full flex items-center justify-between p-4 bg-primary rounded-xl border border-gray-800 hover:border-accent transition-colors"
                     >
                       <div className="text-left">
@@ -182,19 +193,31 @@ const LiveMatchesPage = () => {
                   <span className="w-full border-t border-gray-800"></span>
                 </div>
                 <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
-                  <span className="bg-secondary px-4 text-gray-500">OR DYNAMIC GUEST</span>
+                  <span className="bg-secondary px-4 text-gray-500">OR VERIFIED GUEST</span>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Guest Name</label>
-                <input 
-                  type="text" 
-                  placeholder="Enter full name"
-                  className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Guest Name</label>
+                  <input 
+                    type="text" 
+                    placeholder="Enter full name"
+                    className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
+                    value={guestData.name}
+                    onChange={(e) => setGuestData({ ...guestData, name: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Guest Email</label>
+                  <input 
+                    type="email" 
+                    placeholder="Enter email for verification"
+                    className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
+                    value={guestData.email}
+                    onChange={(e) => setGuestData({ ...guestData, email: e.target.value })}
+                  />
+                </div>
               </div>
 
               <div className="flex gap-4 pt-4">
@@ -205,8 +228,8 @@ const LiveMatchesPage = () => {
                   Cancel
                 </button>
                 <button 
-                  disabled={!guestName}
-                  onClick={() => assignPlayer(null, guestName)}
+                  disabled={!guestData.name || !guestData.email}
+                  onClick={() => assignPlayer(null, guestData.name, guestData.email)}
                   className="flex-1 bg-accent text-primary font-black py-4 rounded-2xl shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:hover:scale-100"
                 >
                   SET GUEST
@@ -321,6 +344,11 @@ const MatchCard = ({ match, onUpdateScore, onEndMatch, onAssignPlayer, onVerifyM
             )}
           </div>
           <p className={`text-sm font-black truncate ${!hasPlayer2 ? 'text-gray-600 italic' : ''}`}>{player2Name}</p>
+          {match.player2Email && !match.player2Id && (
+            <div className="flex items-center justify-center gap-1 text-[8px] font-black text-accent uppercase tracking-tighter mt-1">
+               <Mail size={8} /> Verified Guest
+            </div>
+          )}
           {isLive && (
             <div className="flex justify-center gap-2 mt-2">
               <button onClick={() => onUpdateScore(match.score1, Math.max(0, match.score2 - 1))} className="p-1 bg-gray-800 rounded-md hover:text-accent transition-colors"><Minus size={12}/></button>
@@ -331,12 +359,12 @@ const MatchCard = ({ match, onUpdateScore, onEndMatch, onAssignPlayer, onVerifyM
       </div>
 
       <div className="mt-8 pt-6 border-t border-gray-800/50 flex gap-3">
-        {isMatched ? (
+        {isMatched || (match.status === 'open' && hasPlayer1 && hasPlayer2) ? (
           <button 
             onClick={onVerifyMatch}
             className="flex-1 bg-warning text-primary font-black uppercase py-4 rounded-xl shadow-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
           >
-            <Trophy size={18} /> VERIFY PLAYERS
+            <Trophy size={18} /> {isMatched ? 'VERIFY PLAYERS' : 'START MATCH'}
           </button>
         ) : isLive ? (
           <button 

@@ -11,6 +11,7 @@ import {
   Calendar,
   ArrowLeft,
   Medal,
+  Coins,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -24,6 +25,7 @@ interface UserProfile {
   rating: number;
   unpaidCount?: number;
   rank: number;
+  virtualMoney: number;
 }
 
 const ProfilePage = () => {
@@ -33,16 +35,19 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const isOwnProfile = !userId || userId === authUser?.id;
+  const isOwnProfile = !userId || (authUser && userId === authUser.id);
 
   useEffect(() => {
-    if (userId === "undefined") {
+    // Wait for auth to initialize before deciding if it's own profile
+    if (!userId && !authUser && loading) return; 
+    
+    if (userId === "undefined" || userId === "null") {
       console.error("Invalid user ID provided");
       setLoading(false);
       return;
     }
     fetchProfile();
-  }, [userId, authUser]);
+  }, [userId, authUser, loading]);
 
   const fetchProfile = async () => {
     try {
@@ -144,6 +149,12 @@ const ProfilePage = () => {
               </div>
               <div className="bg-white/5 text-white px-4 py-2 rounded-xl border border-white/10 flex items-center gap-2 font-black uppercase text-sm italic">
                 {profile.wins} Wins / {profile.losses} Losses
+              </div>
+              <div className="bg-yellow-500/10 text-yellow-500 px-4 py-2 rounded-xl border border-yellow-500/20 flex items-center gap-2">
+                <Coins size={18} />
+                <span className="font-black italic text-xl">
+                  {(profile.virtualMoney || 0).toLocaleString()} <span className="text-[10px] uppercase not-italic opacity-70">Coins</span>
+                </span>
               </div>
             </div>
 

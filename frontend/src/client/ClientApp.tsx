@@ -4,6 +4,7 @@ import HallDiscovery from "./HallDiscovery";
 import HallDetails from "./HallDetails";
 import RankingPage from "./RankingPage";
 import ProfilePage from "./ProfilePage";
+import RewardsPage from "./RewardsPage";
 import PlayerMatchesPage from "./PlayerMatchesPage";
 import PlayerTournamentsPage from "./PlayerTournamentsPage";
 import { User as UserIcon, LogIn, LogOut, Menu, X, Trophy } from "lucide-react";
@@ -41,6 +42,7 @@ const ClientApp = () => {
               <NavLink to="/matches">Matches</NavLink>
               <NavLink to="/tournaments">Tournaments</NavLink>
               <NavLink to="/ranking">Ranking</NavLink>
+              <NavLink to="/rewards">Rewards</NavLink>
             </div>
 
             {/* Desktop User Area */}
@@ -91,6 +93,12 @@ const ClientApp = () => {
             >
               Ranking
             </MobileNavLink>
+            <MobileNavLink
+              to="/rewards"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Rewards
+            </MobileNavLink>
             {user ? (
               <div className="pt-2 border-t border-white/10">
                 <div className="flex items-center gap-3 mb-3">
@@ -138,6 +146,7 @@ const ClientApp = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:userId" element={<ProfilePage />} />
           <Route path="/ranking" element={<RankingPage />} />
+          <Route path="/rewards" element={<RewardsPage />} />
           <Route
             path="/tournaments"
             element={<PlayerTournamentsPage />}

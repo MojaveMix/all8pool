@@ -11,6 +11,7 @@ import {
   Plus,
   Search,
   Play,
+  Mail,
 } from "lucide-react";
 import {
   format,
@@ -24,15 +25,17 @@ import {
 interface Booking {
   id: string;
   player1Name: string;
+  player1Email: string | null;
   player2Id: string | null;
   player2Name: string | null;
+  player2Email: string | null;
   table: { number: number; id: string };
   startTime: string;
   endTime: string;
   status: "pending" | "confirmed" | "cancelled" | "completed";
   totalPrice: string;
-  user: { name: string } | null;
-  player2: { name: string } | null;
+  user: { id: string, name: string; email: string } | null;
+  player2: { id: string, name: string; email: string } | null;
 }
 
 const BookingsPage = () => {
@@ -49,7 +52,7 @@ const BookingsPage = () => {
   } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [guestName, setGuestName] = useState("");
+  const [guestData, setGuestData] = useState({ name: "", email: "" });
   const [tables, setTables] = useState<any[]>([]);
   const [newBookingData, setNewBookingData] = useState({
     tableId: "",
@@ -58,8 +61,10 @@ const BookingsPage = () => {
     duration: 1,
     player1Id: null as string | null,
     player1Name: "",
+    player1Email: "",
     player2Id: null as string | null,
     player2Name: "",
+    player2Email: "",
   });
 
   useEffect(() => {
@@ -105,18 +110,19 @@ const BookingsPage = () => {
     }
   };
 
-  const assignPlayer = async (userId: string | null, name: string) => {
+  const assignPlayer = async (userId: string | null, name: string, email?: string) => {
     if (!showPlayerModal) return;
     try {
       await api.patch(`/bookings/${showPlayerModal.bookingId}/assign-player`, {
         playerIndex: showPlayerModal.playerIndex,
         userId,
         name,
+        email
       });
       setShowPlayerModal(null);
       setSearchQuery("");
       setSearchResults([]);
-      setGuestName("");
+      setGuestData({ name: "", email: "" });
       fetchBookings();
     } catch (err: any) {
       alert(err.response?.data?.message || "Failed to assign player");
@@ -131,8 +137,10 @@ const BookingsPage = () => {
         poolHallId: hallId,
         player1Id: booking.user?.id || null,
         player1Name: booking.player1Name,
+        player1Email: booking.player1Email || booking.user?.email,
         player2Id: booking.player2?.id || booking.player2Id,
         player2Name: booking.player2Name,
+        player2Email: booking.player2Email || booking.player2?.email,
         bookingId: booking.id,
       });
 
@@ -161,10 +169,12 @@ const BookingsPage = () => {
         tableId: newBookingData.tableId,
         startTime,
         endTime,
-        userId: newBookingData.player1Id,
+        player1Id: newBookingData.player1Id,
         player1Name: newBookingData.player1Name,
+        player1Email: newBookingData.player1Email,
         player2Id: newBookingData.player2Id,
         player2Name: newBookingData.player2Name,
+        player2Email: newBookingData.player2Email,
       });
 
       setShowNewBookingModal(false);
@@ -462,22 +472,36 @@ const BookingsPage = () => {
                 </div>
                 <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
                   <span className="bg-secondary px-4 text-gray-500">
-                    OR DYNAMIC GUEST
+                    OR VERIFIED GUEST
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
-                  Guest Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter full name"
-                  className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                    Guest Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter full name"
+                    className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
+                    value={guestData.name}
+                    onChange={(e) => setGuestData({ ...guestData, name: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                    Guest Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Enter email for verification"
+                    className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
+                    value={guestData.email}
+                    onChange={(e) => setGuestData({ ...guestData, email: e.target.value })}
+                  />
+                </div>
               </div>
 
               <div className="flex gap-4 pt-4">
@@ -488,8 +512,8 @@ const BookingsPage = () => {
                   Cancel
                 </button>
                 <button
-                  disabled={!guestName}
-                  onClick={() => assignPlayer(null, guestName)}
+                  disabled={!guestData.name || !guestData.email}
+                  onClick={() => assignPlayer(null, guestData.name, guestData.email)}
                   className="flex-1 bg-accent text-primary font-black py-4 rounded-2xl shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:hover:scale-100"
                 >
                   SET GUEST
@@ -617,6 +641,7 @@ const BookingsPage = () => {
                                 ...newBookingData,
                                 player1Id: user.id,
                                 player1Name: user.name,
+                                player1Email: user.email,
                               });
                               setSearchQuery("");
                               setSearchResults([]);
@@ -632,11 +657,11 @@ const BookingsPage = () => {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-2">
                     <input
                       type="text"
                       placeholder="Or enter Guest Name"
-                      className="flex-1 bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
+                      className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
                       value={
                         newBookingData.player1Id
                           ? ""
@@ -650,8 +675,17 @@ const BookingsPage = () => {
                         })
                       }
                     />
+                    {!newBookingData.player1Id && (
+                       <input
+                         type="email"
+                         placeholder="Guest Email"
+                         className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
+                         value={newBookingData.player1Email}
+                         onChange={(e) => setNewBookingData({ ...newBookingData, player1Email: e.target.value })}
+                       />
+                    )}
                     {newBookingData.player1Name && (
-                      <div className="bg-accent/10 text-accent px-4 py-2 rounded-xl text-[10px] font-black uppercase italic">
+                      <div className="bg-accent/10 text-accent px-4 py-2 rounded-xl text-[10px] font-black uppercase italic w-fit">
                         {newBookingData.player1Id
                           ? "Selected Account"
                           : "Guest Mode"}
@@ -697,6 +731,7 @@ const BookingsPage = () => {
                                 ...newBookingData,
                                 player2Id: user.id,
                                 player2Name: user.name,
+                                player2Email: user.email,
                               });
                               setSearchQuery("");
                               setSearchResults([]);
@@ -712,11 +747,11 @@ const BookingsPage = () => {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-2">
                     <input
                       type="text"
                       placeholder="Or enter Opponent Name"
-                      className="flex-1 bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
+                      className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
                       value={
                         newBookingData.player2Id
                           ? ""
@@ -730,8 +765,17 @@ const BookingsPage = () => {
                         })
                       }
                     />
+                    {!newBookingData.player2Id && (
+                       <input
+                         type="email"
+                         placeholder="Opponent Email"
+                         className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
+                         value={newBookingData.player2Email}
+                         onChange={(e) => setNewBookingData({ ...newBookingData, player2Email: e.target.value })}
+                       />
+                    )}
                     {newBookingData.player2Name && (
-                      <div className="bg-accent/10 text-accent px-4 py-2 rounded-xl text-[10px] font-black uppercase italic">
+                      <div className="bg-accent/10 text-accent px-4 py-2 rounded-xl text-[10px] font-black uppercase italic w-fit">
                         {newBookingData.player2Id
                           ? "Selected Account"
                           : "Guest Mode"}

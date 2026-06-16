@@ -39,6 +39,7 @@ app.use('/api/tables', require('./api/routes/tableRoutes'));
 app.use('/api/bookings', require('./api/routes/bookingRoutes'));
 app.use('/api/matches', require('./api/routes/matchRoutes'));
 app.use('/api/dashboard', require('./api/routes/dashboardRoutes'));
+app.use('/api/rewards', require('./api/routes/rewardRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {
