@@ -4,14 +4,12 @@ import api from "../api";
 import {
   Calendar as CalendarIcon,
   X,
-  Table as TableIcon,
   ChevronLeft,
   ChevronRight,
   Filter,
   Plus,
   Search,
   Play,
-  Mail,
 } from "lucide-react";
 import {
   format,

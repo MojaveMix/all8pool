@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 
 const SettingsPage = () => {
-  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('general');
 
   return (

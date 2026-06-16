@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import api from '../api';
 import { 
   DollarSign, 
   TrendingUp, 
   ArrowUpRight, 
   ArrowDownRight, 
-  Calendar,
   Filter,
   Download,
   Table as TableIcon
 } from 'lucide-react';
 import { 
-  BarChart, 
   XAxis, 
   YAxis, 
   CartesianGrid, 

@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import api from '../api';
 import { 
   Users, 
   Search, 
   Filter, 
-  MoreHorizontal, 
   Eye, 
   Ban, 
   Tag, 

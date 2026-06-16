@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   BarChart3, 
   TrendingUp, 
-  Calendar, 
-  Table as TableIcon, 
   Users, 
   Clock, 
   Download,
@@ -21,11 +19,7 @@ import {
   ResponsiveContainer, 
   AreaChart, 
   Area,
-  LineChart,
-  Line,
-  Cell,
-  PieChart,
-  Pie
+  Cell
 } from 'recharts';
 import LoadingSpinner from '../shared/LoadingSpinner';
 
