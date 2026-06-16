@@ -1,21 +1,29 @@
 import React, { useState } from "react";
 import { useAuth } from "../store/AuthContext";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await login(email, password);
-      navigate("/");
+      // Get the stored user to check role (AuthContext sets it in localStorage)
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      if (storedUser.role === 'owner' || storedUser.role === 'admin') {
+        navigate('/backoffice');
+      } else {
+        navigate('/arena');
+      }
     } catch (error) {
       console.error(error);
-      alert("Login failed");
+      alert(t('auth.failed'));
     }
   };
 
@@ -42,28 +50,27 @@ const Login = () => {
           </span>
           <div className="absolute inset-0 rounded-full border border-white/10"></div>
         </div>
-
         <h2 className="text-4xl font-black text-center mb-8 bg-gradient-to-r from-emerald-400 via-green-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-lg">
           All 8 Pool
-          <span className="block text-2xl font-semibold text-gray-300 mt-1">
-            Welcome Back
+          <span className="block text-2xl font-semibold text-gray-300 mt-1 uppercase tracking-tight">
+            {t('auth.welcome')}
           </span>
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 text-left">
           <div>
             <label
               htmlFor="email"
-              className="block text-gray-200 font-medium mb-2 tracking-wide"
+              className="block text-gray-200 font-black text-[10px] uppercase tracking-widest mb-2 ml-1"
             >
-              Email Address
+              {t('auth.email')}
             </label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
+              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold"
               placeholder="your@email.com"
               required
             />
@@ -72,36 +79,36 @@ const Login = () => {
           <div>
             <label
               htmlFor="psswd"
-              className="block text-gray-200 font-medium mb-2 tracking-wide"
+              className="block text-gray-200 font-black text-[10px] uppercase tracking-widest mb-2 ml-1"
             >
-              Password
+              {t('auth.password')}
             </label>
             <input
               type="password"
               id="psswd"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
-              placeholder="Enter your password"
+              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold"
+              placeholder="••••••••"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-3.5 mt-6 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/30 transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+            className="w-full py-4 mt-6 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-black uppercase tracking-tighter rounded-xl shadow-lg hover:shadow-emerald-500/30 transform hover:scale-[1.02] transition-all duration-200 focus:outline-none"
           >
-            Login & Play
+            {t('auth.login_btn')}
           </button>
         </form>
 
-        <p className="text-center text-gray-400 text-sm mt-6">
-          🎱 Rack 'em up! Ready to break?{" "}
+        <p className="text-center text-gray-400 text-[10px] font-black uppercase tracking-widest mt-8">
+          {t('auth.no_account')}{" "}
           <Link
             to="/register"
-            className="underline text-emerald-400 hover:text-emerald-300 transition"
+            className="text-emerald-400 hover:text-emerald-300 transition underline decoration-2 underline-offset-4"
           >
-            Sign up
+            {t('auth.signup')}
           </Link>
         </p>
       </div>

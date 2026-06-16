@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../store/AuthContext";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
@@ -8,16 +9,17 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("player");
   const { register } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await register(name, email, password, role);
-      navigate("/");
+      navigate("/arena");
     } catch (error) {
       console.error(error);
-      // alert("Registration failed");
+      alert(t('auth.failed'));
     }
   };
 
@@ -32,7 +34,6 @@ const Register = () => {
 
       {/* Main Card */}
       <div className="relative z-10 w-full max-w-md p-8 mx-4 backdrop-blur-xl bg-gray-800/40 rounded-2xl shadow-2xl border border-gray-600/30 transition-all duration-500 hover:shadow-emerald-500/20 hover:border-emerald-500/30">
-        {/* 8-Ball Decorative Element */}
         {/* Custom Pool Ball (Solid 8-Ball with float animation) */}
         <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-gradient-to-br from-gray-900 via-black to-gray-800 shadow-2xl flex items-center justify-center border-2 border-gray-600 animate-float">
           <div className="absolute top-1.5 left-2 w-6 h-6 bg-white/40 rounded-full blur-[1px]"></div>
@@ -46,84 +47,71 @@ const Register = () => {
           <div className="absolute inset-0 rounded-full border border-white/10"></div>
         </div>
 
-        <h2 className="text-4xl font-black text-center mb-8 bg-gradient-to-r from-emerald-400 via-green-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-lg">
+        <h2 className="text-4xl font-black text-center mb-8 bg-gradient-to-r from-emerald-400 via-green-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-lg uppercase tracking-tight">
           All 8 Pool
           <span className="block text-2xl font-semibold text-gray-300 mt-1">
-            Join the Game
+            {t('auth.join')}
           </span>
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 text-left">
           <div>
-            <label className="block text-gray-200 font-medium mb-2 tracking-wide">
-              Player Name
+            <label className="block text-gray-200 font-black text-[10px] uppercase tracking-widest mb-2 ml-1">
+              {t('auth.name')}
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
+              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold"
               placeholder="Enter your name"
               required
             />
           </div>
 
           <div>
-            <label className="block text-gray-200 font-medium mb-2 tracking-wide">
-              Email Address
+            <label className="block text-gray-200 font-black text-[10px] uppercase tracking-widest mb-2 ml-1">
+              {t('auth.email')}
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
+              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold"
               placeholder="your@email.com"
               required
             />
           </div>
 
           <div>
-            <label className="block text-gray-200 font-medium mb-2 tracking-wide">
-              Password
+            <label className="block text-gray-200 font-black text-[10px] uppercase tracking-widest mb-2 ml-1">
+              {t('auth.password')}
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200"
-              placeholder="Create a strong password"
+              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold"
+              placeholder="••••••••"
               required
             />
           </div>
 
-          {/* Role selection is kept commented as in original */}
-          {/* <div>
-            <label className="block text-gray-200 font-medium mb-2">Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
-            >
-              <option value="player">Player</option>
-              <option value="owner">Pool Hall Owner</option>
-            </select>
-          </div> */}
-
           <button
             type="submit"
-            className="w-full py-3.5 mt-6 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/30 transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+            className="w-full py-4 mt-6 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-black uppercase tracking-tighter rounded-xl shadow-lg hover:shadow-emerald-500/30 transform hover:scale-[1.02] transition-all duration-200 focus:outline-none"
           >
-            Register & Play
+            {t('auth.register_btn')}
           </button>
         </form>
 
-        <p className="text-center text-gray-400 text-sm mt-6">
-          🎱 Rack 'em up! Ready to break?{" "}
+        <p className="text-center text-gray-400 text-[10px] font-black uppercase tracking-widest mt-8">
+          🎱 {t('auth.have_account')}{" "}
           <Link
             to="/login"
-            className="underline text-emerald-400 hover:text-emerald-300 transition"
+            className="text-emerald-400 hover:text-emerald-300 transition underline decoration-2 underline-offset-4"
           >
-            Sign in
+            {t('nav.login')}
           </Link>
         </p>
       </div>

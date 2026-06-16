@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
+import { useTranslation } from 'react-i18next';
 import { Search, MapPin, Calendar, Users, Trophy, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +18,7 @@ const HallDiscovery = () => {
   const [halls, setHalls] = useState<PoolHall[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchHalls();
@@ -42,12 +44,12 @@ const HallDiscovery = () => {
       <section className="relative h-64 rounded-3xl overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-r from-accent/20 to-primary z-0" />
         <div className="relative z-10 text-center space-y-4">
-          <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase">DISCOVER THE BEST TABLES.</h2>
+          <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase">{t('arena.discovery_title')}</h2>
           <div className="relative max-w-xl mx-auto px-4">
             <Search className="absolute left-8 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
             <input 
               type="text"
-              placeholder="Search by hall name or city..."
+              placeholder={t('arena.search_placeholder')}
               className="w-full pl-12 pr-4 py-4 bg-secondary border border-gray-800 rounded-2xl focus:border-accent outline-none text-white shadow-2xl font-bold"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -89,7 +91,7 @@ const HallDiscovery = () => {
               
               <div className="flex items-center gap-6">
                 <div className="space-y-1">
-                   <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Available</p>
+                   <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t('common.available')}</p>
                    <div className="flex items-center gap-1.5">
                      <div className="w-2 h-2 bg-success rounded-full animate-pulse shadow-[0_0_10px_rgba(0,255,136,0.5)]" />
                      <span className="text-white font-black italic">{hall.tables?.length || 0} Tables</span>
@@ -106,11 +108,11 @@ const HallDiscovery = () => {
               
               <div className="flex items-center justify-between pt-6 border-t border-gray-800/50">
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Starting from</span>
+                  <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{t('arena.starting_from')}</span>
                   <span className="text-xl font-black text-white italic">$12<span className="text-xs text-gray-600">/hr</span></span>
                 </div>
                 <button className="bg-accent text-primary px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-110 transition-all shadow-lg shadow-accent/20">
-                  BOOK NOW
+                  {t('arena.book_now')}
                 </button>
               </div>
             </div>

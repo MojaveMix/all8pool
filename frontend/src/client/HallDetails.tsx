@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../store/AuthContext";
-import { MapPin, Clock, Circle, ArrowLeft, CheckCircle, Users, User, Search, Plus, Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { MapPin, Clock, Circle, ArrowLeft, CheckCircle, Users, User, Search, Plus, Mail, X as XIcon } from "lucide-react";
 
 interface Table {
   id: string;
@@ -28,6 +29,7 @@ interface Hall {
 const HallDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [hall, setHall] = useState<Hall | null>(null);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [bookingStatus, setBookingStatus] = useState<
@@ -101,20 +103,20 @@ const HallDetails = () => {
     // Simple validation
     const start = new Date(`${bookingDate}T${bookingTime}`);
     if (isNaN(start.getTime())) {
-      alert('Invalid date or time.');
+      alert(t('common.error'));
       return;
     }
     if (start < new Date()) {
-      alert('Cannot book in the past.');
+      alert(t('common.error'));
       return;
     }
 
     if (opponentType === 'guest' && (!guestData.name || !guestData.email)) {
-      alert('Please provide guest name and email for verification.');
+      alert(t('common.error'));
       return;
     }
     if (opponentType === 'account' && !selectedOpponent) {
-      alert('Please select an opponent from the platform.');
+      alert(t('common.error'));
       return;
     }
 
@@ -141,7 +143,7 @@ const HallDetails = () => {
         setGuestData({ name: '', email: '' });
       }, 3000);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Booking failed. The table might have been taken.');
+      alert(err.response?.data?.message || t('common.error'));
       setBookingStatus('idle');
     }
   };
@@ -161,15 +163,15 @@ const HallDetails = () => {
   };
 
   if (!hall)
-    return <div className="text-center py-20 font-black italic animate-pulse text-accent">LOADING ARENA DETAILS...</div>;
+    return <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">{t('common.loading')}</div>;
 
   return (
     <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in duration-700">
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/arena")}
         className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors uppercase font-black text-[10px] tracking-widest"
       >
-        <ArrowLeft size={16} /> Back to Discovery
+        <ArrowLeft size={16} /> {t('hall.back_discovery')}
       </button>
 
       {/* Hall Hero Header */}
@@ -192,14 +194,14 @@ const HallDetails = () => {
         </div>
         <div className="text-right relative">
           <p className="text-gray-500 uppercase font-black text-[10px] tracking-[0.3em] mb-2">
-            Arena Status
+            {t('hall.arena_status')}
           </p>
           <div className="text-5xl font-black text-white italic">
             {hall.tables?.filter((t) => t.status === "available").length} /{" "}
             {hall.tables?.length}
           </div>
           <p className="text-accent text-xs font-black uppercase tracking-widest mt-2">
-            Tables Ready for Play
+            {t('arena.tables_ready')}
           </p>
         </div>
       </div>
@@ -212,7 +214,7 @@ const HallDetails = () => {
               size={14}
               className="fill-accent text-accent animate-pulse"
             />{" "}
-            Open Challenges
+            {t('hall.open_challenges')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {matches
@@ -225,10 +227,10 @@ const HallDetails = () => {
                   <div>
                     <div className="flex justify-between items-start mb-6">
                       <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                        Table #{match.table?.number}
+                        {t('hall.table_unit')} #{match.table?.number}
                       </span>
                       <div className="flex items-center gap-1.5 bg-accent/10 text-accent px-3 py-1 rounded-lg text-[10px] font-black uppercase italic">
-                        <Users size={12} /> Live Call
+                        <Users size={12} /> {t('hall.live_call')}
                       </div>
                     </div>
                     <div className="flex items-center gap-4 mb-8">
@@ -240,7 +242,7 @@ const HallDetails = () => {
                           {match.player1?.name || match.player1Name}
                         </p>
                         <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                          Awaiting Challenger
+                          {t('hall.awaiting_challenger')}
                         </p>
                       </div>
                     </div>
@@ -250,7 +252,7 @@ const HallDetails = () => {
                       onClick={() => handleJoinMatch(match.id)}
                       className="w-full bg-accent text-primary py-4 rounded-2xl text-sm font-black uppercase tracking-tighter hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-accent/20"
                     >
-                      Accept Challenge
+                      {t('arena.accept_challenge')}
                     </button>
                   )}
                 </div>
@@ -295,7 +297,7 @@ const HallDetails = () => {
                       : "bg-red-500/10 text-red-500 border border-red-500/20"
                   }`}
                 >
-                  {table.status}
+                  {t(`common.${table.status}`)}
                 </div>
               </div>
 
@@ -322,20 +324,20 @@ const HallDetails = () => {
 
         {/* Booking Sidebar */}
         <div className="bg-secondary/40 rounded-[3rem] p-10 border border-white/10 h-fit sticky top-28 shadow-2xl">
-          <h3 className="text-2xl font-black italic text-white uppercase tracking-tight mb-8">Reservation Info</h3>
+          <h3 className="text-2xl font-black italic text-white uppercase tracking-tight mb-8">{t('hall.reservation_info')}</h3>
 
           {selectedTable ? (
             <div className="space-y-8">
               <div className="flex justify-between items-center bg-primary p-6 rounded-[2rem] border border-white/5">
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">
-                    Table Unit
+                    {t('hall.table_unit')}
                   </p>
                   <p className="text-3xl font-black italic text-white">#{selectedTable.number}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">
-                    Match Rate
+                    {t('hall.match_rate')}
                   </p>
                   <p className="text-accent font-black text-xl italic">
                     ${selectedTable.pricePerHour}/hr
@@ -346,7 +348,7 @@ const HallDetails = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">Event Date</label>
+                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">{t('hall.event_date')}</label>
                     <input 
                       type="date" 
                       value={bookingDate}
@@ -355,7 +357,7 @@ const HallDetails = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">Break Time</label>
+                    <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">{t('hall.break_time')}</label>
                     <input 
                       type="time" 
                       value={bookingTime}
@@ -366,7 +368,7 @@ const HallDetails = () => {
                 </div>
 
                 <div>
-                  <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">Session Duration</label>
+                  <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">{t('hall.session_duration')}</label>
                   <select 
                     value={duration}
                     onChange={(e) => setDuration(Number(e.target.value))}
@@ -379,14 +381,14 @@ const HallDetails = () => {
                 </div>
 
                 {/* Opponent Selection UI */}
-                <div className="pt-6 border-t border-white/5 space-y-6">
+                <div className="pt-6 border-t border-white/5 space-y-6 text-left">
                    <div>
-                      <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-4 block ml-1">Opponent Preference</label>
+                      <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-4 block ml-1">{t('hall.opponent_pref')}</label>
                       <div className="grid grid-cols-3 gap-2">
                          {[
-                           { id: 'open', label: 'Open Call', icon: <Users size={14}/> },
-                           { id: 'account', label: 'Platform', icon: <User size={14}/> },
-                           { id: 'guest', label: 'Verified Guest', icon: <Mail size={14}/> }
+                           { id: 'open', label: t('hall.opponent_types.open'), icon: <Users size={14}/> },
+                           { id: 'account', label: t('hall.opponent_types.platform'), icon: <User size={14}/> },
+                           { id: 'guest', label: t('hall.opponent_types.guest'), icon: <Mail size={14}/> }
                          ].map(opt => (
                            <button
                              key={opt.id}
@@ -406,7 +408,7 @@ const HallDetails = () => {
                           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                           <input 
                             type="text" 
-                            placeholder="Search player name..."
+                            placeholder={t('hall.search_player')}
                             value={searchQuery}
                             onChange={(e) => handleSearchUsers(e.target.value)}
                             className="w-full bg-primary border border-white/10 pl-12 pr-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
@@ -415,7 +417,7 @@ const HallDetails = () => {
                         {selectedOpponent && (
                            <div className="bg-accent/10 p-3 rounded-xl border border-accent/20 flex justify-between items-center">
                               <span className="text-xs font-black text-accent uppercase">{selectedOpponent.name}</span>
-                              <button onClick={() => setSelectedOpponent(null)} className="text-accent hover:text-white"><X size={14}/></button>
+                              <button onClick={() => setSelectedOpponent(null)} className="text-accent hover:text-white"><XIcon size={14}/></button>
                            </div>
                         )}
                         {searchQuery && searchResults.length > 0 && !selectedOpponent && (
@@ -441,45 +443,45 @@ const HallDetails = () => {
                      <div className="space-y-3 animate-in slide-in-from-top-2">
                         <input 
                           type="text" 
-                          placeholder="Guest Full Name"
+                          placeholder={t('hall.guest_name')}
                           value={guestData.name}
                           onChange={(e) => setGuestData({ ...guestData, name: e.target.value })}
                           className="w-full bg-primary border border-white/10 px-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
                         />
                         <input 
                           type="email" 
-                          placeholder="Verification Email"
+                          placeholder={t('hall.guest_email')}
                           value={guestData.email}
                           onChange={(e) => setGuestData({ ...guestData, email: e.target.value })}
                           className="w-full bg-primary border border-white/10 px-4 py-3 rounded-xl text-xs text-white font-bold outline-none focus:border-accent"
                         />
-                        <p className="text-[9px] text-gray-600 font-bold uppercase text-center">Guest will receive a verification link</p>
+                        <p className="text-[9px] text-gray-600 font-bold uppercase text-center">{t('hall.guest_note')}</p>
                      </div>
                    )}
 
                    {opponentType === 'open' && (
                      <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10 text-center animate-in fade-in">
-                        <p className="text-[10px] text-accent font-black uppercase tracking-widest">Broadcast Open Challenge</p>
-                        <p className="text-[9px] text-gray-500 mt-1">Other players in the arena can join your match.</p>
+                        <p className="text-[10px] text-accent font-black uppercase tracking-widest">{t('hall.broadcast_note')}</p>
+                        <p className="text-[9px] text-gray-500 mt-1">{t('hall.broadcast_desc')}</p>
                      </div>
                    )}
                 </div>
 
-                <div className="pt-6 border-t border-white/10 space-y-3">
+                <div className="pt-6 border-t border-white/10 space-y-3 text-left">
                   <div className="flex justify-between items-center">
-                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">Session Subtotal</p>
+                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">{t('hall.subtotal')}</p>
                     <p className="text-white font-black text-2xl italic tabular-nums">${selectedTable.pricePerHour * duration}</p>
                   </div>
                   {hall.promotionType !== 'none' && (
                     <div className="flex justify-between items-center text-accent animate-pulse">
-                      <p className="text-[10px] font-black uppercase tracking-widest">Member Reward: {hall.promotionType === 'free' ? 'FREE MATCH' : `${hall.promotionValue}% OFF`}</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest">{t('hall.member_reward')}: {hall.promotionType === 'free' ? 'FREE MATCH' : `${hall.promotionValue}% OFF`}</p>
                       <p className="text-sm font-black italic">
                         -{hall.promotionType === 'free' ? `$${selectedTable.pricePerHour * duration}` : `$${(selectedTable.pricePerHour * duration * hall.promotionValue) / 100}`}
                       </p>
                     </div>
                   )}
                   <div className="flex justify-between items-center pt-4 border-t border-white/5">
-                    <p className="text-xs text-white font-black uppercase tracking-[0.3em]">Final Price</p>
+                    <p className="text-xs text-white font-black uppercase tracking-[0.3em]">{t('hall.final_price')}</p>
                     <p className="text-accent font-black text-4xl italic tabular-nums">${calculateTotalPrice()}</p>
                   </div>
                 </div>
@@ -487,7 +489,7 @@ const HallDetails = () => {
 
               {bookingStatus === "success" ? (
                 <div className="bg-emerald-500/10 text-emerald-500 p-6 rounded-[2rem] flex items-center gap-4 font-black uppercase tracking-widest text-xs border border-emerald-500/20 shadow-lg shadow-emerald-500/10 animate-in zoom-in-95">
-                  <CheckCircle size={24} /> Arena Secured!
+                  <CheckCircle size={24} /> {t('hall.secured')}
                 </div>
               ) : (
                 <button
@@ -496,13 +498,13 @@ const HallDetails = () => {
                   className="w-full bg-accent text-primary py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm italic hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-accent/20 disabled:opacity-50"
                 >
                   {bookingStatus === "loading"
-                    ? "Securing Arena..."
-                    : "Confirm Match Session"}
+                    ? t('hall.securing')
+                    : t('hall.confirm_btn')}
                 </button>
               )}
 
-              <p className="text-[9px] text-gray-600 text-center uppercase font-black tracking-[0.4em] leading-relaxed">
-                Payment processed at the Pool Hall reception upon arrival
+              <p className="text-[9px] text-gray-600 text-center uppercase font-black tracking-[0.4em] leading-relaxed mt-4">
+                {t('hall.payment_note')}
               </p>
             </div>
           ) : (
@@ -520,9 +522,5 @@ const HallDetails = () => {
     </div>
   );
 };
-
-const X = ({ size }: { size: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-);
 
 export default HallDetails;

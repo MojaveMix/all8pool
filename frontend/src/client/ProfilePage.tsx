@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../store/AuthContext";
+import { useTranslation } from "react-i18next";
 import api from "../api";
 import {
   User as UserIcon,
@@ -30,7 +31,8 @@ interface UserProfile {
 
 const ProfilePage = () => {
   const { userId } = useParams();
-  const { user: authUser } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     // Wait for auth to initialize before deciding if it's own profile
-    if (!userId && !authUser && loading) return; 
+    if (!userId && !authUser && authLoading) return; 
     
     if (userId === "undefined" || userId === "null") {
       console.error("Invalid user ID provided");
@@ -47,7 +49,7 @@ const ProfilePage = () => {
       return;
     }
     fetchProfile();
-  }, [userId, authUser, loading]);
+  }, [userId, authUser, authLoading]);
 
   const fetchProfile = async () => {
     try {
@@ -88,12 +90,12 @@ const ProfilePage = () => {
 
   if (loading)
     return (
-      <div className="text-center py-20 font-black italic animate-pulse text-accent">
-        LOADING PROFILE...
+      <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">
+        {t('profile.loading')}
       </div>
     );
   if (!profile)
-    return <div className="text-center py-20">Profile not found.</div>;
+    return <div className="text-center py-20 font-black uppercase tracking-widest text-gray-500">{t('profile.not_found')}</div>;
 
   const winRate =
     profile.wins + profile.losses > 0
@@ -107,7 +109,7 @@ const ProfilePage = () => {
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors uppercase font-black text-[10px] tracking-widest"
         >
-          <ArrowLeft size={16} /> Back to Arena
+          <ArrowLeft size={16} /> {t('profile.back')}
         </button>
       )}
 
@@ -144,16 +146,16 @@ const ProfilePage = () => {
               <div className="bg-accent/10 text-accent px-4 py-2 rounded-xl border border-accent/20 flex items-center gap-2">
                 <Trophy size={18} />
                 <span className="font-black italic text-xl">
-                  RANK #{profile.rank}
+                  {t('profile.rank')} #{profile.rank}
                 </span>
               </div>
               <div className="bg-white/5 text-white px-4 py-2 rounded-xl border border-white/10 flex items-center gap-2 font-black uppercase text-sm italic">
-                {profile.wins} Wins / {profile.losses} Losses
+                {profile.wins} {t('profile.wins')} / {profile.losses} {t('profile.losses')}
               </div>
               <div className="bg-yellow-500/10 text-yellow-500 px-4 py-2 rounded-xl border border-yellow-500/20 flex items-center gap-2">
                 <Coins size={18} />
                 <span className="font-black italic text-xl">
-                  {(profile.virtualMoney || 0).toLocaleString()} <span className="text-[10px] uppercase not-italic opacity-70">Coins</span>
+                  {(profile.virtualMoney || 0).toLocaleString()} <span className="text-[10px] uppercase not-italic opacity-70">{t('profile.coins')}</span>
                 </span>
               </div>
             </div>
@@ -172,13 +174,13 @@ const ProfilePage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard
           icon={<TrendingUp className="text-accent" />}
-          label="Win Rate"
+          label={t('profile.win_rate')}
           value={`${winRate}%`}
           subValue="Match Performance"
         />
         <StatCard
           icon={<Star className="text-yellow-400" />}
-          label="Mastery Score"
+          label={t('profile.mastery')}
           value={parseFloat(profile.rating.toString()).toFixed(1)}
           subValue="Out of 5.0"
         />
@@ -193,7 +195,7 @@ const ProfilePage = () => {
                 }
               />
             }
-            label="Payment Status"
+            label={t('profile.payment_status')}
             value={profile.unpaidCount || 0}
             subValue="Unpaid Penalties"
           />
@@ -212,7 +214,7 @@ const ProfilePage = () => {
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-2xl font-black italic uppercase text-white flex items-center gap-3">
             <Calendar className="text-accent" />
-            Match History
+            {t('profile.history')}
           </h3>
         </div>
         <div className="space-y-4">

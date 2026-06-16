@@ -1,0 +1,21 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Define the gradient for the circle -->
+  <defs>
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00D98E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00B876;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15" />
+    </filter>
+  </defs>
+  
+  <!-- Main circle (pool ball) with shadow -->
+  <circle cx="60" cy="60" r="55" fill="url(#greenGradient)" filter="url(#shadow)" />
+  
+  <!-- Inner white dot (highlight/ball center) -->
+  <circle cx="60" cy="60" r="18" fill="white" />
+  
+  <!-- Subtle gloss/shine effect -->
+  <ellipse cx="50" cy="45" rx="15" ry="12" fill="white" opacity="0.3" />
+</svg>

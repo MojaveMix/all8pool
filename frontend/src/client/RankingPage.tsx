@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
+import { useTranslation } from 'react-i18next';
 import { Trophy, Star, TrendingUp, Medal, Users, Coins } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -16,6 +17,7 @@ interface Player {
 const RankingPage = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchRankings();
@@ -48,7 +50,7 @@ const RankingPage = () => {
     );
   };
 
-  if (loading) return <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">Calculating legends...</div>;
+  if (loading) return <div className="text-center py-20 font-black italic animate-pulse text-accent uppercase tracking-widest">{t('common.loading')}</div>;
 
   const topThree = players.slice(0, 3);
   const rest = players.slice(3);
@@ -67,21 +69,21 @@ const RankingPage = () => {
           {/* Silver - 2nd */}
           {topThree[1] && (
             <div className="order-2 md:order-1 flex-1 max-w-[280px] w-full group">
-               <PodiumPosition player={topThree[1]} rank={2} color="text-slate-400" bgColor="bg-slate-400/10" height="h-48" stars={renderStars(topThree[1].rating, 16)} />
+               <PodiumPosition player={topThree[1]} rank={2} color="text-slate-400" bgColor="bg-slate-400/10" height="h-48" stars={renderStars(topThree[1].rating, 16)} t={t} />
             </div>
           )}
           
           {/* Gold - 1st */}
           {topThree[0] && (
             <div className="order-1 md:order-2 flex-1 max-w-[320px] w-full -translate-y-10 group">
-               <PodiumPosition player={topThree[0]} rank={1} color="text-accent" bgColor="bg-accent/10" height="h-64" stars={renderStars(topThree[0].rating, 24)} isGold />
+               <PodiumPosition player={topThree[0]} rank={1} color="text-accent" bgColor="bg-accent/10" height="h-64" stars={renderStars(topThree[0].rating, 24)} isGold t={t} />
             </div>
           )}
 
           {/* Bronze - 3rd */}
           {topThree[2] && (
             <div className="order-3 flex-1 max-w-[280px] w-full group">
-               <PodiumPosition player={topThree[2]} rank={3} color="text-amber-600" bgColor="bg-amber-600/10" height="h-40" stars={renderStars(topThree[2].rating, 14)} />
+               <PodiumPosition player={topThree[2]} rank={3} color="text-amber-600" bgColor="bg-amber-600/10" height="h-40" stars={renderStars(topThree[2].rating, 14)} t={t} />
             </div>
           )}
         </div>
@@ -110,18 +112,18 @@ const RankingPage = () => {
 
               <div className="hidden md:flex gap-10 text-right pr-4">
                  <div className="space-y-1 text-yellow-500">
-                    <p className="text-[8px] font-black uppercase tracking-widest">Fortune</p>
+                    <p className="text-[8px] font-black uppercase tracking-widest">{t('profile.coins')}</p>
                     <p className="text-xl font-black italic flex items-center justify-end gap-1">
                       <Coins size={14} /> {player.virtualMoney.toLocaleString()}
                     </p>
                  </div>
                  <div className="space-y-1">
-                    <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Mastery</p>
+                    <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t('profile.mastery')}</p>
                     <p className="text-xl font-black text-accent italic">{parseFloat(player.rating.toString()).toFixed(1)}</p>
                  </div>
                  <div className="space-y-1">
                     <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Palmares</p>
-                    <p className="text-xl font-black text-white italic">{player.wins} <span className="text-[10px] text-gray-600 uppercase not-italic">Wins</span></p>
+                    <p className="text-xl font-black text-white italic">{player.wins} <span className="text-[10px] text-gray-600 uppercase not-italic">{t('profile.wins')}</span></p>
                  </div>
               </div>
             </div>
@@ -139,7 +141,7 @@ const RankingPage = () => {
   );
 };
 
-const PodiumPosition = ({ player, rank, color, bgColor, height, stars, isGold }: any) => (
+const PodiumPosition = ({ player, rank, color, bgColor, height, stars, isGold, t }: any) => (
    <div className="flex flex-col items-center gap-6">
       <Link to={`/profile/${player.id}`} className="relative">
          <div className={`w-24 h-24 rounded-[2rem] border-4 border-white/10 overflow-hidden shadow-2xl relative z-10 ${isGold ? 'scale-125' : ''}`}>
@@ -159,14 +161,14 @@ const PodiumPosition = ({ player, rank, color, bgColor, height, stars, isGold }:
          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
          <span className={`text-6xl font-black italic ${color}`}>#{rank}</span>
          <div className="text-center relative z-10">
-            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">Fortune</p>
+            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">{t('profile.coins')}</p>
             <p className="text-xl font-black text-yellow-500 italic flex items-center justify-center gap-1">
               <Coins size={16} /> {player.virtualMoney.toLocaleString()}
             </p>
          </div>
          <div className="text-center relative z-10 pt-2 opacity-50">
             <p className="text-[8px] font-black text-gray-600 uppercase tracking-[0.3em]">Palmares</p>
-            <p className="text-sm font-black text-white italic">{player.wins} Wins</p>
+            <p className="text-sm font-black text-white italic">{player.wins} {t('profile.wins')}</p>
          </div>
       </div>
    </div>

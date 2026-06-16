@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { useAuth } from '../store/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { Activity, Trophy, Clock, Users, Circle, Search, MapPin, Star, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -21,6 +22,7 @@ interface Match {
 
 const PlayerMatchesPage = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'live' | 'finished'>('live');
@@ -61,10 +63,10 @@ const PlayerMatchesPage = () => {
         <div>
           <h2 className="text-4xl font-black italic tracking-tighter uppercase flex items-center gap-4">
             <Activity className="text-accent animate-pulse" size={40} />
-            The Global Arena
+            {t('arena.title')}
           </h2>
           <p className="text-gray-500 font-bold uppercase tracking-widest text-xs mt-2">
-            Track live matches and accept open challenges
+            {t('arena.subtitle')}
           </p>
         </div>
 
@@ -73,19 +75,19 @@ const PlayerMatchesPage = () => {
             onClick={() => setFilter('live')}
             className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${filter === 'live' ? 'bg-accent text-primary shadow-lg shadow-accent/20' : 'text-gray-500 hover:text-white'}`}
           >
-            Live Arena
+            {t('arena.live')}
           </button>
           <button 
             onClick={() => setFilter('finished')}
             className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${filter === 'finished' ? 'bg-accent text-primary shadow-lg shadow-accent/20' : 'text-gray-500 hover:text-white'}`}
           >
-            Match History
+            {t('arena.history')}
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-20 text-accent font-black italic animate-pulse tracking-widest uppercase">Synchronizing Arena Data...</div>
+        <div className="text-center py-20 text-accent font-black italic animate-pulse tracking-widest uppercase">{t('common.loading')}</div>
       ) : matches.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {matches.map((match) => (
@@ -94,26 +96,27 @@ const PlayerMatchesPage = () => {
               match={match} 
               onJoin={() => handleJoinMatch(match.id)}
               currentUser={user}
+              t={t}
             />
           ))}
         </div>
       ) : (
         <div className="text-center py-20 bg-secondary/50 rounded-[3rem] border border-dashed border-gray-800">
           <Users size={48} className="mx-auto text-gray-700 mb-4" />
-          <p className="text-gray-500 font-black uppercase tracking-widest">No active matches found in the arena</p>
+          <p className="text-gray-500 font-black uppercase tracking-widest">{t('arena.no_matches')}</p>
         </div>
       )}
     </div>
   );
 };
 
-const PlayerMatchCard = ({ match, onJoin, currentUser }: { match: Match, onJoin: () => void, currentUser: any }) => {
+const PlayerMatchCard = ({ match, onJoin, currentUser, t }: { match: Match, onJoin: () => void, currentUser: any, t: any }) => {
   const isLive = match.status === 'live';
   const isMatched = match.status === 'matched';
   const isOpen = match.status === 'open';
   
   const p1Name = match.player1?.name || match.player1Name || 'Guest 1';
-  const p2Name = match.player2?.name || match.player2Name || 'Awaiting Rival';
+  const p2Name = match.player2?.name || match.player2Name || t('arena.awaiting_rival', { defaultValue: 'Awaiting Rival' });
   
   const canJoin = isOpen && !match.player2 && currentUser?.role === 'player' && currentUser?.id !== match.player1?.id;
 
@@ -213,7 +216,7 @@ const PlayerMatchCard = ({ match, onJoin, currentUser }: { match: Match, onJoin:
                onClick={(e) => { e.preventDefault(); onJoin(); }}
                className="w-full bg-accent text-primary py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:scale-105 transition-all"
             >
-               ACCEPT CHALLENGE
+               {t('arena.accept_challenge')}
             </button>
          )}
 
