@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../api';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Star, TrendingUp, Medal, Users, Coins } from 'lucide-react';
+import { Trophy, Star, Medal, Users, Coins } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../shared/LoadingSpinner';
 

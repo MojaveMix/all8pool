@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../api';
 import { useAuth } from '../store/AuthContext';
 import { Gift, Coins, Coffee, Package, Tag, CheckCircle, AlertCircle, ShoppingBag } from 'lucide-react';
@@ -15,7 +15,7 @@ interface Reward {
 }
 
 const RewardsPage = () => {
-  const { user } = useAuth();
+  const { } = useAuth();
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
   const [userMoney, setUserMoney] = useState<number>(0);

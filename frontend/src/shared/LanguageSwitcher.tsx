@@ -1,6 +1,4 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe } from 'lucide-react';
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
