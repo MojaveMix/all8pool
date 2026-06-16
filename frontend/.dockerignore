@@ -8,5 +8,3 @@ dist
 build
 .vscode
 .eslint.config.js
-tsconfig*.json
-vite.config.ts
