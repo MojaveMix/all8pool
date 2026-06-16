@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../api';
 import { useTranslation } from 'react-i18next';
-import { Search, MapPin, Calendar, Users, Trophy, User as UserIcon } from 'lucide-react';
+import { Search, MapPin, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface PoolHall {

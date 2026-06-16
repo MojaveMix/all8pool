@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { Activity, Users, Trophy, Clock, ChevronRight, Plus, Minus, Square, Search, Check, Mail } from 'lucide-react';
+import { Activity, Users, Trophy, Clock, Plus, Minus, Square, Search, Mail } from 'lucide-react';
 
 interface Match {
   id: string;

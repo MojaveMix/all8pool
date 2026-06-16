@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../api';
 import { useAuth } from '../store/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Activity, Trophy, Clock, Users, Circle, Search, MapPin, Star, UserPlus } from 'lucide-react';
+import { Activity, Clock, Users, Circle, MapPin, Star, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../shared/LoadingSpinner';
 

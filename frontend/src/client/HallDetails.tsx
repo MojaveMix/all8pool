@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../store/AuthContext";
@@ -12,7 +12,6 @@ import {
   Users,
   User,
   Search,
-  Plus,
   Mail,
   X as XIcon,
 } from "lucide-react";

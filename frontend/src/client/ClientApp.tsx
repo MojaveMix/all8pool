@@ -15,7 +15,7 @@ import {
   TermsPage,
   PrivacyPage,
 } from "./info/InfoPages";
-import { User as UserIcon, LogIn, LogOut, Menu, X, Trophy } from "lucide-react";
+import { User as UserIcon, LogIn, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import LanguageSwitcher from "../shared/LanguageSwitcher";
 

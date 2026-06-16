@@ -1,12 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import api from '../api';
-import { Trophy, Users, Plus, ChevronRight, Play, Star } from 'lucide-react';
+import { useState } from 'react';
+import { Trophy, Users, Plus, ChevronRight, Star } from 'lucide-react';
 
 const TournamentsPage = () => {
-  const [searchParams] = useSearchParams();
-  const hallId = searchParams.get('hallId');
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState<any>(null);
 
   // Mock data for professional UI demonstration
@@ -24,7 +19,7 @@ const TournamentsPage = () => {
           TOURNAMENT ARENA
         </h2>
         <button 
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => {}}
           className="bg-accent text-primary px-6 py-3 rounded-2xl font-black uppercase tracking-tighter shadow-lg hover:scale-105 transition-transform flex items-center gap-2"
         >
           <Plus size={20} /> Create Tournament

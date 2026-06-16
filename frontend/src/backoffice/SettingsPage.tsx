@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Settings, 
@@ -13,7 +13,6 @@ import {
 
 const SettingsPage = () => {
   const [searchParams] = useSearchParams();
-  const hallId = searchParams.get('hallId');
   const [activeTab, setActiveTab] = useState('general');
 
   return (

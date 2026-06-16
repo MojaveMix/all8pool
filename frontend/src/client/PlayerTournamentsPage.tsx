@@ -1,5 +1,4 @@
-import React from 'react';
-import { Trophy, Users, Star, Calendar, ChevronRight, Medal } from 'lucide-react';
+import { Trophy, Users, Star, ChevronRight, Medal } from 'lucide-react';
 
 const PlayerTournamentsPage = () => {
   // Mock tournaments data for a high-end feel

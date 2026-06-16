@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { 
   Plus, 
-  Trash2, 
-  Circle, 
   Settings, 
   Play, 
   Square, 
   DollarSign, 
   LayoutGrid, 
   Edit3,
-  Search,
-  Users
+  Search
 } from 'lucide-react';
 
 interface Table {

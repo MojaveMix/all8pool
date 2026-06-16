@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { 
   BarChart, 
-  Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -29,7 +28,6 @@ import LoadingSpinner from '../shared/LoadingSpinner';
 
 const FinancePage = () => {
   const [searchParams] = useSearchParams();
-  const hallId = searchParams.get('hallId');
   const [loading, setLoading] = useState(true);
 
   // Mock data for professional UI demonstration
@@ -56,7 +54,7 @@ const FinancePage = () => {
   useEffect(() => {
     // Simulate loading
     setTimeout(() => setLoading(false), 1000);
-  }, [hallId]);
+  }, [searchParams]);
 
   if (loading) return <LoadingSpinner message="Analyzing Financial Data..." />;
 
@@ -141,7 +139,7 @@ const FinancePage = () => {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {tableIncomeData.map((entry, index) => (
+                  {tableIncomeData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
