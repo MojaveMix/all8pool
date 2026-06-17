@@ -21,14 +21,18 @@ const createBooking = async (req, res) => {
       return res.status(404).json({ message: 'Table not found' });
     }
 
+    // Convert string times to Date objects for accurate DB comparison
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
     // Check for double booking (overlapping slots)
     const existingBooking = await Booking.findOne({
       where: {
         tableId,
         status: { [Op.not]: 'cancelled' },
         [Op.and]: [
-          { startTime: { [Op.lt]: endTime } },
-          { endTime: { [Op.gt]: startTime } }
+          { startTime: { [Op.lt]: end } },
+          { endTime: { [Op.gt]: start } }
         ]
       }
     });
@@ -38,8 +42,6 @@ const createBooking = async (req, res) => {
     }
 
     // Calculate price
-    const start = new Date(startTime);
-    const end = new Date(endTime);
     const hours = (end - start) / (1000 * 60 * 60);
     let totalPrice = hours * table.pricePerHour;
     

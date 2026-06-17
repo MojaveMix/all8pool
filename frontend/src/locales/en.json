@@ -91,6 +91,9 @@
     "tables_ready": "Tables Ready for Play"
   },
   "hall": {
+    "tactical_view": "Tactical Arena View",
+    "my_reservations": "My Reservations",
+    "no_reservations": "You have no upcoming reservations here.",
     "back_discovery": "Back to Discovery",
     "arena_status": "Arena Status",
     "open_challenges": "Open Challenges",

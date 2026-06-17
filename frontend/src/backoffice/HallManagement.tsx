@@ -13,6 +13,7 @@ interface PoolHall {
   closingTime: string;
   promotionType: 'none' | 'percentage' | 'free';
   promotionValue: number;
+  currency: string;
 }
 
 const HallManagement = () => {
@@ -29,6 +30,7 @@ const HallManagement = () => {
     closingTime: '23:00',
     promotionType: 'none',
     promotionValue: 0,
+    currency: 'USD',
   });
 
   useEffect(() => {
@@ -55,6 +57,7 @@ const HallManagement = () => {
       closingTime: hall.closingTime,
       promotionType: hall.promotionType,
       promotionValue: hall.promotionValue,
+      currency: hall?.currency || 'USD',
     });
     setShowModal(true);
   };
@@ -93,6 +96,7 @@ const HallManagement = () => {
               closingTime: '23:00',
               promotionType: 'none',
               promotionValue: 0,
+              currency: 'USD',
             });
             setShowModal(true);
           }}
@@ -111,7 +115,10 @@ const HallManagement = () => {
                </div>
             )}
             
-            <h3 className="text-2xl font-black text-white italic tracking-tighter mb-6">{hall.name}</h3>
+            <div className="flex justify-between items-start mb-6">
+              <h3 className="text-2xl font-black text-white italic tracking-tighter">{hall.name}</h3>
+              <span className="bg-primary px-3 py-1 rounded-lg text-accent text-[10px] font-black border border-white/5 uppercase">{hall.currency || 'USD'}</span>
+            </div>
             
             <div className="space-y-4 text-gray-400">
               <div className="flex items-start gap-3">
@@ -163,6 +170,33 @@ const HallManagement = () => {
                   required
                 />
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Currency</label>
+                    <select
+                      className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
+                      value={formData.currency}
+                      onChange={(e) => setFormData({...formData, currency: e.target.value})}
+                      required
+                    >
+                       <option value="USD">USD ($)</option>
+                       <option value="MAD">MAD (DH)</option>
+                       <option value="EUR">EUR (€)</option>
+                       <option value="GBP">GBP (£)</option>
+                    </select>
+                 </div>
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Phone</label>
+                    <input
+                      placeholder="+33..."
+                      className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    />
+                 </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">City</label>
@@ -175,15 +209,24 @@ const HallManagement = () => {
                     />
                  </div>
                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Phone</label>
-                    <input
-                      placeholder="+33..."
-                      className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    />
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Opening - Closing</label>
+                    <div className="flex gap-2">
+                       <input 
+                          type="time" 
+                          className="w-full bg-primary border border-gray-800 p-2 rounded-xl text-white outline-none focus:border-accent font-bold text-xs"
+                          value={formData.openingTime}
+                          onChange={(e) => setFormData({...formData, openingTime: e.target.value})}
+                       />
+                       <input 
+                          type="time" 
+                          className="w-full bg-primary border border-gray-800 p-2 rounded-xl text-white outline-none focus:border-accent font-bold text-xs"
+                          value={formData.closingTime}
+                          onChange={(e) => setFormData({...formData, closingTime: e.target.value})}
+                       />
+                    </div>
                  </div>
               </div>
+              
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Full Address</label>
                 <input

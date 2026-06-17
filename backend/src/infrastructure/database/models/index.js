@@ -5,6 +5,7 @@ const Booking = require("./Booking");
 const Match = require("./Match");
 const Tournament = require("./Tournament");
 const Reward = require("./Reward");
+const OwnerRequest = require("./OwnerRequest");
 
 // User <-> PoolHall (Owner)
 User.hasMany(PoolHall, { foreignKey: "ownerId", as: "poolHalls" });
@@ -128,4 +129,5 @@ module.exports = {
   Match,
   Tournament,
   Reward,
+  OwnerRequest,
 };

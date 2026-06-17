@@ -55,6 +55,10 @@ const PoolHall = sequelize.define('PoolHall', {
     type: DataTypes.INTEGER, // e.g., 10, 50, 60
     defaultValue: 0,
   },
+  currency: {
+    type: DataTypes.STRING,
+    defaultValue: 'USD', // Default currency
+  },
 }, {
   timestamps: true,
 });

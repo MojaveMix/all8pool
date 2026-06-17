@@ -16,11 +16,11 @@ const server = http.createServer(app);
 connectDB();
 
 // Sync Database (In production, use migrations)
-if (process.env.NODE_ENV !== 'production') {
+// if (process.env.NODE_ENV !== 'production') {
   sequelize.sync({ alter: true }).then(() => {
     console.log('Database synced');
   });
-}
+// }
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -40,6 +40,7 @@ app.use('/api/bookings', require('./api/routes/bookingRoutes'));
 app.use('/api/matches', require('./api/routes/matchRoutes'));
 app.use('/api/dashboard', require('./api/routes/dashboardRoutes'));
 app.use('/api/rewards', require('./api/routes/rewardRoutes'));
+app.use('/api/owner-requests', require('./api/routes/ownerRequestRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

@@ -24,10 +24,11 @@ const TableManagement = () => {
   const [searchParams] = useSearchParams();
   const hallId = searchParams.get('hallId');
   const [tables, setTables] = useState<Table[]>([]);
+  const [hallCurrency, setHallCurrency] = useState('USD');
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     number: '',
-    type: '8-ball',
+    type: '8-ball' as '8-ball',
     pricePerHour: '12',
   });
 
@@ -51,7 +52,10 @@ const TableManagement = () => {
     try {
       const res = await api.get(`/pool-halls/my`);
       const hall = res.data.find((h: any) => h.id === hallId);
-      if (hall) setTables(hall.tables);
+      if (hall) {
+        setTables(hall.tables);
+        setHallCurrency(hall.currency || 'USD');
+      }
     } catch (err) {
       console.error(err);
     }
@@ -151,6 +155,7 @@ const TableManagement = () => {
           <ProfessionalTableCard 
             key={table.id} 
             table={table} 
+            currency={hallCurrency}
             onUpdateStatus={(status) => updateStatus(table.id, status)} 
             onStartMatch={() => setShowMatchModal(table)}
           />
@@ -185,13 +190,13 @@ const TableManagement = () => {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Hourly Rate ($)</label>
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Hourly Rate ({hallCurrency})</label>
                 <div className="relative">
-                   <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-xs">{hallCurrency}</div>
                    <input
                     type="number"
                     placeholder="12.00"
-                    className="w-full bg-primary border border-gray-800 pl-10 pr-4 py-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
+                    className="w-full bg-primary border border-gray-800 pl-14 pr-4 py-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
                     onChange={(e) => setFormData({...formData, pricePerHour: e.target.value})}
                     required
                   />

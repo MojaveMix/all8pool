@@ -17,6 +17,7 @@ import FinancePage from "./FinancePage";
 import CustomersPage from "./CustomersPage";
 import AnalyticsPage from "./AnalyticsPage";
 import SettingsPage from "./SettingsPage";
+import SystemAdminPage from "./SystemAdminPage";
 import {
   LayoutDashboard,
   LogOut,
@@ -90,6 +91,14 @@ const BackofficeApp = () => {
     },
   ];
 
+  if (user?.role === "admin") {
+    navItems.push({
+      label: "System Admin",
+      icon: UsersIcon,
+      path: "/backoffice/admin",
+    });
+  }
+
   const isActive = (path: string) => {
     if (path === "/backoffice" && window.location.pathname === "/backoffice")
       return true;
@@ -144,7 +153,9 @@ const BackofficeApp = () => {
             <span className="font-bold text-sm tracking-tight">Halls List</span>
           </Link>
 
-          {navItems.map((item) => (
+          {navItems.map((item) => {
+            const requiresHall = item.path.includes("hallId");
+            return (
             <Link
               key={item.label}
               to={item.path}
@@ -152,7 +163,7 @@ const BackofficeApp = () => {
                 isActive(item.path)
                   ? "bg-accent text-primary shadow-[0_10px_20px_rgba(0,255,136,0.1)]"
                   : "hover:bg-primary text-gray-400 hover:text-white"
-              } ${!hallId ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+              } ${!hallId && requiresHall ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
             >
               <item.icon
                 size={20}
@@ -168,7 +179,7 @@ const BackofficeApp = () => {
                 }`}
               />
             </Link>
-          ))}
+          )})}
         </nav>
 
         <div className="p-6 border-t border-gray-800 bg-secondary/50 backdrop-blur-xl">
@@ -205,7 +216,7 @@ const BackofficeApp = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-12 overflow-auto bg-[radial-gradient(circle_at_top_right,_#1a1a1a,_#121212)]">
-        {!hallId && window.location.pathname !== "/backoffice" && (
+        {!hallId && window.location.pathname !== "/backoffice" && window.location.pathname !== "/backoffice/admin" && (
           <div className="bg-warning/10 border border-warning/20 text-warning p-4 rounded-2xl mb-8 font-bold text-sm flex items-center gap-3">
             <Activity size={18} />
             Please select a pool hall from the dashboard to view detailed
@@ -215,6 +226,7 @@ const BackofficeApp = () => {
 
         <Routes>
           <Route path="/" element={<HallManagement />} />
+          <Route path="/admin" element={user?.role === "admin" ? <SystemAdminPage /> : <Navigate to="/backoffice" />} />
           <Route
             path="/dashboard"
             element={

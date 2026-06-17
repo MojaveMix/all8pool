@@ -91,6 +91,9 @@
     "tables_ready": "Tables Prêtes à Jouer"
   },
   "hall": {
+    "tactical_view": "Vue Tactique de l'Arène",
+    "my_reservations": "Mes Réservations",
+    "no_reservations": "Vous n'avez aucune réservation à venir ici.",
     "back_discovery": "Retour à la Découverte",
     "arena_status": "Statut de l'Arène",
     "open_challenges": "Défis Ouverts",

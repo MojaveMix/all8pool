@@ -148,7 +148,7 @@ const LandingPage = () => {
               {t('landing.owner_cta.desc')}
             </p>
             <Link 
-              to="/register?role=owner" 
+              to="/apply-owner" 
               className="inline-flex items-center gap-3 bg-white text-primary px-8 py-4 rounded-2xl font-black uppercase tracking-tighter hover:scale-105 transition-transform shadow-xl"
             >
               {t('landing.owner_cta.btn')} <ChevronRight size={20} />

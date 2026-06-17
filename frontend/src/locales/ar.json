@@ -91,6 +91,9 @@
     "tables_ready": "طاولات جاهزة للعب"
   },
   "hall": {
+    "tactical_view": "عرض الساحة التكتيكي",
+    "my_reservations": "حجوزاتي",
+    "no_reservations": "ليس لديك حجوزات قادمة هنا.",
     "back_discovery": "العودة إلى الاستكشاف",
     "arena_status": "حالة الساحة",
     "open_challenges": "تحديات مفتوحة",
