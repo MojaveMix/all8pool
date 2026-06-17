@@ -61,13 +61,19 @@ Match.belongsTo(PoolHall, {
 
 // Table <-> Match
 Table.hasMany(Match, {
-  foreignKey: "tableId",
+  foreignKey: {
+    name: "tableId",
+    allowNull: true
+  },
   as: "matches",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
 Match.belongsTo(Table, {
-  foreignKey: "tableId",
+  foreignKey: {
+    name: "tableId",
+    allowNull: true
+  },
   as: "table",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",

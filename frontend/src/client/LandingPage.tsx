@@ -45,7 +45,7 @@ const LandingPage = () => {
         <div className="relative z-10 text-center space-y-8 max-w-5xl px-4 animate-in fade-in zoom-in duration-1000">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full backdrop-blur-md">
              <Zap className="text-accent" size={16} />
-             <span className="text-[10px] font-black uppercase tracking-[0.3em]">{t('landing.evolution')}</span>
+             <span className="text-xs font-black uppercase tracking-[0.3em]">{t('landing.evolution')}</span>
           </div>
           
           <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter leading-tight uppercase">
@@ -95,20 +95,20 @@ const LandingPage = () => {
       {/* Stats Section */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-8 px-4">
          <div className="text-center space-y-2">
-            <p className="text-4xl font-black italic text-white">50+</p>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('landing.stats.halls')}</p>
+            <p className="text-5xl font-black italic text-white">50+</p>
+            <p className="text-sm md:text-base font-black text-gray-400 uppercase tracking-widest">{t('landing.stats.halls')}</p>
          </div>
          <div className="text-center space-y-2">
-            <p className="text-4xl font-black italic text-white">10k+</p>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('landing.stats.players')}</p>
+            <p className="text-5xl font-black italic text-white">10k+</p>
+            <p className="text-sm md:text-base font-black text-gray-400 uppercase tracking-widest">{t('landing.stats.players')}</p>
          </div>
          <div className="text-center space-y-2">
-            <p className="text-4xl font-black italic text-white">24/7</p>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('landing.stats.matches')}</p>
+            <p className="text-5xl font-black italic text-white">24/7</p>
+            <p className="text-sm md:text-base font-black text-gray-400 uppercase tracking-widest">{t('landing.stats.matches')}</p>
          </div>
          <div className="text-center space-y-2">
-            <p className="text-4xl font-black italic text-white">100%</p>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('landing.stats.experience')}</p>
+            <p className="text-5xl font-black italic text-white">100%</p>
+            <p className="text-sm md:text-base font-black text-gray-400 uppercase tracking-widest">{t('landing.stats.experience')}</p>
          </div>
       </section>
 
@@ -125,8 +125,8 @@ const LandingPage = () => {
               <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
                 {f.icon}
               </div>
-              <h3 className="text-2xl font-black italic uppercase">{f.title}</h3>
-              <p className="text-gray-500 font-bold leading-relaxed uppercase text-xs tracking-wider">{f.description}</p>
+              <h3 className="text-3xl font-black italic uppercase">{f.title}</h3>
+              <p className="text-gray-400 font-bold leading-relaxed uppercase text-base tracking-wider">{f.description}</p>
             </div>
           ))}
         </div>
@@ -159,22 +159,22 @@ const LandingPage = () => {
              <div className="p-6 bg-primary/60 rounded-3xl border border-white/5 space-y-2">
                 <Star className="text-accent" size={20} />
                 <p className="text-sm font-black uppercase italic">{t('landing.owner_cta.analytics')}</p>
-                <p className="text-[10px] text-gray-500 font-bold uppercase">{t('landing.owner_cta.analytics_desc')}</p>
+                <p className="text-xs text-gray-500 font-bold uppercase">{t('landing.owner_cta.analytics_desc')}</p>
              </div>
              <div className="p-6 bg-primary/60 rounded-3xl border border-white/5 space-y-2">
                 <Calendar className="text-accent" size={20} />
                 <p className="text-sm font-black uppercase italic">{t('landing.owner_cta.booking')}</p>
-                <p className="text-[10px] text-gray-500 font-bold uppercase">{t('landing.owner_cta.booking_desc')}</p>
+                <p className="text-xs text-gray-500 font-bold uppercase">{t('landing.owner_cta.booking_desc')}</p>
              </div>
              <div className="p-6 bg-primary/60 rounded-3xl border border-white/5 space-y-2">
                 <Users className="text-accent" size={20} />
                 <p className="text-sm font-black uppercase italic">{t('landing.owner_cta.crm')}</p>
-                <p className="text-[10px] text-gray-500 font-bold uppercase">{t('landing.owner_cta.crm_desc')}</p>
+                <p className="text-xs text-gray-500 font-bold uppercase">{t('landing.owner_cta.crm_desc')}</p>
              </div>
              <div className="p-6 bg-primary/60 rounded-3xl border border-white/5 space-y-2">
                 <MapPin className="text-accent" size={20} />
                 <p className="text-sm font-black uppercase italic">{t('landing.owner_cta.exposure')}</p>
-                <p className="text-[10px] text-gray-500 font-bold uppercase">{t('landing.owner_cta.exposure_desc')}</p>
+                <p className="text-xs text-gray-500 font-bold uppercase">{t('landing.owner_cta.exposure_desc')}</p>
              </div>
           </div>
         </div>

@@ -291,10 +291,127 @@ const updateMatchScore = async (req, res) => {
   }
 };
 
+const sendChallenge = async (req, res) => {
+  try {
+    const { player2Id, poolHallId, scheduledStartTime, stake } = req.body;
+    const player1Id = req.user.id;
+
+    if (player2Id && player1Id === player2Id) {
+      return res.status(400).json({ message: 'You cannot challenge yourself' });
+    }
+
+    // Check if player1 has enough money
+    if (stake > 0) {
+      const p1 = await User.findByPk(player1Id);
+      if (p1 && p1.virtualMoney < stake) {
+        return res.status(400).json({ message: 'Insufficient virtual money for this stake' });
+      }
+    }
+
+    let player2 = null;
+    if (player2Id) {
+      player2 = await User.findByPk(player2Id);
+      if (!player2) return res.status(404).json({ message: 'Challenged player not found' });
+    }
+
+    const match = await Match.create({
+      player1Id,
+      player1Name: req.user.name,
+      player1Email: req.user.email,
+      player2Id: player2Id || null,
+      player2Name: player2 ? player2.name : null,
+      player2Email: player2 ? player2.email : null,
+      poolHallId,
+      tableId: null,
+      scheduledStartTime,
+      stake: stake || 0,
+      status: 'challenge',
+      challengeStatus: 'pending',
+      isPaid: false
+    });
+
+    res.status(201).json(match);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const respondToChallenge = async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { action } = req.body; // 'accept' or 'reject'
+
+    const match = await Match.findByPk(matchId);
+    if (!match) return res.status(404).json({ message: 'Challenge not found' });
+
+    if (match.player2Id !== req.user.id) {
+      return res.status(403).json({ message: 'You are not the challenged player' });
+    }
+
+    if (match.challengeStatus !== 'pending') {
+      return res.status(400).json({ message: 'Challenge is no longer pending' });
+    }
+
+    if (action === 'accept') {
+      // Check if player2 has enough money
+      if (match.stake > 0) {
+        const p2 = await User.findByPk(req.user.id);
+        if (p2 && p2.virtualMoney < match.stake) {
+          return res.status(400).json({ message: 'Insufficient virtual money for this stake' });
+        }
+      }
+      match.challengeStatus = 'accepted';
+    } else {
+      match.challengeStatus = 'rejected';
+      match.status = 'cancelled';
+    }
+
+    await match.save();
+    res.json(match);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const organizeChallenge = async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { tableId, scheduledStartTime } = req.body;
+
+    const match = await Match.findByPk(matchId);
+    if (!match) return res.status(404).json({ message: 'Match not found' });
+
+    const hall = await PoolHall.findByPk(match.poolHallId);
+    if (hall.ownerId !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Only the hall owner can organize challenges' });
+    }
+
+    if (match.challengeStatus !== 'accepted') {
+      return res.status(400).json({ message: 'Challenge must be accepted by both players first' });
+    }
+
+    if (tableId) match.tableId = tableId;
+    if (scheduledStartTime) match.scheduledStartTime = scheduledStartTime;
+    
+    match.status = 'matched'; // Moves to matched status, ready to be verified/live when players arrive
+    await match.save();
+
+    res.json(match);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 module.exports = {
   createMatch,
   joinMatch,
   getMatches,
   updateMatchScore,
   verifyMatch,
+  sendChallenge,
+  respondToChallenge,
+  organizeChallenge,
 };

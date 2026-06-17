@@ -24,13 +24,13 @@
     "maintenance": "Maintenance"
   },
   "landing": {
-    "evolution": "L'évolution des sports de billard",
+    "evolution": "Le Futur du Billard",
     "hero_title": "PRÉPAREZ-VOUS.",
-    "hero_subtitle": "DOMINEZ L'ARÈNE.",
-    "hero_desc": "La plateforme ultime pour les joueurs de billard et les propriétaires de salles. Réservations en temps réel, suivi des matchs en direct et classements professionnels.",
-    "go_dashboard": "Aller au Tableau de Bord",
-    "join_arena": "Rejoindre l'Arène",
-    "player_login": "Connexion Joueur",
+    "hero_subtitle": "MAÎTRISEZ LA TABLE.",
+    "hero_desc": "La destination premium pour les joueurs et les propriétaires de salles. Réservations instantanées, suivi de matchs en direct et analyses de performances pro.",
+    "go_dashboard": "Tableau de Bord Personnel",
+    "join_arena": "Commencer à Jouer",
+    "player_login": "Espace Joueurs",
     "stats": {
       "halls": "Salles Partenaires",
       "players": "Joueurs Actifs",
@@ -39,29 +39,29 @@
     },
     "features_title": "Tout ce dont vous avez besoin pour dominer",
     "features": {
-      "booking_title": "Réservation de Précision",
-      "booking_desc": "Trouvez et réservez votre table de billard préférée en quelques secondes. Disponibilité en temps réel à portée de main.",
-      "arena_title": "Arène Mondiale",
-      "arena_desc": "Rejoignez des matchs en direct, acceptez des défis ouverts et bâtissez votre réputation dans la communauté locale.",
-      "ranking_title": "Classements Pro",
-      "ranking_desc": "Suivez vos victoires, défaites et votre classement. Battez-vous pour la première place du classement mondial."
+      "booking_title": "Réservation Instantanée",
+      "booking_desc": "Trouvez votre salle préférée et réservez votre table en quelques secondes. Disponibilité en direct.",
+      "arena_title": "L'Arène Mondiale",
+      "arena_desc": "Rejoignez des matchs en direct, relevez des défis et forgez votre réputation au sein de la communauté.",
+      "ranking_title": "Classement Pro",
+      "ranking_desc": "Suivez vos victoires et progressez dans le classement. Visez la première place locale et mondiale."
     },
     "owner_cta": {
-      "title": "Êtes-vous un",
-      "subtitle": "Propriétaire de Salle ?",
-      "desc": "Transformez votre entreprise avec notre suite de gestion professionnelle. Suivez les tables, gérez les réservations et organisez des tournois en toute simplicité.",
-      "btn": "Accès Propriétaire",
-      "analytics": "Analyses",
-      "analytics_desc": "Suivi des revenus en temps réel",
-      "booking": "Réservation",
-      "booking_desc": "Planification automatisée",
-      "crm": "CRM",
-      "crm_desc": "Gestion des joueurs",
-      "exposure": "Exposition",
-      "exposure_desc": "Soyez vu par plus de 10k joueurs"
+      "title": "Vous possédez une",
+      "subtitle": "Salle de Billard ?",
+      "desc": "Optimisez votre activité avec notre suite de gestion professionnelle. Suivez l'occupation, gérez les réservations et organisez vos tournois.",
+      "btn": "Enregistrer Votre Salle",
+      "analytics": "Analyses en Direct",
+      "analytics_desc": "Suivi des revenus et performances",
+      "booking": "Gestion des Réservations",
+      "booking_desc": "Planification intelligente et organisée",
+      "crm": "Base de Données",
+      "crm_desc": "Gestion avancée des joueurs",
+      "exposure": "Visibilité Maximale",
+      "exposure_desc": "Soyez visible auprès de milliers de joueurs"
     },
-    "final_cta": "Prêt à casser ?",
-    "get_cue": "Prenez votre queue maintenant"
+    "final_cta": "Prêt pour la casse ?",
+    "get_cue": "Commencez Votre Aventure Aujourd'hui"
   },
   "auth": {
     "welcome": "Bon retour parmi nous",

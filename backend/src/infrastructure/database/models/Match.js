@@ -45,7 +45,7 @@ const Match = sequelize.define('Match', {
   },
   tableId: {
     type: DataTypes.UUID,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'Tables',
       key: 'id'
@@ -82,8 +82,15 @@ const Match = sequelize.define('Match', {
     defaultValue: 0,
   },
   status: {
-    type: DataTypes.ENUM('open', 'matched', 'live', 'finished', 'cancelled'),
+    type: DataTypes.ENUM('open', 'matched', 'live', 'finished', 'cancelled', 'challenge'),
     defaultValue: 'open',
+  },
+  challengeStatus: {
+    type: DataTypes.ENUM('none', 'pending', 'accepted', 'rejected'),
+    defaultValue: 'none',
+  },
+  scheduledStartTime: {
+    type: DataTypes.DATE,
   },
   startTime: {
     type: DataTypes.DATE,

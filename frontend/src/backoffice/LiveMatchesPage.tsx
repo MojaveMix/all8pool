@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { Activity, Users, Trophy, Clock, Plus, Minus, Square, Search, Mail } from 'lucide-react';
+import { Activity, Users, Trophy, Clock, Plus, Minus, Square, Search, Mail, Zap } from 'lucide-react';
 
 interface Match {
   id: string;
-  table: { number: number };
+  table: { number: number } | null;
   player1: { name: string; id: string, email: string } | null;
   player1Name: string | null;
   player1Email: string | null;
@@ -16,7 +16,9 @@ interface Match {
   player2Id?: string | null;
   score1: number;
   score2: number;
-  status: 'open' | 'matched' | 'live' | 'finished';
+  status: 'open' | 'matched' | 'live' | 'finished' | 'challenge';
+  challengeStatus?: 'pending' | 'accepted' | 'rejected' | 'none';
+  scheduledStartTime?: string;
   startTime: string;
 }
 
@@ -25,12 +27,18 @@ const LiveMatchesPage = () => {
   const hallId = searchParams.get('hallId');
   const [matches, setMatches] = useState<Match[]>([]);
   const [showPlayerModal, setShowPlayerModal] = useState<{ matchId: string, playerIndex: 1 | 2 } | null>(null);
+  const [showOrganizeModal, setShowOrganizeModal] = useState<Match | null>(null);
+  const [tables, setTables] = useState<any[]>([]);
+  const [selectedTable, setSelectedTable] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [guestData, setGuestData] = useState({ name: '', email: '' });
 
   useEffect(() => {
-    if (hallId) fetchMatches();
+    if (hallId) {
+      fetchMatches();
+      fetchTables();
+    }
   }, [hallId]);
 
   const fetchMatches = async () => {
@@ -39,6 +47,30 @@ const LiveMatchesPage = () => {
       setMatches(res.data);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const fetchTables = async () => {
+    try {
+      const res = await api.get(`/tables?hallId=${hallId}`);
+      setTables(res.data);
+      if (res.data.length > 0) setSelectedTable(res.data[0].id);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleOrganizeChallenge = async () => {
+    if (!showOrganizeModal || !selectedTable) return;
+    try {
+      await api.patch(`/matches/${showOrganizeModal.id}/organize`, {
+        tableId: selectedTable
+      });
+      setShowOrganizeModal(null);
+      fetchMatches();
+      alert('Challenge organized! Table assigned.');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to organize challenge');
     }
   };
 
@@ -106,7 +138,7 @@ const LiveMatchesPage = () => {
     const match = matches.find(m => m.id === matchId);
     if (!match) return;
 
-    if (!window.confirm(`End match at Table #${match.table.number}? Final Score ${match.score1}:${match.score2}`)) return;
+    if (!window.confirm(`End match at Table #${match.table?.number}? Final Score ${match.score1}:${match.score2}`)) return;
 
     try {
       await api.patch(`/matches/${matchId}/score`, { status: 'finished' });
@@ -130,6 +162,9 @@ const LiveMatchesPage = () => {
           <div className="bg-warning/20 text-warning px-4 py-2 rounded-xl text-xs font-black uppercase border border-warning/30">
             {matches.filter(m => m.status === 'matched').length} Pending
           </div>
+          <div className="bg-blue-500/20 text-blue-500 px-4 py-2 rounded-xl text-xs font-black uppercase border border-blue-500/30">
+            {matches.filter(m => m.status === 'challenge' && m.challengeStatus === 'accepted').length} Accepted Challenges
+          </div>
         </div>
       </div>
 
@@ -142,6 +177,7 @@ const LiveMatchesPage = () => {
             onEndMatch={() => endMatch(match.id)}
             onAssignPlayer={(index) => setShowPlayerModal({ matchId: match.id, playerIndex: index })}
             onVerifyMatch={() => handleVerifyMatch(match.id)}
+            onOrganize={() => setShowOrganizeModal(match)}
           />
         ))}
         
@@ -152,6 +188,49 @@ const LiveMatchesPage = () => {
           </div>
         )}
       </div>
+
+      {showOrganizeModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-secondary w-full max-w-md p-10 rounded-[2.5rem] border border-gray-800 shadow-2xl animate-in zoom-in-95 duration-300">
+            <h3 className="text-2xl font-black italic text-accent mb-8 tracking-tight uppercase">Organize Challenge</h3>
+            <div className="space-y-6">
+               <div className="p-4 bg-primary/50 rounded-2xl border border-white/5 space-y-2">
+                  <p className="text-[10px] font-black text-gray-500 uppercase">Opponents</p>
+                  <p className="text-white font-bold">{showOrganizeModal.player1?.name} VS {showOrganizeModal.player2?.name}</p>
+                  <p className="text-[10px] font-black text-blue-500 uppercase">Scheduled: {showOrganizeModal.scheduledStartTime ? new Date(showOrganizeModal.scheduledStartTime).toLocaleString() : 'TBD'}</p>
+               </div>
+
+               <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Assign Table</label>
+                  <select 
+                    value={selectedTable}
+                    onChange={(e) => setSelectedTable(e.target.value)}
+                    className="w-full bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent transition-colors font-bold"
+                  >
+                    {tables.map(t => (
+                      <option key={t.id} value={t.id}>Table #{t.number} ({t.type})</option>
+                    ))}
+                  </select>
+               </div>
+
+               <div className="flex gap-4 pt-4">
+                  <button 
+                    onClick={() => setShowOrganizeModal(null)}
+                    className="flex-1 bg-gray-800 text-white font-bold py-4 rounded-2xl hover:bg-gray-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleOrganizeChallenge}
+                    className="flex-1 bg-accent text-primary font-black py-4 rounded-2xl shadow-lg hover:scale-[1.02] transition-transform"
+                  >
+                    CONFIRM & NOTIFY
+                  </button>
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showPlayerModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -243,15 +322,17 @@ const LiveMatchesPage = () => {
   );
 };
 
-const MatchCard = ({ match, onUpdateScore, onEndMatch, onAssignPlayer, onVerifyMatch }: { 
+const MatchCard = ({ match, onUpdateScore, onEndMatch, onAssignPlayer, onVerifyMatch, onOrganize }: { 
   match: Match, 
   onUpdateScore: (s1: number, s2: number) => void,
   onEndMatch: () => void,
   onAssignPlayer: (index: 1 | 2) => void,
-  onVerifyMatch: () => void
+  onVerifyMatch: () => void,
+  onOrganize: () => void
 }) => {
   const isLive = match.status === 'live';
   const isMatched = match.status === 'matched';
+  const isChallenge = match.status === 'challenge';
   const player1Name = match.player1?.name || match.player1Name || 'Add Player 1';
   const player2Name = match.player2?.name || match.player2Name || 'Add Player 2';
   const hasPlayer1 = !!(match.player1 || match.player1Name);
@@ -262,6 +343,7 @@ const MatchCard = ({ match, onUpdateScore, onEndMatch, onAssignPlayer, onVerifyM
       relative bg-secondary rounded-[2rem] p-8 border-2 transition-all duration-500
       ${isLive ? 'border-accent shadow-[0_0_30px_rgba(0,255,136,0.15)] ring-1 ring-accent/50' : 
         isMatched ? 'border-warning shadow-[0_0_30px_rgba(255,187,51,0.15)] ring-1 ring-warning/50' : 
+        isChallenge ? 'border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/50 opacity-90' :
         'border-gray-800 opacity-60'}
     `}>
       {isLive && (
@@ -274,16 +356,21 @@ const MatchCard = ({ match, onUpdateScore, onEndMatch, onAssignPlayer, onVerifyM
           Ready to Verify
         </div>
       )}
+      {isChallenge && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
+          Challenge {match.challengeStatus}
+        </div>
+      )}
 
       <div className="flex justify-between items-center mb-8">
         <div className="flex flex-col">
           <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Table</span>
-          <span className="text-3xl font-black italic text-white">#{match.table.number}</span>
+          <span className="text-3xl font-black italic text-white">{match.table ? `#${match.table.number}` : 'TBD'}</span>
         </div>
         <div className="flex items-center gap-2 bg-primary px-4 py-2 rounded-2xl border border-gray-800">
           <Clock size={16} className="text-gray-500" />
           <span className="text-sm font-bold font-mono">
-            {new Date(match.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {new Date(isChallenge ? (match.scheduledStartTime || match.startTime) : match.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
       </div>
@@ -359,7 +446,14 @@ const MatchCard = ({ match, onUpdateScore, onEndMatch, onAssignPlayer, onVerifyM
       </div>
 
       <div className="mt-8 pt-6 border-t border-gray-800/50 flex gap-3">
-        {isMatched || (match.status === 'open' && hasPlayer1 && hasPlayer2) ? (
+        {isChallenge && match.challengeStatus === 'accepted' ? (
+           <button 
+             onClick={onOrganize}
+             className="flex-1 bg-blue-500 text-white font-black uppercase py-4 rounded-xl shadow-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
+           >
+             <Zap size={18} /> ORGANIZE CHALLENGE
+           </button>
+        ) : isMatched || (match.status === 'open' && hasPlayer1 && hasPlayer2) ? (
           <button 
             onClick={onVerifyMatch}
             className="flex-1 bg-warning text-primary font-black uppercase py-4 rounded-xl shadow-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"

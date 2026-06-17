@@ -17,8 +17,16 @@ connectDB();
 
 // Sync Database (In production, use migrations)
 // if (process.env.NODE_ENV !== 'production') {
-  sequelize.sync({ alter: true }).then(() => {
+  sequelize.sync({ alter: true }).then(async () => {
     console.log('Database synced');
+    try {
+      // Force tableId to be nullable because alter: true sometimes fails with foreign keys in MySQL
+      await sequelize.query("ALTER TABLE Matches MODIFY tableId CHAR(36) BINARY NULL;");
+      console.log('Schema fixed: tableId is now nullable');
+    } catch (err) {
+      // If it fails, it might already be correct or table name is different
+      console.log('Note: Manual schema fix attempt completed.');
+    }
   });
 // }
 const io = new Server(server, {

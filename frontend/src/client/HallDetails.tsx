@@ -220,7 +220,7 @@ const HallDetails = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:space-y-12 animate-in fade-in duration-700 pb-20">
       <button
         onClick={() => navigate("/arena")}
-        className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors uppercase font-black text-[10px] tracking-widest"
+        className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors uppercase font-black text-xs tracking-widest"
       >
         <ArrowLeft size={16} /> {t("hall.back_discovery")}
       </button>
@@ -247,7 +247,7 @@ const HallDetails = () => {
         </div>
         <div className="text-left md:text-right relative z-10 w-full md:w-auto flex md:flex-col justify-between items-end md:justify-start">
           <div className="md:mb-2">
-            <p className="text-gray-500 uppercase font-black text-[8px] md:text-[10px] tracking-[0.3em] mb-1">
+            <p className="text-gray-500 uppercase font-black text-xs tracking-[0.3em] mb-1">
               {t("hall.arena_status")}
             </p>
             <div className="text-3xl md:text-5xl font-black text-white italic leading-none">
@@ -279,10 +279,10 @@ const HallDetails = () => {
               >
                 <div>
                   <div className="flex justify-between items-start mb-6">
-                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                    <span className="text-sm md:text-base font-black text-gray-400 uppercase tracking-widest">
                       {t("hall.table_unit")} #{booking.table?.number}
                     </span>
-                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase italic ${booking.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-white/10 text-white'}`}>
+                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-black uppercase italic ${booking.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-white/10 text-white'}`}>
                       {booking.status}
                     </div>
                   </div>
@@ -327,10 +327,10 @@ const HallDetails = () => {
                 >
                   <div>
                     <div className="flex justify-between items-start mb-6">
-                      <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                      <span className="text-xs font-black text-gray-500 uppercase tracking-widest">
                         {t("hall.table_unit")} #{match.table?.number}
                       </span>
-                      <div className="flex items-center gap-1.5 bg-accent/10 text-accent px-3 py-1 rounded-lg text-[10px] font-black uppercase italic">
+                      <div className="flex items-center gap-1.5 bg-accent/10 text-accent px-3 py-1 rounded-lg text-xs font-black uppercase italic">
                         <Users size={12} /> {t("hall.live_call")}
                       </div>
                     </div>
@@ -425,7 +425,7 @@ const HallDetails = () => {
               <div className="flex justify-between items-center bg-primary p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-white/5 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative">
-                  <p className="text-[8px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">
+                  <p className="text-xs text-gray-500 uppercase font-black tracking-widest mb-1">
                     {t("hall.table_unit")}
                   </p>
                   <p className="text-2xl md:text-3xl font-black italic text-white">
@@ -433,7 +433,7 @@ const HallDetails = () => {
                   </p>
                 </div>
                 <div className="text-right relative">
-                  <p className="text-[8px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">
+                  <p className="text-xs text-gray-500 uppercase font-black tracking-widest mb-1">
                     {t("hall.match_rate")}
                   </p>
                   <p className="text-accent font-black text-lg md:text-xl italic">
@@ -445,7 +445,7 @@ const HallDetails = () => {
               <div className="space-y-4 md:space-y-6">
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <label className="text-[8px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
+                    <label className="text-xs text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
                       {t("hall.event_date")}
                     </label>
                     <input
@@ -456,7 +456,7 @@ const HallDetails = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-[8px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
+                    <label className="text-xs text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
                       {t("hall.break_time")}
                     </label>
                     <input
@@ -469,7 +469,7 @@ const HallDetails = () => {
                 </div>
 
                 <div>
-                  <label className="text-[8px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
+                  <label className="text-xs text-gray-500 uppercase font-black tracking-widest mb-2 block ml-1">
                     {t("hall.session_duration")}
                   </label>
                   <select
@@ -488,7 +488,7 @@ const HallDetails = () => {
                 {/* Opponent Selection UI */}
                 <div className="pt-4 md:pt-6 border-t border-white/5 space-y-4 md:space-y-6 text-left">
                   <div>
-                    <label className="text-[8px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest mb-3 md:mb-4 block ml-1">
+                    <label className="text-xs text-gray-500 uppercase font-black tracking-widest mb-3 md:mb-4 block ml-1">
                       {t("hall.opponent_pref")}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
@@ -515,7 +515,7 @@ const HallDetails = () => {
                           className={`flex flex-col items-center gap-2 p-2 md:p-3 rounded-xl md:rounded-2xl border transition-all ${opponentType === opt.id ? "bg-accent/10 border-accent text-accent shadow-[0_0_15px_rgba(0,255,136,0.1)]" : "bg-primary border-white/5 text-gray-500 hover:text-white hover:border-white/10"}`}
                         >
                           {opt.icon}
-                          <span className="text-[7px] md:text-[8px] font-black uppercase tracking-tighter text-center">
+                          <span className="text-[9px] md:text-xs font-black uppercase tracking-tighter text-center">
                             {opt.label}
                           </span>
                         </button>
@@ -622,7 +622,7 @@ const HallDetails = () => {
 
                 <div className="pt-4 md:pt-6 border-t border-white/10 space-y-3 text-left">
                   <div className="flex justify-between items-center">
-                    <p className="text-[8px] md:text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">
+                    <p className="text-xs text-gray-500 font-black uppercase tracking-[0.2em]">
                       {t("hall.subtotal")}
                     </p>
                     <p className="text-white font-black text-xl md:text-2xl italic tabular-nums leading-none">
@@ -630,7 +630,7 @@ const HallDetails = () => {
                     </p>
                   </div>
                   <div className="flex justify-between items-center pt-3 md:pt-4 border-t border-white/5">
-                    <p className="text-[10px] md:text-xs text-white font-black uppercase tracking-[0.3em]">
+                    <p className="text-sm text-white font-black uppercase tracking-[0.3em]">
                       {t("hall.final_price")}
                     </p>
                     <p className="text-accent font-black text-3xl md:text-4xl italic tabular-nums leading-none">

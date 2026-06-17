@@ -24,13 +24,13 @@
     "maintenance": "Maintenance"
   },
   "landing": {
-    "evolution": "The Evolution of Cue Sports",
+    "evolution": "The Future of Cue Sports",
     "hero_title": "RACK 'EM UP.",
-    "hero_subtitle": "RULE THE ARENA.",
-    "hero_desc": "The ultimate platform for pool players and hall owners. Real-time bookings, live match tracking, and professional rankings.",
-    "go_dashboard": "Go to Dashboard",
-    "join_arena": "Join the Arena",
-    "player_login": "Player Login",
+    "hero_subtitle": "COMMAND THE TABLE.",
+    "hero_desc": "The premium destination for pool players and hall owners. Instant bookings, live match tracking, and professional performance analytics.",
+    "go_dashboard": "Personal Dashboard",
+    "join_arena": "Start Playing Now",
+    "player_login": "Player Entrance",
     "stats": {
       "halls": "Partner Halls",
       "players": "Active Players",
@@ -39,29 +39,29 @@
     },
     "features_title": "Everything You Need to Dominate",
     "features": {
-      "booking_title": "Precision Booking",
-      "booking_desc": "Find and reserve your favorite pool table in seconds. Real-time availability at your fingertips.",
-      "arena_title": "Global Arena",
-      "arena_desc": "Join live matches, accept open challenges, and build your reputation in the local community.",
+      "booking_title": "Instant Booking",
+      "booking_desc": "Locate your favorite hall and reserve your table in seconds. Live availability at your fingertips.",
+      "arena_title": "The Global Arena",
+      "arena_desc": "Join live matches, accept open challenges, and build your legacy in the local community.",
       "ranking_title": "Pro Rankings",
-      "ranking_desc": "Track your wins, losses, and rating. Compete for the top spot on the global leaderboard."
+      "ranking_desc": "Track every win, loss, and stat. Compete for the top spot on the local and global leaderboards."
     },
     "owner_cta": {
-      "title": "Are You a",
-      "subtitle": "Hall Owner?",
-      "desc": "Transform your business with our professional management suite. Track tables, manage bookings, and host tournaments with ease.",
-      "btn": "Get Owner Access",
-      "analytics": "Analytics",
-      "analytics_desc": "Real-time revenue tracking",
-      "booking": "Booking",
-      "booking_desc": "Automated scheduling",
-      "crm": "CRM",
-      "crm_desc": "Player management",
-      "exposure": "Exposure",
-      "exposure_desc": "Be seen by 10k+ players"
+      "title": "Do You Own a",
+      "subtitle": "Pool Hall?",
+      "desc": "Elevate your business with our professional management suite. Track occupancy, manage bookings, and host tournaments with ease.",
+      "btn": "Register Your Hall",
+      "analytics": "Real-time Analytics",
+      "analytics_desc": "Revenue and performance tracking",
+      "booking": "Smart Booking",
+      "booking_desc": "Automated and organized scheduling",
+      "crm": "Player CRM",
+      "crm_desc": "Advanced player management",
+      "exposure": "Maximum Exposure",
+      "exposure_desc": "Get seen by thousands of active players"
     },
-    "final_cta": "Ready to Break?",
-    "get_cue": "Get Your Cue Now"
+    "final_cta": "Ready for the Break?",
+    "get_cue": "Start Your Journey Today"
   },
   "auth": {
     "welcome": "Welcome Back",

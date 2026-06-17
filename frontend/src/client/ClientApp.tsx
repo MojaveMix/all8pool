@@ -26,7 +26,7 @@ const ClientApp = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 text-white font-sans relative">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 text-white font-sans relative">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)] bg-[length:40px_40px]" />
@@ -161,7 +161,7 @@ const ClientApp = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="flex-grow relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/arena" element={<HallDiscovery />} />
@@ -180,7 +180,7 @@ const ClientApp = () => {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-12 mt-20 bg-black/20 backdrop-blur-sm">
+      <footer className="relative border-t border-white/10 py-12 mt-20 bg-black/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-gray-400 text-xs sm:text-sm">
             <Link to="/about" className="hover:text-emerald-400 transition">
