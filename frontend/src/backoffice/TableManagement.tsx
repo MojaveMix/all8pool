@@ -6,7 +6,6 @@ import {
   Settings, 
   Play, 
   Square, 
-  DollarSign, 
   LayoutGrid, 
   Edit3,
   Search
@@ -350,8 +349,9 @@ const TableManagement = () => {
   );
 };
 
-const ProfessionalTableCard = ({ table, onUpdateStatus, onStartMatch }: { 
+const ProfessionalTableCard = ({ table, currency, onUpdateStatus, onStartMatch }: { 
   table: Table, 
+  currency: string,
   onUpdateStatus: (status: string) => void,
   onStartMatch: () => void
 }) => {
@@ -385,7 +385,7 @@ const ProfessionalTableCard = ({ table, onUpdateStatus, onStartMatch }: {
         </div>
         <div className="p-4 bg-primary rounded-2xl border border-gray-800">
           <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Rate</p>
-          <p className="text-sm font-black text-accent">${table.pricePerHour}<span className="text-[10px] text-gray-600">/hr</span></p>
+          <p className="text-sm font-black text-accent">{currency}{table.pricePerHour}<span className="text-[10px] text-gray-600">/hr</span></p>
         </div>
       </div>
 

@@ -38,6 +38,7 @@ interface Hall {
   tables: Table[];
   promotionType: "none" | "percentage" | "free";
   promotionValue: number;
+  currency?: string;
 }
 
 const HallDetails = () => {
@@ -393,7 +394,6 @@ const HallDetails = () => {
                   index={index}
                   isSelected={selectedTable?.id === table.id}
                   onClick={() => table.status === 'available' && setSelectedTable(table)}
-                  t={t}
                   hall={hall}
                 />
               ))}
@@ -676,7 +676,7 @@ const HallDetails = () => {
 
 // --- Tactical UI Components ---
 
-const TacticalTable = ({ table, index, isSelected, onClick, t, hall }: any) => {
+const TacticalTable = ({ table, index, isSelected, onClick, hall }: any) => {
   const isAvailable = table.status === 'available';
   
   return (
