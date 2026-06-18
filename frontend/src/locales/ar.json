@@ -151,5 +151,22 @@
     "contact_title": "تواصل مع مركز القيادة",
     "terms_title": "قواعد الاشتباك",
     "privacy_title": "بروتوكول أمن البيانات"
+  },
+  "backoffice_nav": {
+    "dashboard": "لوحة القيادة",
+    "tables": "الطاولات",
+    "bookings": "الحجوزات",
+    "matches": "مباريات مباشرة",
+    "tournaments": "البطولات",
+    "finance": "المالية",
+    "customers": "العملاء",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "system_admin": "مدير النظام",
+    "halls_list": "قائمة القاعات",
+    "management": "الإدارة",
+    "logout": "تسجيل الخروج",
+    "verified_owner": "مالك موثق",
+    "select_hall": "يرجى تحديد قاعة بلياردو من لوحة القيادة لعرض خيارات الإدارة التفصيلية."
   }
 }

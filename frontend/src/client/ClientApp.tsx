@@ -17,7 +17,6 @@ import {
 } from "./info/InfoPages";
 import { User as UserIcon, LogIn, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import LanguageSwitcher from "../shared/LanguageSwitcher";
 
 const ClientApp = () => {
   const { user, logout } = useAuth();
@@ -60,7 +59,6 @@ const ClientApp = () => {
 
             {/* Desktop User Area */}
             <div className="hidden md:flex items-center gap-4 lg:gap-6">
-              <LanguageSwitcher />
               {user ? (
                 <UserMenu
                   user={user}
@@ -80,7 +78,6 @@ const ClientApp = () => {
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center gap-3">
-              <LanguageSwitcher />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 rounded-lg bg-white/10 backdrop-blur-sm"

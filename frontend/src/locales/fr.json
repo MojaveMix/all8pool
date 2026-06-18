@@ -151,5 +151,22 @@
     "contact_title": "Contacter le Centre de Commandement",
     "terms_title": "Règles d'Engagement",
     "privacy_title": "Protocole de Sécurité des Données"
+  },
+  "backoffice_nav": {
+    "dashboard": "Tableau de Bord",
+    "tables": "Tables",
+    "bookings": "Réservations",
+    "matches": "Matchs en Direct",
+    "tournaments": "Tournois",
+    "finance": "Finances",
+    "customers": "Clients",
+    "analytics": "Analyses",
+    "settings": "Paramètres",
+    "system_admin": "Admin Système",
+    "halls_list": "Liste des Salles",
+    "management": "Gestion",
+    "logout": "Déconnexion",
+    "verified_owner": "Propriétaire Vérifié",
+    "select_hall": "Veuillez sélectionner une salle de billard dans le tableau de bord pour afficher les options de gestion."
   }
 }

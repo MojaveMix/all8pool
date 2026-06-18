@@ -151,5 +151,22 @@
     "contact_title": "Reach the Command Center",
     "terms_title": "Rules of Engagement",
     "privacy_title": "Data Security Protocol"
+  },
+  "backoffice_nav": {
+    "dashboard": "Dashboard",
+    "tables": "Tables",
+    "bookings": "Bookings",
+    "matches": "Live Matches",
+    "tournaments": "Tournaments",
+    "finance": "Finance",
+    "customers": "Customers",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "system_admin": "System Admin",
+    "halls_list": "Halls List",
+    "management": "Management",
+    "logout": "Logout",
+    "verified_owner": "Verified Owner",
+    "select_hall": "Please select a pool hall from the dashboard to view detailed management options."
   }
 }

@@ -7,6 +7,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useAuth } from "../store/AuthContext";
+import { useTranslation } from "react-i18next";
 import HallManagement from "./HallManagement";
 import TableManagement from "./TableManagement";
 import DashboardOverview from "./DashboardOverview";
@@ -37,6 +38,7 @@ const BackofficeApp = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const hallId = searchParams.get("hallId");
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
@@ -45,47 +47,47 @@ const BackofficeApp = () => {
 
   const navItems = [
     {
-      label: "Dashboard",
+      label: t("backoffice_nav.dashboard"),
       icon: LayoutDashboard,
       path: hallId ? `/backoffice/dashboard?hallId=${hallId}` : "/backoffice",
     },
     {
-      label: "Tables",
+      label: t("backoffice_nav.tables"),
       icon: TableIcon,
       path: hallId ? `/backoffice/tables?hallId=${hallId}` : "/backoffice",
     },
     {
-      label: "Bookings",
+      label: t("backoffice_nav.bookings"),
       icon: Calendar,
       path: hallId ? `/backoffice/bookings?hallId=${hallId}` : "/backoffice",
     },
     {
-      label: "Live Matches",
+      label: t("backoffice_nav.matches"),
       icon: Activity,
       path: hallId ? `/backoffice/matches?hallId=${hallId}` : "/backoffice",
     },
     {
-      label: "Tournaments",
+      label: t("backoffice_nav.tournaments"),
       icon: Trophy,
       path: hallId ? `/backoffice/tournaments?hallId=${hallId}` : "/backoffice",
     },
     {
-      label: "Finance",
+      label: t("backoffice_nav.finance"),
       icon: DollarSign,
       path: hallId ? `/backoffice/finance?hallId=${hallId}` : "/backoffice",
     },
     {
-      label: "Customers",
+      label: t("backoffice_nav.customers"),
       icon: UsersIcon,
       path: hallId ? `/backoffice/customers?hallId=${hallId}` : "/backoffice",
     },
     {
-      label: "Analytics",
+      label: t("backoffice_nav.analytics"),
       icon: BarChart3,
       path: hallId ? `/backoffice/analytics?hallId=${hallId}` : "/backoffice",
     },
     {
-      label: "Settings",
+      label: t("backoffice_nav.settings"),
       icon: Settings,
       path: hallId ? `/backoffice/settings?hallId=${hallId}` : "/backoffice",
     },
@@ -93,7 +95,7 @@ const BackofficeApp = () => {
 
   if (user?.role === "admin") {
     navItems.push({
-      label: "System Admin",
+      label: t("backoffice_nav.system_admin"),
       icon: UsersIcon,
       path: "/backoffice/admin",
     });
@@ -132,7 +134,7 @@ const BackofficeApp = () => {
 
         <nav className="flex-1 px-4 space-y-1 mt-4 overflow-y-auto">
           <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4">
-            Management
+            {t("backoffice_nav.management")}
           </p>
           <Link
             to="/backoffice"
@@ -150,7 +152,7 @@ const BackofficeApp = () => {
                   : "group-hover:text-accent"
               }
             />
-            <span className="font-bold text-sm tracking-tight">Halls List</span>
+            <span className="font-bold text-sm tracking-tight">{t("backoffice_nav.halls_list")}</span>
           </Link>
 
           {navItems.map((item) => {
@@ -190,7 +192,7 @@ const BackofficeApp = () => {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-black truncate">{user?.name}</p>
               <p className="text-[10px] text-accent font-bold truncate uppercase tracking-tighter">
-                {user?.role === "admin" ? "System Admin" : "Verified Owner"}
+                {user?.role === "admin" ? t("backoffice_nav.system_admin") : t("backoffice_nav.verified_owner")}
               </p>
             </div>
             <Link
@@ -209,7 +211,7 @@ const BackofficeApp = () => {
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-danger/10 text-danger font-bold text-sm hover:bg-danger hover:text-white transition-all border border-danger/20"
           >
             <LogOut size={18} />
-            Logout
+            {t("backoffice_nav.logout")}
           </button>
         </div>
       </aside>
@@ -219,8 +221,7 @@ const BackofficeApp = () => {
         {!hallId && window.location.pathname !== "/backoffice" && window.location.pathname !== "/backoffice/admin" && (
           <div className="bg-warning/10 border border-warning/20 text-warning p-4 rounded-2xl mb-8 font-bold text-sm flex items-center gap-3">
             <Activity size={18} />
-            Please select a pool hall from the dashboard to view detailed
-            management options.
+            {t("backoffice_nav.select_hall")}
           </div>
         )}
 
