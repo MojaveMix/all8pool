@@ -50,9 +50,13 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  points: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
   virtualMoney: {
     type: DataTypes.INTEGER,
-    defaultValue: 1000, // Initial balance
+    defaultValue: 100, // Initial balance
   },
   lastBonusDate: {
     type: DataTypes.DATE,

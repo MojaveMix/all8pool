@@ -61,7 +61,15 @@
       "exposure_desc": "Soyez visible auprès de milliers de joueurs"
     },
     "final_cta": "Prêt pour la casse ?",
-    "get_cue": "Commencez Votre Aventure Aujourd'hui"
+    "get_cue": "Commencez Votre Aventure Aujourd'hui",
+    "live_matches_title": "En Direct dans l'Arène",
+    "leaderboard_title": "Joueurs les Mieux Classés",
+    "tournaments_title": "Tournois en Cours et à Venir",
+    "stats_preview_title": "Suivez Votre Carrière Pro",
+    "compete_now": "Rejoindre l'Arène",
+    "view_ranking": "Voir le Classement",
+    "join_tournament": "S'inscrire",
+    "players_online": "Joueurs en Ligne"
   },
   "auth": {
     "welcome": "Bon retour parmi nous",

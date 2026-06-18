@@ -61,7 +61,15 @@
       "exposure_desc": "Get seen by thousands of active players"
     },
     "final_cta": "Ready for the Break?",
-    "get_cue": "Start Your Journey Today"
+    "get_cue": "Start Your Journey Today",
+    "live_matches_title": "Live in the Arena",
+    "leaderboard_title": "Top Ranked Players",
+    "tournaments_title": "Ongoing & Upcoming Tournaments",
+    "stats_preview_title": "Track Your Pro Career",
+    "compete_now": "Compete Now",
+    "view_ranking": "View Rankings",
+    "join_tournament": "Join Tournament",
+    "players_online": "Players Online"
   },
   "auth": {
     "welcome": "Welcome Back",

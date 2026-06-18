@@ -41,9 +41,10 @@ const getRankings = async (req, res) => {
   try {
     const rankings = await User.findAll({
       where: { role: 'player' },
-      attributes: ['id', 'name', 'avatar', 'wins', 'losses', 'rating', 'virtualMoney'],
+      attributes: ['id', 'name', 'avatar', 'wins', 'losses', 'rating', 'virtualMoney', 'points'],
       order: [
-        ['virtualMoney', 'DESC'], // Primary ranking by money as requested
+        ['points', 'DESC'], // Primary ranking by points
+        ['virtualMoney', 'DESC'], 
         ['rating', 'DESC']
       ],
       limit: 50
@@ -58,23 +59,23 @@ const getRankings = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'name', 'email', 'avatar', 'role', 'wins', 'losses', 'rating', 'unpaidCount', 'virtualMoney']
+      attributes: ['id', 'name', 'email', 'avatar', 'role', 'wins', 'losses', 'rating', 'unpaidCount', 'virtualMoney', 'points']
     });
     
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // Calculate rank if player (rank by virtualMoney)
+    // Calculate rank if player (rank by points)
     let rank = null;
     if (user.role === 'player') {
       rank = await User.count({
         where: {
           role: 'player',
           [Op.or]: [
-            { virtualMoney: { [Op.gt]: user.virtualMoney } },
+            { points: { [Op.gt]: user.points } },
             { 
               [Op.and]: [
-                { virtualMoney: user.virtualMoney },
-                { rating: { [Op.gt]: user.rating } }
+                { points: user.points },
+                { virtualMoney: { [Op.gt]: user.virtualMoney } }
               ]
             }
           ]
@@ -95,7 +96,7 @@ const getUserProfile = async (req, res) => {
     
     // Basic check for UUID format if possible, or just let findByPk handle it
     const user = await User.findByPk(id, {
-      attributes: ['id', 'name', 'email', 'avatar', 'role', 'wins', 'losses', 'rating', 'virtualMoney']
+      attributes: ['id', 'name', 'email', 'avatar', 'role', 'wins', 'losses', 'rating', 'virtualMoney', 'points']
     });
     
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -107,11 +108,11 @@ const getUserProfile = async (req, res) => {
         where: {
           role: 'player',
           [Op.or]: [
-            { virtualMoney: { [Op.gt]: user.virtualMoney } },
+            { points: { [Op.gt]: user.points } },
             { 
               [Op.and]: [
-                { virtualMoney: user.virtualMoney },
-                { rating: { [Op.gt]: user.rating } }
+                { points: user.points },
+                { virtualMoney: { [Op.gt]: user.virtualMoney } }
               ]
             }
           ]
@@ -237,11 +238,31 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getGlobalStats = async (req, res) => {
+  try {
+    const { Match, PoolHall } = require('../../infrastructure/database/models');
+    
+    const playersCount = await User.count({ where: { role: 'player' } });
+    const matchesCount = await Match.count();
+    const hallsCount = await PoolHall.count();
+
+    res.json({
+      players: playersCount + 1500, // Base + actual for a more "populated" feel
+      matches: matchesCount + 12000,
+      halls: hallsCount + 45
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 module.exports = {
   getUsers,
   getRankings,
   getProfile,
   getUserProfile,
+  getGlobalStats,
   updateUserRole,
   createUser,
   updateUserStatus,

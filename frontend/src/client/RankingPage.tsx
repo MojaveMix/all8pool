@@ -14,6 +14,7 @@ interface Player {
   losses: number;
   rating: number;
   virtualMoney: number;
+  points: number;
 }
 
 interface PoolHall {
@@ -297,6 +298,12 @@ const RankingPage = () => {
               </div>
 
               <div className="hidden md:flex gap-10 text-right pr-4 items-center">
+                 <div className="space-y-1">
+                    <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Points</p>
+                    <p className="text-xl font-black text-white italic flex items-center justify-end gap-1">
+                      <Zap size={14} className="text-accent" /> {player.points.toLocaleString()}
+                    </p>
+                 </div>
                  <div className="space-y-1 text-yellow-500">
                     <p className="text-[8px] font-black uppercase tracking-widest">{t('profile.coins')}</p>
                     <p className="text-xl font-black italic flex items-center justify-end gap-1">
@@ -365,14 +372,16 @@ const PodiumPosition = ({ player, rank, color, bgColor, height, stars, isGold, t
          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
          <span className={`text-6xl font-black italic ${color}`}>#{rank}</span>
          <div className="text-center relative z-10">
-            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">{t('profile.coins')}</p>
-            <p className="text-xl font-black text-yellow-500 italic flex items-center justify-center gap-1">
-              <Coins size={16} /> {player.virtualMoney.toLocaleString()}
+            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">Points</p>
+            <p className="text-xl font-black text-white italic flex items-center justify-center gap-1">
+              <Zap size={16} className="text-accent" /> {player.points.toLocaleString()}
             </p>
          </div>
          <div className="text-center relative z-10 pt-2 opacity-50">
-            <p className="text-[8px] font-black text-gray-600 uppercase tracking-[0.3em]">Palmares</p>
-            <p className="text-sm font-black text-white italic">{player.wins} {t('profile.wins')}</p>
+            <p className="text-[8px] font-black text-gray-600 uppercase tracking-[0.3em]">{t('profile.coins')}</p>
+            <p className="text-sm font-black text-yellow-500 italic flex items-center justify-center gap-1">
+              <Coins size={12} /> {player.virtualMoney.toLocaleString()}
+            </p>
          </div>
       </div>
    </div>

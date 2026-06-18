@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Medal,
   Coins,
+  Zap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../shared/LoadingSpinner";
@@ -28,6 +29,7 @@ interface UserProfile {
   unpaidCount?: number;
   rank: number;
   virtualMoney: number;
+  points: number;
 }
 
 const ProfilePage = () => {
@@ -152,6 +154,12 @@ const ProfilePage = () => {
               </div>
               <div className="bg-white/5 text-white px-4 py-2 rounded-xl border border-white/10 flex items-center gap-2 font-black uppercase text-sm italic">
                 {profile.wins} {t('profile.wins')} / {profile.losses} {t('profile.losses')}
+              </div>
+              <div className="bg-primary text-white px-4 py-2 rounded-xl border border-white/10 flex items-center gap-2">
+                <Zap size={18} className="text-accent" />
+                <span className="font-black italic text-xl">
+                  {profile.points || 0} <span className="text-[10px] uppercase not-italic opacity-70">Points</span>
+                </span>
               </div>
               <div className="bg-yellow-500/10 text-yellow-500 px-4 py-2 rounded-xl border border-yellow-500/20 flex items-center gap-2">
                 <Coins size={18} />

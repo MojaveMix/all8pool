@@ -21,6 +21,7 @@ const updateUserStats = async (match) => {
     const winner = await User.findByPk(winnerId);
     if (winner) {
       winner.wins += 1;
+      winner.points += 50;
       winner.rating = Math.min(5, parseFloat(winner.rating) + 0.2);
       
       // Award money: base reward + stake from opponent
@@ -33,6 +34,7 @@ const updateUserStats = async (match) => {
     const loser = await User.findByPk(loserId);
     if (loser) {
       loser.losses += 1;
+      loser.points = Math.max(0, loser.points - 10);
       loser.rating = Math.max(1, parseFloat(loser.rating) - 0.1);
       
       // Deduct stake from loser

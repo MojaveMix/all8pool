@@ -61,7 +61,15 @@
       "exposure_desc": "وصول مباشر لآلاف اللاعبين"
     },
     "final_cta": "هل أنت مستعد لضربة البداية؟",
-    "get_cue": "ابدأ رحلتك اليوم"
+    "get_cue": "ابدأ رحلتك اليوم",
+    "live_matches_title": "مباشر في الساحة",
+    "leaderboard_title": "أفضل اللاعبين تصنيفاً",
+    "tournaments_title": "البطولات الجارية والقادمة",
+    "stats_preview_title": "تتبع مسيرتك الاحترافية",
+    "compete_now": "نافس الآن",
+    "view_ranking": "عرض التصنيفات",
+    "join_tournament": "انضم للبطولة",
+    "players_online": "اللاعبون المتصلون"
   },
   "auth": {
     "welcome": "مرحباً بك مجدداً",

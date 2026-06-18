@@ -1,11 +1,12 @@
 const express = require('express');
-const { getUsers, getRankings, getProfile, getUserProfile, updateUserRole, createUser, updateUserStatus, deleteUser } = require('../controllers/userController');
+const { getUsers, getRankings, getProfile, getUserProfile, getGlobalStats, updateUserRole, createUser, updateUserStatus, deleteUser } = require('../controllers/userController');
 const { authMiddleware, roleMiddleware } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
 router.get('/me', authMiddleware, getProfile);
 router.get('/rankings', getRankings);
+router.get('/stats', getGlobalStats);
 router.get('/:id', getUserProfile);
 router.get('/', authMiddleware, getUsers);
 router.post('/', authMiddleware, roleMiddleware(['admin']), createUser);
