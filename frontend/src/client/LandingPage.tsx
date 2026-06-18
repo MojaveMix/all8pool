@@ -31,6 +31,7 @@ import {
   TrendingDown,
   Check,
   Gamepad2,
+  Swords
 } from "lucide-react";
 
 const LandingPage = () => {
@@ -39,17 +40,19 @@ const LandingPage = () => {
   const [stats, setStats] = useState({ players: 0, matches: 0, halls: 0 });
   const [topPlayers, setTopPlayers] = useState<any[]>([]);
   const [liveMatches, setLiveMatches] = useState<any[]>([]);
+  const [openChallenges, setOpenChallenges] = useState<any[]>([]);
   const [recentWinners, setRecentWinners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, rankingsRes, matchesRes, finishedRes] = await Promise.all([
+        const [statsRes, rankingsRes, matchesRes, finishedRes, challengesRes] = await Promise.all([
           api.get("/users/stats"),
           api.get("/users/rankings"),
           api.get("/matches?status=live"),
-          api.get("/matches?status=finished")
+          api.get("/matches?status=finished"),
+          api.get("/matches?status=open")
         ]);
         
         setStats(statsRes.data);
@@ -61,7 +64,15 @@ const LandingPage = () => {
           setLiveMatches([
             { id: 1, player1: { name: "Alex 'The Shark'" }, player2: { name: "John Doe" }, poolHall: { name: "Elite Billiards" }, score1: 3, score2: 2, stake: 50 },
             { id: 2, player1: { name: "Sarah Connor" }, player2: { name: "Mike Tyson" }, poolHall: { name: "Rack 'Em Up" }, score1: 0, score2: 1, stake: 100 },
-            { id: 3, player1: { name: "CueMaster" }, player2: { name: "Shadow" }, poolHall: { name: "The Arena" }, score1: 5, score2: 5, stake: 0 },
+          ]);
+        }
+
+        if (challengesRes.data && challengesRes.data.length > 0) {
+          setOpenChallenges(challengesRes.data.slice(0, 3));
+        } else {
+          setOpenChallenges([
+            { id: 3, player1: { name: "GhostBreak" }, poolHall: { name: "The Arena" }, stake: 200, status: "open" },
+            { id: 4, player1: { name: "ProHustler" }, poolHall: { name: "Diamond Club" }, stake: 0, status: "open" }
           ]);
         }
 
@@ -155,13 +166,6 @@ const LandingPage = () => {
     },
   ];
 
-  const liveFeed = [
-    { time: "2m ago", action: "🎯 Alex 'The Shark' won 2,500 PTS" },
-    { time: "5m ago", action: "👑 Sarah Connor ranked up to Top 50" },
-    { time: "8m ago", action: "🏆 New tournament slot claimed" },
-    { time: "12m ago", action: "⚡ 156 matches completed today" },
-  ];
-
   return (
     <div className="space-y-0 overflow-hidden pb-32 relative">
       {/* Hero Section with Live Action Feed */}
@@ -196,7 +200,7 @@ const LandingPage = () => {
           >
             <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-400">
-              🔥 {liveMatches.length} Matches Live Right Now
+              🔥 {liveMatches.length} Matches & {openChallenges.length} Challenges Live
             </span>
           </motion.div>
 
@@ -344,7 +348,7 @@ const LandingPage = () => {
         </motion.div>
       </section>
 
-      {/* Hall of Fame / Rankings Section - NOW AT TOP */}
+      {/* Hall of Fame / Rankings Section */}
       <section className="px-4 max-w-7xl mx-auto space-y-16 py-24 border-y border-white/5">
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
@@ -476,302 +480,153 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Quick Start Section - How to Get Started */}
-      <section className="bg-secondary/40 border-y border-white/5 py-20 px-4">
-        <div className="max-w-7xl mx-auto space-y-14">
-          <div className="text-center space-y-3">
-            <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
-              <Bolt size={18} />
-              Get Started Fast
+      {/* Live Matches & Challenges Section */}
+      <section className="px-4 max-w-7xl mx-auto space-y-12 py-24 bg-gradient-to-b from-transparent to-secondary/10">
+        
+        {/* Active Open Challenges */}
+        <div className="mb-20">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-yellow-500/20 rounded-2xl flex items-center justify-center border border-yellow-500/30">
+                <Swords className="text-yellow-500 animate-pulse" />
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter">
+                Open Challenges
+              </h2>
             </div>
-            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none">
-              Join in 4 <span className="text-accent">Simple Steps</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {steps.map((step, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.12 }}
-                viewport={{ once: true }}
-                className="relative group"
-              >
-                <div className="bg-secondary/50 border border-white/10 rounded-2xl p-6 space-y-4 h-full hover:border-accent/30 transition-all hover:shadow-[0_0_40px_rgba(0,255,136,0.1)]">
-                  <div className="text-5xl md:text-6xl font-black italic text-white/10 group-hover:text-accent/20 transition-colors">
-                    {step.number}
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg md:text-xl font-black italic uppercase text-white tracking-tighter">
-                      {step.title}
-                    </h3>
-                    <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest">
-                      {step.description}
-                    </p>
-                  </div>
-                </div>
-                {idx < steps.length - 1 && (
-                  <div className="hidden md:block absolute -right-3 top-1/2 transform -translate-y-1/2 z-10">
-                    <ChevronRight size={28} className="text-accent/30" />
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center pt-4">
-            {!user && (
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-3 bg-accent text-primary px-12 py-4 rounded-2xl font-black uppercase tracking-tighter text-lg hover:scale-105 transition-transform shadow-lg shadow-accent/30"
-              >
-                <Play size={20} fill="currentColor" />
-                Start Playing Now
-              </Link>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Beginner Benefits Section */}
-      <section className="px-4 max-w-7xl mx-auto py-20 space-y-14">
-        <div className="text-center space-y-3">
-          <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
-            <Star size={18} />
-            Perfect For New Players
-          </div>
-          <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none">
-            Start Your <span className="text-accent">Winning Journey</span>
-          </h2>
-          <p className="text-gray-400 text-sm font-bold max-w-2xl mx-auto">
-            We help beginner and intermediate players grow their skills and
-            ranking
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <BenefitCard
-            icon="🎯"
-            title="Matched Players"
-            description="Get paired with players at your exact skill level for fair competition"
-          />
-          <BenefitCard
-            icon="📊"
-            title="Track Progress"
-            description="Watch your ranking climb instantly after every win"
-          />
-          <BenefitCard
-            icon="🏆"
-            title="Win Real Prizes"
-            description="Earn points and cash rewards as you climb the leaderboard"
-          />
-          <BenefitCard
-            icon="🛡️"
-            title="Fair Play"
-            description="Verified players and secure scoring to ensure honest competition"
-          />
-          <BenefitCard
-            icon="💬"
-            title="Active Community"
-            description="Connect with competitive pool players worldwide"
-          />
-          <BenefitCard
-            icon="⚡"
-            title="Instant Matches"
-            description="Find a game anytime with thousands of active players"
-          />
-        </div>
-
-        <div className="text-center pt-6">
-          {!user && (
             <Link
-              to="/register"
-              className="inline-flex items-center gap-3 bg-accent/10 border border-accent/30 text-accent px-8 py-3 rounded-xl font-black uppercase tracking-tighter text-sm hover:bg-accent/20 transition-all"
+              to="/arena"
+              className="hidden md:flex items-center gap-2 text-yellow-500 font-black uppercase tracking-widest text-xs hover:text-white transition-colors"
             >
-              <Gamepad2 size={18} />
-              Create Your Free Account
+              View All <ChevronRight size={14} />
             </Link>
-          )}
-        </div>
-      </section>
+          </div>
 
-      {/* Success Stories Section */}
-      <section className="bg-accent/5 py-24 px-4 border-y border-accent/10">
-        <div className="max-w-7xl mx-auto space-y-16">
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
-              <Sparkles size={20} />
-              Real Success Stories
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {openChallenges.map((challenge) => {
+              const p1Name = challenge.player1?.name || challenge.player1Name || "Anonymous";
+              const hallName = challenge.poolHall?.name || "The Arena";
+              return (
+                <motion.div
+                  key={`challenge-${challenge.id}`}
+                  whileHover={{ y: -5 }}
+                  className="bg-secondary/60 backdrop-blur-xl border border-yellow-500/20 rounded-[2rem] p-8 space-y-6 relative overflow-hidden group shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-[50px] pointer-events-none" />
+                  
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                       <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center text-xl font-black border border-white/10 group-hover:border-yellow-500/50 transition-colors">
+                          {p1Name[0]}
+                       </div>
+                       <div>
+                         <p className="text-sm font-black uppercase tracking-widest">{p1Name}</p>
+                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1 mt-1">
+                           <MapPin size={12} className="text-yellow-500" /> {hallName}
+                         </p>
+                       </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Stake</p>
+                      <p className="text-lg font-black italic text-yellow-500">{challenge.stake > 0 ? `${challenge.stake} PTS` : 'FREE'}</p>
+                    </div>
+                  </div>
+
+                  <Link
+                    to="/arena"
+                    className="block w-full py-3 text-center bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-500 font-black uppercase tracking-widest text-xs rounded-xl transition-colors"
+                  >
+                    Accept Challenge
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Live Active Matches */}
+        <div>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center border border-red-500/30">
+                <Activity className="text-red-500 animate-pulse" />
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter">
+                Live Arena Action
+              </h2>
             </div>
-            <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none">
-              Players Like <span className="text-accent">You</span> Winning
-            </h2>
-            <p className="text-gray-400 text-lg font-bold max-w-2xl mx-auto">
-              See what's possible when you join the elite competitive community
-            </p>
+            <div className="hidden md:flex items-center gap-2 text-red-500 font-black uppercase tracking-widest text-xs">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-ping" />
+              {liveMatches.length} Matches in Progress
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {successStories.map((story, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-secondary/50 border border-white/10 rounded-[2.5rem] p-10 space-y-6 hover:border-accent/30 transition-all hover:shadow-[0_0_40px_rgba(0,255,136,0.1)]"
-              >
-                <div className="text-6xl">{story.icon}</div>
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-black italic text-white uppercase tracking-tighter">
-                    {story.name}
-                  </h3>
-                  <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">
-                    {story.achievement}
-                  </p>
-                  <div className="flex items-center gap-2 pt-4 border-t border-white/10">
-                    <Zap size={16} className="text-accent" />
-                    <span className="text-accent font-black text-lg">
-                      {story.earnings}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+            {liveMatches.map((match) => {
+              const p1Name = match.player1?.name || match.player1Name || "Player 1";
+              const p2Name = match.player2?.name || match.player2Name || "Player 2";
+              const hallName = match.poolHall?.name || "The Arena";
+              const matchType = match.stake > 0 ? `Stake: ${match.stake} PTS` : "Friendly Match";
 
-      {/* Everything You Need to Dominate - Feature Grid */}
-      <section className="bg-gradient-to-b from-primary via-secondary/20 to-primary py-20 px-4">
-        <div className="max-w-7xl mx-auto space-y-20">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="space-y-4">
-              <h2 className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter leading-none">
-                Everything You Need <br />
-                <span className="text-accent">To Dominate.</span>
-              </h2>
-              <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-lg">
-                Integrated Suite for the Modern Player
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <ModernFeature
-              icon={<Layout />}
-              title="Pro Dashboard"
-              desc="Analyze every break, bank, and victory with precision data."
-            />
-            <ModernFeature
-              icon={<MousePointer2 />}
-              title="Quick Booking"
-              desc="Reserve your favorite table in seconds, anytime, anywhere."
-            />
-            <ModernFeature
-              icon={<Lock />}
-              title="Secured Match"
-              desc="Fair play guaranteed with verified score reporting protocols."
-            />
-            <QuickStat
-              icon={<Globe />}
-              label="Global Network"
-              value="45+ Cities"
-              color="text-cyan-400"
-              className="bg-secondary/40 p-10 rounded-[3rem] border border-white/5"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Live Matches Section */}
-      <section className="px-4 max-w-7xl mx-auto space-y-12 py-24">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center border border-red-500/30">
-              <Activity className="text-red-500 animate-pulse" />
-            </div>
-            <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter">
-              Live Arena Action
-            </h2>
-          </div>
-          <div className="hidden md:flex items-center gap-2 text-red-500 font-black uppercase tracking-widest text-xs">
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-ping" />
-            {liveMatches.length} Matches in Progress
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {liveMatches.map((match) => {
-            const p1Name =
-              match.player1?.name || match.player1Name || "Player 1";
-            const p2Name =
-              match.player2?.name || match.player2Name || "Player 2";
-            const scoreText = `${match.score1 || 0} - ${match.score2 || 0}`;
-            const hallName = match.poolHall?.name || "The Arena";
-            const matchType =
-              match.stake > 0 ? `Stake: ${match.stake} PTS` : "Friendly Match";
-
-            return (
-              <motion.div
-                key={match.id}
-                whileHover={{ y: -10 }}
-                className="bg-secondary/40 backdrop-blur-xl border border-white/10 rounded-[3rem] p-10 space-y-8 relative group overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 p-6">
-                  <div className="text-[10px] font-black text-accent uppercase tracking-widest opacity-50 group-hover:opacity-100 transition-opacity">
-                    {matchType}
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center text-center">
-                  <div className="space-y-3 flex-1 min-w-0">
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-3xl mx-auto flex items-center justify-center text-2xl font-black border border-white/10 group-hover:border-accent/50 transition-colors shadow-xl">
-                      {p1Name[0]}
-                    </div>
-                    <p className="text-xs font-black uppercase tracking-widest truncate w-full px-2 mx-auto">
-                      {p1Name}
-                    </p>
-                  </div>
-                  
-                  <div className="px-2 md:px-4 shrink-0 flex flex-col items-center space-y-3">
-                    <div className="flex items-center justify-center gap-3 bg-primary/40 px-4 py-2 rounded-2xl border border-white/5 shadow-inner">
-                      <span className="text-3xl md:text-4xl font-black italic text-white drop-shadow-md">{match.score1 || 0}</span>
-                      <span className="text-[10px] font-black italic text-accent uppercase tracking-widest">VS</span>
-                      <span className="text-3xl md:text-4xl font-black italic text-white drop-shadow-md">{match.score2 || 0}</span>
-                    </div>
-                    <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
-                      <div className="w-1/2 h-full bg-accent animate-shimmer" />
+              return (
+                <motion.div
+                  key={`live-${match.id}`}
+                  whileHover={{ y: -10 }}
+                  className="bg-secondary/40 backdrop-blur-xl border border-white/10 rounded-[3rem] p-10 space-y-8 relative group overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 p-6">
+                    <div className="text-[10px] font-black text-accent uppercase tracking-widest opacity-50 group-hover:opacity-100 transition-opacity">
+                      {matchType}
                     </div>
                   </div>
 
-                  <div className="space-y-3 flex-1 min-w-0">
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-3xl mx-auto flex items-center justify-center text-2xl font-black border border-white/10 group-hover:border-accent/50 transition-colors shadow-xl">
-                      {p2Name[0]}
+                  <div className="flex justify-between items-center text-center">
+                    <div className="space-y-3 flex-1 min-w-0">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-3xl mx-auto flex items-center justify-center text-2xl font-black border border-white/10 group-hover:border-accent/50 transition-colors shadow-xl">
+                        {p1Name[0]}
+                      </div>
+                      <p className="text-xs font-black uppercase tracking-widest truncate w-full px-2 mx-auto">
+                        {p1Name}
+                      </p>
                     </div>
-                    <p className="text-xs font-black uppercase tracking-widest truncate w-full px-2 mx-auto">
-                      {p2Name}
-                    </p>
-                  </div>
-                </div>
+                    
+                    <div className="px-2 md:px-4 shrink-0 flex flex-col items-center space-y-3">
+                      <div className="flex items-center justify-center gap-3 bg-primary/40 px-4 py-2 rounded-2xl border border-white/5 shadow-inner">
+                        <span className="text-3xl md:text-4xl font-black italic text-white drop-shadow-md">{match.score1 || 0}</span>
+                        <span className="text-[10px] font-black italic text-accent uppercase tracking-widest">VS</span>
+                        <span className="text-3xl md:text-4xl font-black italic text-white drop-shadow-md">{match.score2 || 0}</span>
+                      </div>
+                      <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div className="w-1/2 h-full bg-accent animate-shimmer" />
+                      </div>
+                    </div>
 
-                <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-gray-400 text-[10px] font-black uppercase tracking-widest">
-                    <MapPin size={16} className="text-accent" />
-                    {hallName}
+                    <div className="space-y-3 flex-1 min-w-0">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-3xl mx-auto flex items-center justify-center text-2xl font-black border border-white/10 group-hover:border-accent/50 transition-colors shadow-xl">
+                        {p2Name[0]}
+                      </div>
+                      <p className="text-xs font-black uppercase tracking-widest truncate w-full px-2 mx-auto">
+                        {p2Name}
+                      </p>
+                    </div>
                   </div>
-                  <Link
-                    to="/arena"
-                    className="p-3 bg-accent text-primary rounded-2xl hover:scale-110 transition-transform shadow-lg shadow-accent/20"
-                  >
-                    <Play size={16} fill="currentColor" />
-                  </Link>
-                </div>
-              </motion.div>
-            );
-          })}
+
+                  <div className="pt-6 border-t border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-gray-400 text-[10px] font-black uppercase tracking-widest">
+                      <MapPin size={16} className="text-accent" />
+                      {hallName}
+                    </div>
+                    <Link
+                      to="/arena"
+                      className="p-3 bg-accent text-primary rounded-2xl hover:scale-110 transition-transform shadow-lg shadow-accent/20"
+                    >
+                      <Play size={16} fill="currentColor" />
+                    </Link>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -895,8 +750,129 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Quick Start Section - How to Get Started */}
+      <section className="bg-secondary/40 border-y border-white/5 py-20 px-4">
+        <div className="max-w-7xl mx-auto space-y-14">
+          <div className="text-center space-y-3">
+            <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
+              <Bolt size={18} />
+              Get Started Fast
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none">
+              Join in 4 <span className="text-accent">Simple Steps</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {steps.map((step, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.12 }}
+                viewport={{ once: true }}
+                className="relative group"
+              >
+                <div className="bg-secondary/50 border border-white/10 rounded-2xl p-6 space-y-4 h-full hover:border-accent/30 transition-all hover:shadow-[0_0_40px_rgba(0,255,136,0.1)]">
+                  <div className="text-5xl md:text-6xl font-black italic text-white/10 group-hover:text-accent/20 transition-colors">
+                    {step.number}
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg md:text-xl font-black italic uppercase text-white tracking-tighter">
+                      {step.title}
+                    </h3>
+                    <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+                {idx < steps.length - 1 && (
+                  <div className="hidden md:block absolute -right-3 top-1/2 transform -translate-y-1/2 z-10">
+                    <ChevronRight size={28} className="text-accent/30" />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center pt-4">
+            {!user && (
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-3 bg-accent text-primary px-12 py-4 rounded-2xl font-black uppercase tracking-tighter text-lg hover:scale-105 transition-transform shadow-lg shadow-accent/30"
+              >
+                <Play size={20} fill="currentColor" />
+                Start Playing Now
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Beginner Benefits Section */}
+      <section className="px-4 max-w-7xl mx-auto py-20 space-y-14">
+        <div className="text-center space-y-3">
+          <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
+            <Star size={18} />
+            Perfect For New Players
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none">
+            Start Your <span className="text-accent">Winning Journey</span>
+          </h2>
+          <p className="text-gray-400 text-sm font-bold max-w-2xl mx-auto">
+            We help beginner and intermediate players grow their skills and
+            ranking
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <BenefitCard
+            icon="🎯"
+            title="Matched Players"
+            description="Get paired with players at your exact skill level for fair competition"
+          />
+          <BenefitCard
+            icon="📊"
+            title="Track Progress"
+            description="Watch your ranking climb instantly after every win"
+          />
+          <BenefitCard
+            icon="🏆"
+            title="Win Real Prizes"
+            description="Earn points and cash rewards as you climb the leaderboard"
+          />
+          <BenefitCard
+            icon="🛡️"
+            title="Fair Play"
+            description="Verified players and secure scoring to ensure honest competition"
+          />
+          <BenefitCard
+            icon="💬"
+            title="Active Community"
+            description="Connect with competitive pool players worldwide"
+          />
+          <BenefitCard
+            icon="⚡"
+            title="Instant Matches"
+            description="Find a game anytime with thousands of active players"
+          />
+        </div>
+
+        <div className="text-center pt-6">
+          {!user && (
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-3 bg-accent/10 border border-accent/30 text-accent px-8 py-3 rounded-xl font-black uppercase tracking-tighter text-sm hover:bg-accent/20 transition-all"
+            >
+              <Gamepad2 size={18} />
+              Create Your Free Account
+            </Link>
+          )}
+        </div>
+      </section>
+
       {/* Hall Owner CTA - Register Your Hall */}
-      <section className="px-4 max-w-7xl mx-auto py-24">
+      <section className="px-4 max-w-7xl mx-auto py-24 border-t border-white/5">
         <div className="bg-[radial-gradient(circle_at_top_right,_rgba(0,255,136,0.1),_transparent)] bg-secondary/50 rounded-[5rem] p-16 md:p-32 border border-white/10 relative overflow-hidden shadow-2xl">
           <div className="absolute -left-20 -bottom-20 opacity-5 -rotate-12">
             <ShieldCheck size={500} />
