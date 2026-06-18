@@ -2,33 +2,26 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../store/AuthContext";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import api from "../api";
 import {
   Trophy,
-  Target,
   Users,
   Calendar,
   ChevronRight,
   Star,
   MapPin,
   Play,
-  Zap,
   ShieldCheck,
   TrendingUp,
   Activity,
   Medal,
   Clock,
   ArrowRight,
-  Layout,
-  MousePointer2,
-  Lock,
   Globe,
   Flame,
-  Sparkles,
   Bolt,
   Crown,
-  TrendingDown,
   Check,
   Gamepad2,
   Swords
@@ -42,7 +35,7 @@ const LandingPage = () => {
   const [liveMatches, setLiveMatches] = useState<any[]>([]);
   const [openChallenges, setOpenChallenges] = useState<any[]>([]);
   const [recentWinners, setRecentWinners] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,26 +115,7 @@ const LandingPage = () => {
     },
   ];
 
-  const successStories = [
-    {
-      name: "Marcus J.",
-      achievement: "Climbed 1000 Ranks in 3 Months",
-      earnings: "$2,400 earned",
-      icon: "🚀",
-    },
-    {
-      name: "Elena K.",
-      achievement: "Tournament Champion 2x",
-      earnings: "$8,500 winnings",
-      icon: "👑",
-    },
-    {
-      name: "David M.",
-      achievement: "Hall Elite Member",
-      earnings: "$5,200 earned",
-      icon: "⚡",
-    },
-  ];
+
 
   const steps = [
     {
@@ -960,24 +934,7 @@ const QuickStat = ({ icon, label, value, color, className = "" }: any) => (
   </div>
 );
 
-const ModernFeature = ({ icon, title, desc }: any) => (
-  <motion.div
-    whileHover={{ y: -5 }}
-    className="bg-secondary/30 p-10 rounded-[3rem] border border-white/5 space-y-6 hover:border-accent/30 transition-colors group"
-  >
-    <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-primary transition-all duration-500">
-      {icon}
-    </div>
-    <div className="space-y-3">
-      <h3 className="text-2xl font-black italic uppercase text-white tracking-tighter">
-        {title}
-      </h3>
-      <p className="text-xs text-gray-500 font-bold uppercase tracking-widest leading-relaxed">
-        {desc}
-      </p>
-    </div>
-  </motion.div>
-);
+
 
 const OwnerFeature = ({ icon, title }: any) => (
   <div className="p-8 bg-primary/40 rounded-[2.5rem] border border-white/5 space-y-4 group hover:border-accent/30 transition-colors">
