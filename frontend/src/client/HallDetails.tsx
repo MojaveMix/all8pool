@@ -39,6 +39,7 @@ interface Hall {
   promotionType: "none" | "percentage" | "free";
   promotionValue: number;
   currency?: string;
+  image?: string;
 }
 
 const HallDetails = () => {
@@ -226,10 +227,17 @@ const HallDetails = () => {
       </button>
 
       {/* Hall Hero Header */}
-      <div className="bg-secondary/50 rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 border border-white/10 flex flex-col md:flex-row justify-between items-start gap-8 md:gap-10 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-          <MapPin size={240} />
-        </div>
+      <div className="bg-secondary/50 rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 border border-white/10 flex flex-col md:flex-row justify-between items-start gap-8 md:gap-10 relative overflow-hidden min-h-[220px]">
+        {hall.image ? (
+          <>
+            <img src={hall.image} alt={hall.name} className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent pointer-events-none" />
+          </>
+        ) : (
+          <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+            <MapPin size={240} />
+          </div>
+        )}
         <div className="relative z-10 w-full md:w-auto">
           <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter text-white uppercase leading-tight md:leading-none">
             {hall.name}

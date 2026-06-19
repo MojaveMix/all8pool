@@ -2,7 +2,7 @@ const { PoolHall, Table } = require('../../infrastructure/database/models');
 
 const createPoolHall = async (req, res) => {
   try {
-    const { name, address, city, phone, description, openingTime, closingTime, currency } = req.body;
+    const { name, address, city, phone, description, openingTime, closingTime, currency, image } = req.body;
     const poolHall = await PoolHall.create({
       name,
       address,
@@ -12,6 +12,7 @@ const createPoolHall = async (req, res) => {
       openingTime,
       closingTime,
       currency,
+      image,
       ownerId: req.user.id,
     });
     res.status(201).json(poolHall);
@@ -63,7 +64,7 @@ const updatePoolHall = async (req, res) => {
       name, address, city, phone, description, 
       openingTime, closingTime, 
       promotionType, promotionValue,
-      currency
+      currency, image
     } = req.body;
 
     const poolHall = await PoolHall.findByPk(id);
@@ -78,7 +79,7 @@ const updatePoolHall = async (req, res) => {
       name, address, city, phone, description, 
       openingTime, closingTime, 
       promotionType, promotionValue,
-      currency
+      currency, image
     });
 
     res.json(poolHall);

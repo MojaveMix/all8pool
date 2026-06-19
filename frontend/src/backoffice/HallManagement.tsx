@@ -14,6 +14,7 @@ interface PoolHall {
   promotionType: 'none' | 'percentage' | 'free';
   promotionValue: number;
   currency: string;
+  image?: string;
 }
 
 const HallManagement = () => {
@@ -31,6 +32,7 @@ const HallManagement = () => {
     promotionType: 'none',
     promotionValue: 0,
     currency: 'USD',
+    image: '',
   });
 
   useEffect(() => {
@@ -58,6 +60,7 @@ const HallManagement = () => {
       promotionType: hall.promotionType,
       promotionValue: hall.promotionValue,
       currency: hall?.currency || 'USD',
+      image: hall.image || '',
     });
     setShowModal(true);
   };
@@ -97,6 +100,7 @@ const HallManagement = () => {
               promotionType: 'none',
               promotionValue: 0,
               currency: 'USD',
+              image: '',
             });
             setShowModal(true);
           }}
@@ -113,6 +117,16 @@ const HallManagement = () => {
                <div className="absolute -right-12 top-6 bg-accent text-primary px-12 py-1 rotate-45 font-black text-[10px] uppercase tracking-widest shadow-xl">
                   {hall.promotionType === 'free' ? 'FREE' : `${hall.promotionValue}% OFF`}
                </div>
+            )}
+            
+            {hall.image ? (
+              <div className="h-36 bg-primary rounded-t-[2.5rem] -mx-8 -mt-8 mb-6 overflow-hidden border-b border-gray-800">
+                <img src={hall.image} alt={hall.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              </div>
+            ) : (
+              <div className="h-20 bg-primary rounded-t-[1.5rem] -mx-8 -mt-8 mb-6 flex items-center justify-center border-b border-gray-800 text-white/5 font-black uppercase italic select-none">
+                ARENA
+              </div>
             )}
             
             <div className="flex justify-between items-start mb-6">
@@ -236,6 +250,55 @@ const HallManagement = () => {
                   onChange={(e) => setFormData({...formData, address: e.target.value})}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Hall Image (Optional)</label>
+                <div className="flex flex-col gap-4">
+                  {formData.image && (
+                    <div className="h-32 rounded-2xl overflow-hidden border border-gray-800 bg-primary relative group">
+                      <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({...formData, image: ''})}
+                        className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-black text-xs text-red-400 uppercase tracking-widest"
+                      >
+                        Remove Image
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-4">
+                    <input
+                      type="text"
+                      placeholder="Paste Image URL"
+                      className="flex-grow bg-primary border border-gray-800 p-4 rounded-2xl text-white outline-none focus:border-accent font-bold text-sm"
+                      value={formData.image && formData.image.startsWith('data:') ? 'Uploaded Image File' : formData.image}
+                      disabled={formData.image ? formData.image.startsWith('data:') : false}
+                      onChange={(e) => setFormData({...formData, image: e.target.value})}
+                    />
+                    <label className="shrink-0 bg-primary border border-gray-800 hover:border-accent text-gray-400 hover:text-accent font-bold px-6 py-4 rounded-2xl cursor-pointer text-sm flex items-center justify-center transition-colors">
+                      Upload File
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 2 * 1024 * 1024) {
+                            alert("Image too large. Choose an image under 2MB.");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setFormData({...formData, image: reader.result as string});
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">

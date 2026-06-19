@@ -32,7 +32,7 @@ const User = sequelize.define('User', {
     defaultValue: 'active',
   },
   avatar: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
   },
   wins: {
     type: DataTypes.INTEGER,

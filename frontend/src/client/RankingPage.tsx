@@ -77,7 +77,13 @@ const ChallengeModal = ({ player, onClose }: { player: Player, onClose: () => vo
 
           <div className="flex items-center gap-4 p-4 bg-primary/50 rounded-3xl border border-white/5">
              <div className="w-16 h-16 bg-secondary rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden">
-                {player.avatar ? <img src={player.avatar} className="w-full h-full object-cover" /> : <Users size={24} className="text-gray-700" />}
+                {player.avatar ? (
+                  <img src={player.avatar} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-xl text-primary uppercase select-none">
+                    {player.name ? player.name[0] : 'P'}
+                  </div>
+                )}
              </div>
              <div>
                 <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Challenging Rival</p>
@@ -289,7 +295,13 @@ const RankingPage = () => {
               <div className="w-12 text-center font-black italic text-gray-700 text-2xl group-hover:text-accent transition-colors">#{index + 4}</div>
               
               <Link to={`/profile/${player.id}`} className="w-14 h-14 bg-secondary rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform">
-                {player.avatar ? <img src={player.avatar} className="w-full h-full object-cover" /> : <Users size={24} className="text-gray-700" />}
+                {player.avatar ? (
+                  <img src={player.avatar} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-lg text-primary uppercase select-none">
+                    {player.name ? player.name[0] : 'P'}
+                  </div>
+                )}
               </Link>
 
               <div className="flex-1">
@@ -347,7 +359,13 @@ const PodiumPosition = ({ player, rank, color, bgColor, height, stars, isGold, t
    <div className="flex flex-col items-center gap-6">
       <Link to={`/profile/${player.id}`} className="relative">
          <div className={`w-24 h-24 rounded-[2rem] border-4 border-white/10 overflow-hidden shadow-2xl relative z-10 ${isGold ? 'scale-125' : ''}`}>
-            {player.avatar ? <img src={player.avatar} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-secondary flex items-center justify-center"><Users size={40} className="text-gray-700" /></div>}
+            {player.avatar ? (
+              <img src={player.avatar} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-3xl text-primary uppercase select-none">
+                {player.name ? player.name[0] : 'P'}
+              </div>
+            )}
          </div>
          <div className={`absolute -top-4 -right-4 w-12 h-12 ${bgColor} rounded-2xl flex items-center justify-center border-2 border-white/10 z-20 shadow-xl`}>
             <Trophy className={color} size={20} />

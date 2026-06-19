@@ -6,6 +6,8 @@ interface User {
   name: string;
   email: string;
   role: "player" | "owner" | "admin";
+  avatar?: string | null;
+  virtualMoney?: number;
 }
 
 interface AuthContextType {
@@ -19,6 +21,7 @@ interface AuthContextType {
     role: string,
   ) => Promise<void>;
   logout: () => void;
+  updateUser: (fields: Partial<User>) => void;
   loading: boolean;
 }
 
@@ -77,9 +80,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("user");
   };
 
+  const updateUser = (fields: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev, ...fields };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, token, login, register, logout, loading }}
+      value={{ user, token, login, register, logout, updateUser, loading }}
     >
       {children}
     </AuthContext.Provider>

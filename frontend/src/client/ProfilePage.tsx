@@ -14,6 +14,7 @@ import {
   Medal,
   Coins,
   Zap,
+  Camera,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../shared/LoadingSpinner";
@@ -34,7 +35,7 @@ interface UserProfile {
 
 const ProfilePage = () => {
   const { userId } = useParams();
-  const { user: authUser, loading: authLoading } = useAuth();
+  const { user: authUser, loading: authLoading, updateUser } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -71,6 +72,32 @@ const ProfilePage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image is too large. Please select an image under 2MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+      try {
+        const res = await api.put("/users/me", { avatar: base64String });
+        if (res.data?.user && isOwnProfile) {
+          updateUser({ avatar: res.data.user.avatar });
+        }
+        fetchProfile();
+      } catch (err) {
+        console.error("Failed to update avatar", err);
+        alert("Failed to update photo");
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const renderStars = (rating: number) => {
@@ -123,7 +150,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="relative flex flex-col md:flex-row items-center gap-10">
-          <div className="w-40 h-40 bg-primary rounded-[2.5rem] border-4 border-accent/30 flex items-center justify-center overflow-hidden shadow-2xl">
+          <div className="w-40 h-40 bg-primary rounded-[2.5rem] border-4 border-accent/30 flex items-center justify-center overflow-hidden shadow-2xl relative group">
             {profile.avatar ? (
               <img
                 src={profile.avatar}
@@ -131,7 +158,21 @@ const ProfilePage = () => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <UserIcon size={80} className="text-gray-700" />
+              <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-5xl text-primary uppercase select-none">
+                {profile.name ? profile.name[0] : 'P'}
+              </div>
+            )}
+            {isOwnProfile && (
+              <label className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white text-[10px] font-black uppercase tracking-widest gap-2 select-none">
+                <Camera size={20} className="text-accent animate-bounce" />
+                <span>Change Photo</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+              </label>
             )}
           </div>
 

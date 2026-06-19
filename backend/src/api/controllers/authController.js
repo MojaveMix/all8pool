@@ -33,6 +33,7 @@ const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
       },
       token,
     });
@@ -87,6 +88,7 @@ const login = async (req, res) => {
         email: user.email,
         role: user.role,
         virtualMoney: user.virtualMoney,
+        avatar: user.avatar,
       },
       token,
       bonusAwarded,

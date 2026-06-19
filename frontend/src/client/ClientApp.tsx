@@ -15,7 +15,7 @@ import {
   TermsPage,
   PrivacyPage,
 } from "./info/InfoPages";
-import { User as UserIcon, LogIn, LogOut, Menu, X } from "lucide-react";
+import { LogIn, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const ClientApp = () => {
@@ -121,7 +121,17 @@ const ClientApp = () => {
             {user ? (
               <div className="pt-2 border-t border-white/10">
                 <div className="flex items-center gap-3 mb-3">
-                  <UserIcon size={20} className="text-emerald-400" />
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt=""
+                      className="w-8 h-8 rounded-full object-cover border border-emerald-400/30"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-gradient-to-br from-accent to-emerald-600 rounded-full flex items-center justify-center font-black italic text-xs text-primary uppercase select-none">
+                      {user.name ? user.name[0] : 'P'}
+                    </div>
+                  )}
                   <span className="font-semibold">{user.name}</span>
                 </div>
                 {(user.role === "owner" || user.role === "admin") && (
@@ -259,10 +269,20 @@ const UserMenu = ({
     )}
     <Link
       to="/profile"
-      className="flex items-center gap-1.5 lg:gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 lg:px-4 lg:py-2 rounded-full border border-white/20 hover:border-emerald-400/50 transition-all"
+      className="flex items-center gap-1.5 lg:gap-2 bg-white/10 backdrop-blur-sm pl-1.5 pr-3 py-1.5 lg:pl-2 lg:pr-4 lg:py-2 rounded-full border border-white/20 hover:border-emerald-400/50 transition-all shrink-0"
     >
-      <UserIcon size={18} className="text-emerald-400" />
-      <span className="text-xs lg:text-sm font-bold">{user.name}</span>
+      {user.avatar ? (
+        <img
+          src={user.avatar}
+          alt=""
+          className="w-6 h-6 rounded-full object-cover border border-emerald-400/30"
+        />
+      ) : (
+        <div className="w-6 h-6 bg-gradient-to-br from-accent to-emerald-600 rounded-full flex items-center justify-center font-black italic text-[10px] text-primary uppercase select-none shrink-0">
+          {user.name ? user.name[0] : 'P'}
+        </div>
+      )}
+      <span className="text-xs lg:text-sm font-bold truncate max-w-[100px]">{user.name}</span>
     </Link>
     <button
       onClick={() => {

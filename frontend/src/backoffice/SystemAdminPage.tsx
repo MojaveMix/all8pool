@@ -52,6 +52,39 @@ const SystemAdminPage = () => {
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "player" });
   const [createLoading, setCreateLoading] = useState(false);
 
+  const [readMessages, setReadMessages] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("admin_read_messages") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  const handleMarkAsRead = (requestId: string) => {
+    if (!readMessages.includes(requestId)) {
+      const updated = [...readMessages, requestId];
+      setReadMessages(updated);
+      localStorage.setItem("admin_read_messages", JSON.stringify(updated));
+    }
+  };
+
+  const unreadCount = requests.filter(r => r.message && !readMessages.includes(r.id)).length;
+
+  const formatTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (seconds < 60) return "Just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days}d ago`;
+    return date.toLocaleDateString();
+  };
+
   const fetchUsers = async (query: string = "") => {
     try {
       setLoading(true);
@@ -65,17 +98,21 @@ const SystemAdminPage = () => {
     }
   };
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await api.get('/owner-requests');
       setRequests(res.data);
     } catch (err) {
       console.error("Failed to fetch requests", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchRequests(true);
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'users') {
@@ -238,11 +275,16 @@ const SystemAdminPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('requests')}
-          className={`px-6 py-4 font-black uppercase tracking-widest text-xs transition-all relative ${
+          className={`px-6 py-4 font-black uppercase tracking-widest text-xs transition-all relative flex items-center gap-2 ${
             activeTab === 'requests' ? 'text-accent' : 'text-gray-500 hover:text-white'
           }`}
         >
           Partner Applications
+          {unreadCount > 0 && (
+            <span className="px-1.5 py-0.5 text-[9px] bg-danger text-white rounded-full font-black animate-pulse select-none">
+              {unreadCount}
+            </span>
+          )}
           {activeTab === 'requests' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />}
         </button>
       </div>
@@ -406,9 +448,26 @@ const SystemAdminPage = () => {
                       </div>
 
                       {r.message && (
-                        <div className="bg-secondary/50 rounded-xl p-4 border border-gray-800/50">
-                          <p className="text-xs text-gray-500 font-black uppercase tracking-widest mb-2">Message</p>
-                          <p className="text-sm text-gray-400 font-medium italic">"{r.message}"</p>
+                        <div 
+                          onClick={() => handleMarkAsRead(r.id)}
+                          className={`rounded-xl p-4 border transition-colors cursor-pointer ${
+                            !readMessages.includes(r.id) 
+                              ? 'bg-accent/5 border-accent/30 hover:bg-accent/10 shadow-[0_0_15px_rgba(0,255,136,0.05)]' 
+                              : 'bg-secondary/50 border-gray-800/50 hover:bg-secondary/70'
+                          }`}
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <p className="text-xs text-gray-500 font-black uppercase tracking-widest flex items-center gap-2 select-none">
+                              Message 
+                              {!readMessages.includes(r.id) && (
+                                <span className="bg-accent text-primary text-[9px] px-2 py-0.5 rounded-full font-black animate-pulse normal-case tracking-normal">New</span>
+                              )}
+                            </p>
+                            <span className="text-[10px] text-gray-500 font-bold select-none">
+                              {formatTimeAgo(r.createdAt)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-300 font-medium italic">"{r.message}"</p>
                         </div>
                       )}
                       

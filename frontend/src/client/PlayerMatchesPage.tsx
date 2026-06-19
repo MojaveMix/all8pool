@@ -357,6 +357,10 @@ const PlayerMatchCard = ({ match, onJoin, onRespond, currentUser, t }: { match: 
           <Link to={match.player1 ? `/profile/${match.player1.id}` : '#'} className={`relative w-16 h-16 bg-primary rounded-2xl border border-gray-800 flex items-center justify-center mx-auto mb-2 shadow-inner group-hover:scale-110 transition-transform block ${!match.player1 ? 'cursor-default' : 'hover:border-accent'}`}>
              {match.player1?.avatar ? (
                 <img src={match.player1.avatar} className="w-full h-full object-cover rounded-2xl" />
+             ) : match.player1 ? (
+                <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-xl text-primary uppercase select-none rounded-2xl">
+                  {match.player1.name ? match.player1.name[0] : 'P'}
+                </div>
              ) : (
                 <Users size={24} className="text-gray-700" />
              )}
@@ -382,6 +386,10 @@ const PlayerMatchCard = ({ match, onJoin, onRespond, currentUser, t }: { match: 
                 <div className="w-full h-full bg-accent/10 text-accent flex flex-col items-center justify-center gap-1">
                    <UserPlus size={20} />
                    <span className="text-[8px] font-black uppercase tracking-tighter">Open</span>
+                </div>
+             ) : match.player2 ? (
+                <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-xl text-primary uppercase select-none rounded-2xl">
+                  {match.player2.name ? match.player2.name[0] : 'P'}
                 </div>
              ) : (
                 <Users size={24} className="text-gray-700" />
