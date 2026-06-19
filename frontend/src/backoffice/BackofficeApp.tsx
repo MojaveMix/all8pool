@@ -8,6 +8,9 @@ import {
 } from "react-router-dom";
 import { useAuth } from "../store/AuthContext";
 import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import api from "../api";
 import HallManagement from "./HallManagement";
 import TableManagement from "./TableManagement";
 import DashboardOverview from "./DashboardOverview";
@@ -31,6 +34,8 @@ import {
   Settings,
   Users as UsersIcon,
   BarChart3,
+  Bell,
+  Check,
 } from "lucide-react";
 
 const BackofficeApp = () => {
@@ -218,6 +223,17 @@ const BackofficeApp = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-12 overflow-auto bg-[radial-gradient(circle_at_top_right,_#1a1a1a,_#121212)]">
+        {/* Top Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-gray-800 pb-6 shrink-0">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight text-white uppercase italic font-mono bg-gradient-to-r from-white via-accent to-white bg-clip-text text-transparent">Partner Portal</h2>
+            <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-1">Lobby Control & System Operations</p>
+          </div>
+          <div className="flex items-center gap-4 self-end sm:self-auto">
+            <OwnerNotificationBell />
+          </div>
+        </div>
+
         {!hallId && window.location.pathname !== "/backoffice" && window.location.pathname !== "/backoffice/admin" && (
           <div className="bg-warning/10 border border-warning/20 text-warning p-4 rounded-2xl mb-8 font-bold text-sm flex items-center gap-3">
             <Activity size={18} />
@@ -274,6 +290,200 @@ const BackofficeApp = () => {
           />
         </Routes>
       </main>
+    </div>
+  );
+};
+
+const OwnerNotificationBell = () => {
+  const { user } = useAuth();
+  const [challenges, setChallenges] = useState<any[]>([]);
+  const [ownerHalls, setOwnerHalls] = useState<any[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  // For organizing matches
+  const [selectedTables, setSelectedTables] = useState<Record<string, string>>({});
+
+  const fetchData = async () => {
+    if (!user || (user.role !== 'owner' && user.role !== 'admin')) return;
+    try {
+      // Get owner's halls (with tables embedded)
+      const hallsRes = await api.get('/pool-halls/my');
+      setOwnerHalls(hallsRes.data);
+      const myHallIds = hallsRes.data.map((h: any) => h.id);
+
+      // Get all challenge matches
+      const matchesRes = await api.get('/matches?status=challenge');
+      
+      // Filter for accepted challenges at the owner's halls that are not organized yet
+      const pendingOrganize = matchesRes.data.filter(
+        (m: any) => m.challengeStatus === 'accepted' && m.status === 'challenge' && myHallIds.includes(m.poolHallId)
+      );
+      
+      setChallenges(pendingOrganize);
+
+      // Pre-select first available table for each challenge
+      const initialTables: Record<string, string> = {};
+      pendingOrganize.forEach((m: any) => {
+        const hall = hallsRes.data.find((h: any) => h.id === m.poolHallId);
+        const availTable = hall?.tables?.find((t: any) => t.status === 'available');
+        if (availTable) {
+          initialTables[m.id] = availTable.id;
+        }
+      });
+      setSelectedTables(prev => ({ ...initialTables, ...prev }));
+    } catch (err) {
+      console.error('Error fetching owner notifications:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 15000); // Check every 15s
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const handleOrganize = async (matchId: string) => {
+    const tableId = selectedTables[matchId];
+    if (!tableId) {
+      alert('Please assign an available table first.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.patch(`/matches/${matchId}/organize`, { tableId });
+      alert('Match successfully organized and confirmed!');
+      fetchData();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to organize match');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user || (user.role !== 'owner' && user.role !== 'admin')) return null;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative p-2 text-gray-400 hover:text-accent hover:bg-white/5 rounded-full transition-all duration-300 flex items-center justify-center shrink-0"
+      >
+        <Bell size={18} />
+        {challenges.length > 0 && (
+          <span className="absolute top-0 right-0 w-4 h-4 bg-accent text-primary text-[9px] font-black rounded-full flex items-center justify-center shadow-[0_0_8px_#00ff88]">
+            {challenges.length}
+          </span>
+        )}
+      </button>
+
+      {/* Dropdown Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-45" onClick={() => setIsOpen(false)} />
+            
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              className="absolute right-0 top-full mt-3 w-[320px] sm:w-[340px] bg-secondary border border-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-50 p-5 space-y-4 text-left backdrop-blur-xl"
+            >
+              <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent font-mono">Gauntlet Coordinator</span>
+                  <p className="text-[9px] text-gray-500 font-mono mt-0.5">Authorize accepted matches</p>
+                </div>
+                <span className="bg-accent/10 border border-accent/20 text-accent text-[9px] font-mono font-bold px-2 py-0.5 rounded-full">
+                  {challenges.length} Pending
+                </span>
+              </div>
+
+              <div className="max-h-72 overflow-y-auto space-y-3.5 pr-1">
+                {challenges.length > 0 ? (
+                  challenges.map((c) => {
+                    const hall = ownerHalls.find(h => h.id === c.poolHallId);
+                    const availableTables = hall?.tables?.filter((t: any) => t.status === 'available') || [];
+                    
+                    return (
+                      <div key={c.id} className="bg-primary/50 border border-gray-800 hover:border-accent/20 p-4 rounded-2xl space-y-3 transition-all">
+                        <div className="flex items-center justify-between gap-1.5 border-b border-white/5 pb-2">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="font-black text-white uppercase text-xs truncate max-w-[85px]">{c.player1?.name}</span>
+                            <span className="text-[8px] text-accent font-mono bg-accent/5 border border-accent/15 px-1 rounded">
+                              {parseFloat((c.player1?.rating ?? 0).toString()).toFixed(1)}
+                            </span>
+                          </div>
+                          
+                          <span className="text-[9px] text-gray-600 font-mono font-black italic">VS</span>
+                          
+                          <div className="flex items-center gap-1.5 min-w-0 justify-end">
+                            <span className="text-[8px] text-accent font-mono bg-accent/5 border border-accent/15 px-1 rounded">
+                              {parseFloat((c.player2?.rating ?? 0).toString()).toFixed(1)}
+                            </span>
+                            <span className="font-black text-white uppercase text-xs truncate max-w-[85px]">{c.player2?.name}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5 text-[10px] text-gray-400 font-mono">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-accent text-[11px]">📍</span>
+                            <span className="truncate text-white font-bold">{c.poolHall?.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-accent text-[11px]">📅</span>
+                            <span>{new Date(c.scheduledStartTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} @ {new Date(c.scheduledStartTime).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-yellow-500 font-black border-t border-white/5 pt-1.5">
+                            <span className="text-[11px]">💰</span>
+                            <span>{c.stake} Virtual Pts Stake</span>
+                          </div>
+                        </div>
+
+                        {/* Assign Table Select */}
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-mono text-gray-500 uppercase tracking-widest font-black block">Assign Battle Table</label>
+                          {availableTables.length > 0 ? (
+                            <div className="relative">
+                              <select
+                                value={selectedTables[c.id] || ''}
+                                onChange={(e) => setSelectedTables(prev => ({ ...prev, [c.id]: e.target.value }))}
+                                className="w-full bg-primary border border-gray-800 focus:border-accent rounded-xl p-2.5 text-[10px] font-mono text-white outline-none appearance-none cursor-pointer"
+                              >
+                                <option value="">-- SELECT AVAILABLE TABLE --</option>
+                                {availableTables.map((t: any) => (
+                                  <option key={t.id} value={t.id}>Table #{t.number} — {t.type} (${t.pricePerHour}/hr)</option>
+                                ))}
+                              </select>
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600 text-[8px]">▼</div>
+                            </div>
+                          ) : (
+                            <div className="text-[9px] text-danger font-mono uppercase bg-danger/10 px-2 py-2 rounded-xl border border-danger/15 text-center font-bold">
+                              No Available Tables
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          onClick={() => handleOrganize(c.id)}
+                          disabled={loading || !selectedTables[c.id]}
+                          className="w-full py-2.5 bg-gradient-to-r from-accent to-emerald-600 text-primary rounded-xl text-[10px] font-mono font-black uppercase tracking-widest hover:from-emerald-400 transition-all shadow-[0_0_15px_rgba(0,255,136,0.1)] hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] flex items-center justify-center gap-1 disabled:opacity-50 disabled:pointer-events-none"
+                        >
+                          Authorize Match <Check size={10} />
+                        </button>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-10 text-gray-600 font-mono text-xs uppercase tracking-wider">
+                    No duels to authorize
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

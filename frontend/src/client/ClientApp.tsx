@@ -9,14 +9,18 @@ import ProfilePage from "./ProfilePage";
 import RewardsPage from "./RewardsPage";
 import PlayerMatchesPage from "./PlayerMatchesPage";
 import PlayerTournamentsPage from "./PlayerTournamentsPage";
+import PlayersPage from "./PlayersPage";
 import {
   AboutPage,
   ContactPage,
   TermsPage,
   PrivacyPage,
 } from "./info/InfoPages";
-import { LogIn, LogOut, Menu, X } from "lucide-react";
-import { useState } from "react";
+import GlobalChallengeWidget from "./GlobalChallengeWidget";
+import { LogIn, LogOut, Menu, X, Bell, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import api from "../api";
 
 const ClientApp = () => {
   const { user, logout } = useAuth();
@@ -52,6 +56,7 @@ const ClientApp = () => {
             <div className="hidden md:flex items-center gap-6 lg:gap-8">
               <NavLink to="/arena">{t("nav.discover")}</NavLink>
               <NavLink to="/matches">{t("nav.matches")}</NavLink>
+              <NavLink to="/players">Players</NavLink>
               <NavLink to="/tournaments">{t("nav.tournaments")}</NavLink>
               <NavLink to="/ranking">{t("nav.ranking")}</NavLink>
               <NavLink to="/rewards">{t("nav.rewards")}</NavLink>
@@ -78,6 +83,7 @@ const ClientApp = () => {
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center gap-3">
+              <NotificationBell />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 rounded-lg bg-white/10 backdrop-blur-sm"
@@ -99,6 +105,12 @@ const ClientApp = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               {t("nav.matches")}
+            </MobileNavLink>
+            <MobileNavLink
+              to="/players"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Players
             </MobileNavLink>
             <MobileNavLink
               to="/tournaments"
@@ -176,6 +188,7 @@ const ClientApp = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:userId" element={<ProfilePage />} />
           <Route path="/ranking" element={<RankingPage />} />
+          <Route path="/players" element={<PlayersPage />} />
           <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/tournaments" element={<PlayerTournamentsPage />} />
           <Route path="/matches" element={<PlayerMatchesPage />} />
@@ -185,6 +198,9 @@ const ClientApp = () => {
           <Route path="/privacy" element={<PrivacyPage />} />
         </Routes>
       </main>
+
+      {/* Global Widget for Players */}
+      {user?.role === 'player' && <GlobalChallengeWidget />}
 
       {/* Footer */}
       <footer className="relative border-t border-white/10 py-12 mt-20 bg-black/20 backdrop-blur-sm">
@@ -247,6 +263,131 @@ const MobileNavLink = ({
   </Link>
 );
 
+const NotificationBell = () => {
+  const { user } = useAuth();
+  const [challenges, setChallenges] = useState<any[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const fetchChallenges = async () => {
+    if (!user || user.role !== 'player') return;
+    try {
+      const res = await api.get('/matches?status=challenge');
+      const incoming = res.data.filter(
+        (m: any) => m.player2Id === user.id && m.challengeStatus === 'pending'
+      );
+      setChallenges(incoming);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchChallenges();
+    const interval = setInterval(fetchChallenges, 15000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const handleRespond = async (matchId: string, action: 'accept' | 'reject') => {
+    setLoading(true);
+    try {
+      await api.patch(`/matches/${matchId}/respond`, { action });
+      alert(`Challenge ${action === 'accept' ? 'accepted!' : 'declined!'}`);
+      fetchChallenges();
+    } catch (err: any) {
+      alert(err.response?.data?.message || `Failed to respond`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user || user.role !== 'player') return null;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative p-2 text-gray-300 hover:text-accent hover:bg-white/5 rounded-full transition-all duration-300 flex items-center justify-center shrink-0"
+      >
+        <Bell size={20} />
+        {challenges.length > 0 && (
+          <span className="absolute top-0 right-0 w-4 h-4 bg-accent text-primary text-[9px] font-black rounded-full flex items-center justify-center shadow-[0_0_8px_#00ff88]">
+            {challenges.length}
+          </span>
+        )}
+      </button>
+
+      {/* Dropdown Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop to close click */}
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+            
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="absolute right-0 mt-3 w-80 bg-secondary/95 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl z-50 p-4 space-y-3 overflow-hidden text-left"
+            >
+              <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-accent font-mono">Incoming Duels</span>
+                <span className="text-[10px] text-gray-500 font-mono font-bold">{challenges.length} Pending</span>
+              </div>
+
+              <div className="max-h-60 overflow-y-auto space-y-3 pr-1">
+                {challenges.length > 0 ? (
+                  challenges.map((c) => (
+                    <div key={c.id} className="bg-primary/40 border border-white/5 p-3 rounded-xl space-y-2 text-xs font-sans">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-primary rounded border border-white/10 flex items-center justify-center text-[10px] uppercase font-mono text-accent shrink-0 overflow-hidden">
+                          {c.player1.avatar ? (
+                            <img src={c.player1.avatar} className="w-full h-full object-cover" />
+                          ) : (
+                            c.player1.name[0]
+                          )}
+                        </div>
+                        <span className="font-black text-white uppercase tracking-wide truncate">{c.player1.name}</span>
+                      </div>
+
+                      <div className="text-[10px] text-gray-500 font-mono space-y-1">
+                        <div>📍 {c.poolHall?.name}</div>
+                        <div>📅 {new Date(c.scheduledStartTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} @ {new Date(c.scheduledStartTime).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
+                        <div className="text-yellow-500 font-black">💰 {c.stake} Pts Wagered</div>
+                      </div>
+
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={() => handleRespond(c.id, 'reject')}
+                          disabled={loading}
+                          className="flex-1 py-1.5 border border-danger/30 text-danger rounded-lg text-[9px] font-mono font-black uppercase tracking-wider hover:bg-danger hover:text-white transition-all duration-200 disabled:opacity-50"
+                        >
+                          Decline
+                        </button>
+                        <button
+                          onClick={() => handleRespond(c.id, 'accept')}
+                          disabled={loading}
+                          className="flex-1 py-1.5 bg-accent text-primary rounded-lg text-[9px] font-mono font-black uppercase tracking-wider hover:bg-emerald-400 shadow-[0_0_10px_rgba(0,255,136,0.15)] transition-all duration-200 flex items-center justify-center gap-0.5 disabled:opacity-50"
+                        >
+                          Accept <Check size={10} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-6 text-gray-500 font-mono text-xs uppercase">
+                    No duels requested
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const UserMenu = ({
   user,
   logout,
@@ -267,6 +408,7 @@ const UserMenu = ({
         {t("nav.backoffice")}
       </Link>
     )}
+    <NotificationBell />
     <Link
       to="/profile"
       className="flex items-center gap-1.5 lg:gap-2 bg-white/10 backdrop-blur-sm pl-1.5 pr-3 py-1.5 lg:pl-2 lg:pr-4 lg:py-2 rounded-full border border-white/20 hover:border-emerald-400/50 transition-all shrink-0"

@@ -77,15 +77,16 @@ const ChallengeModal = ({ onClose, onSuccess }: { onClose: () => void, onSuccess
       <div className="bg-secondary w-full max-w-xl rounded-[3rem] border border-white/10 overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
         <div className="p-10 space-y-8">
           <div className="flex justify-between items-center">
-            <h3 className="text-3xl font-black italic uppercase text-white tracking-tighter">Broadcast Open Call</h3>
+            <h3 className="text-3xl font-black italic uppercase text-white tracking-tighter">Throw the Gauntlet</h3>
             <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full text-gray-500 transition-colors">
               <X size={24} />
             </button>
           </div>
 
-          <div className="bg-accent/5 p-6 rounded-3xl border border-accent/10">
-             <p className="text-sm text-accent font-black uppercase tracking-widest mb-1">Status: Open to Anyone</p>
-             <p className="text-xs text-gray-500 leading-relaxed uppercase font-bold">This challenge will be visible to all players in the Arena. The first to accept will be your rival.</p>
+          <div className="bg-red-500/10 p-6 rounded-3xl border border-red-500/20 flex flex-col items-center justify-center text-center">
+             <Zap className="text-red-500 mb-2" size={32} />
+             <p className="text-sm text-red-400 font-black uppercase tracking-widest mb-1">Open Gladiator Challenge</p>
+             <p className="text-xs text-gray-400 leading-relaxed font-medium">By broadcasting this, you are throwing your gauntlet into the arena. This challenge will be visible to all players. The first worthy adversary to accept will be your rival!</p>
           </div>
 
           <div className="space-y-6">
@@ -150,9 +151,9 @@ const ChallengeModal = ({ onClose, onSuccess }: { onClose: () => void, onSuccess
           <button 
             onClick={handleBroadcast}
             disabled={loading}
-            className="w-full bg-accent text-primary py-5 rounded-2xl font-black uppercase tracking-tighter text-xl shadow-[0_0_50px_rgba(0,255,136,0.2)] hover:scale-105 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+            className="w-full bg-red-600 text-white py-5 rounded-2xl font-black uppercase tracking-tighter text-xl shadow-[0_0_50px_rgba(220,38,38,0.3)] hover:scale-105 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
           >
-            {loading ? 'Transmitting...' : <>Post Open Challenge <ChevronRight size={24} /></>}
+            {loading ? 'Transmitting...' : <>Step Into the Arena <ChevronRight size={24} /></>}
           </button>
         </div>
       </div>
@@ -232,9 +233,9 @@ const PlayerMatchesPage = () => {
           {user?.role === 'player' && (
              <button 
                onClick={() => setShowBroadcastModal(true)}
-               className="bg-accent text-primary px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:scale-105 transition-all flex items-center gap-2"
+               className="bg-red-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-500/20 hover:scale-105 transition-all flex items-center gap-2"
              >
-                <Plus size={16} /> Broadcast Challenge
+                <Plus size={16} /> Throw Gauntlet
              </button>
           )}
 

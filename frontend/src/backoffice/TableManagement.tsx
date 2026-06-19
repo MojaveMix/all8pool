@@ -82,6 +82,11 @@ const TableManagement = () => {
 
   const startMatch = async () => {
     if (!showMatchModal) return;
+    if ((player1Id && player2Id && player1Id === player2Id) ||
+        (!player1Id && !player2Id && player1Name && player2Name && player1Name.toLowerCase() === player2Name.toLowerCase())) {
+      alert('A player cannot play against themselves');
+      return;
+    }
     try {
       await api.post('/matches', {
         tableId: showMatchModal.id,
@@ -121,9 +126,17 @@ const TableManagement = () => {
 
   const selectUser = (user: any) => {
     if (activePlayerIndex === 1) {
+      if (player2Id === user.id) {
+        alert('A player cannot play against themselves');
+        return;
+      }
       setPlayer1Id(user.id);
       setPlayer1Name(user.name);
     } else {
+      if (player1Id === user.id) {
+        alert('A player cannot play against themselves');
+        return;
+      }
       setPlayer2Id(user.id);
       setPlayer2Name(user.name);
     }
