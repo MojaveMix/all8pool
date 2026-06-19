@@ -26,11 +26,14 @@ const createReward = async (req, res) => {
     const { name, description, cost, category, poolHallId, image } = req.body;
 
     // Check if owner owns the hall
-    if (poolHallId && req.user.role === 'owner') {
+    if (req.user.role === 'owner') {
+      if (!poolHallId) {
+        return res.status(403).json({ message: 'Owners can only create rewards for their own pool halls' });
+      }
       const hall = await PoolHall.findOne({ where: { id: poolHallId, ownerId: req.user.id } });
       if (!hall) return res.status(403).json({ message: 'You do not own this pool hall' });
-    } else if (!poolHallId && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Only admins can create global rewards' });
+    } else if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied' });
     }
 
     const reward = await Reward.create({

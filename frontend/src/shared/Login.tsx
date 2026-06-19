@@ -6,12 +6,39 @@ import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
   const { login } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+    
+    let newErrors: { email?: string; password?: string; form?: string } = {};
+
+    // Validate email
+    if (!email) {
+      newErrors.email = "Email is required.";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        newErrors.email = "Please enter a valid email address.";
+      }
+    }
+
+    // Validate password
+    if (!password) {
+      newErrors.password = "Password is required.";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       await login(email, password);
       // Get the stored user to check role (AuthContext sets it in localStorage)
@@ -21,9 +48,10 @@ const Login = () => {
       } else {
         navigate('/arena');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert(t('auth.failed'));
+      const errMsg = error.response?.data?.message || t('auth.failed');
+      setErrors({ form: errMsg });
     }
   };
 
@@ -38,17 +66,23 @@ const Login = () => {
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md p-8 mx-4 backdrop-blur-xl bg-gray-800/40 rounded-2xl shadow-2xl border border-gray-600/30 transition-all duration-500 hover:shadow-emerald-500/20 hover:border-emerald-500/30">
-        {/* Custom Pool Ball (Solid 8-Ball with float animation) */}
-        <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-gradient-to-br from-gray-900 via-black to-gray-800 shadow-2xl flex items-center justify-center border-2 border-gray-600 animate-float">
-          <div className="absolute top-1.5 left-2 w-6 h-6 bg-white/40 rounded-full blur-[1px]"></div>
-          <div className="absolute bottom-2 right-3 w-3 h-3 bg-white/20 rounded-full blur-[0.5px]"></div>
-          <span
-            className="text-white font-black text-2xl drop-shadow-lg relative z-10"
-            style={{ textShadow: "0 2px 3px rgba(0,0,0,0.5)" }}
-          >
-            8
-          </span>
-          <div className="absolute inset-0 rounded-full border border-white/10"></div>
+        {/* Modern 3D Glossy 8-Ball */}
+        <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-[radial-gradient(circle_at_30%_30%,_#4b5563_0%,_#0b0f19_60%,_#000000_100%)] border border-white/10 shadow-[0_15px_30px_rgba(0,0,0,0.8),inset_0_4px_12px_rgba(255,255,255,0.25)] flex items-center justify-center animate-float overflow-hidden select-none z-20">
+          {/* Glass glare highlight */}
+          <div className="absolute top-1.5 left-3.5 w-10 h-5 bg-gradient-to-b from-white/35 via-white/5 to-transparent rounded-full rotate-[-15deg] blur-[0.5px]"></div>
+          
+          {/* Bottom bounce light reflection */}
+          <div className="absolute bottom-1 right-3 w-8 h-3 bg-white/10 rounded-full blur-[1px] opacity-60"></div>
+          
+          {/* White target circle */}
+          <div className="w-9 h-9 bg-gradient-to-tr from-gray-200 via-white to-gray-100 rounded-full flex items-center justify-center shadow-[inset_0_-2px_6px_rgba(0,0,0,0.25),0_4px_8px_rgba(0,0,0,0.5)] transform rotate-[10deg]">
+            <span
+              className="text-gray-950 font-black text-xl tracking-tighter"
+              style={{ fontFamily: "'Outfit', sans-serif" }}
+            >
+              8
+            </span>
+          </div>
         </div>
         <h2 className="text-4xl font-black text-center mb-8 bg-gradient-to-r from-emerald-400 via-green-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-lg">
           All 8 Pool
@@ -57,7 +91,13 @@ const Login = () => {
           </span>
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5 text-left">
+        {errors.form && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-xs font-bold mb-6 text-center animate-in fade-in">
+            {errors.form}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5 text-left" noValidate>
           <div>
             <label
               htmlFor="email"
@@ -69,11 +109,18 @@ const Login = () => {
               type="email"
               id="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors({ ...errors, email: undefined });
+              }}
+              className={`w-full px-4 py-3 bg-gray-900/60 border ${errors.email ? 'border-red-500' : 'border-gray-600/50'} rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold`}
               placeholder="your@email.com"
-              required
             />
+            {errors.email && (
+              <p className="text-red-500 font-bold text-xs mt-2 ml-1 animate-in slide-in-from-top-1 duration-200">
+                {errors.email}
+              </p>
+            )}
           </div>
 
           <div>
@@ -87,11 +134,18 @@ const Login = () => {
               type="password"
               id="psswd"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors({ ...errors, password: undefined });
+              }}
+              className={`w-full px-4 py-3 bg-gray-900/60 border ${errors.password ? 'border-red-500' : 'border-gray-600/50'} rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-200 font-bold`}
               placeholder="••••••••"
-              required
             />
+            {errors.password && (
+              <p className="text-red-500 font-bold text-xs mt-2 ml-1 animate-in slide-in-from-top-1 duration-200">
+                {errors.password}
+              </p>
+            )}
           </div>
 
           <button

@@ -25,6 +25,22 @@ interface AuthContextType {
   loading: boolean;
 }
 
+const decodeToken = (token: string) => {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      window.atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -39,7 +55,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
+      try {
+        const decoded = decodeToken(token);
+        const parsed = JSON.parse(storedUser);
+        if (decoded && decoded.role) {
+          // Forcefully override role to align with secure JWT signature values
+          parsed.role = decoded.role;
+          parsed.name = decoded.name;
+          parsed.id = decoded.id;
+        } else {
+          logout();
+          setLoading(false);
+          return;
+        }
+        setUser(parsed);
+      } catch (err) {
+        logout();
+      }
+    } else {
+      setUser(null);
     }
     setLoading(false);
   }, [token]);
@@ -83,7 +117,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateUser = (fields: Partial<User>) => {
     setUser((prev) => {
       if (!prev) return null;
-      const updated = { ...prev, ...fields };
+      // Do not allow updating the role locally
+      const { role, ...allowedFields } = fields as any;
+      const updated = { ...prev, ...allowedFields };
       localStorage.setItem("user", JSON.stringify(updated));
       return updated;
     });
