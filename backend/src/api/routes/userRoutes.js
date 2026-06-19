@@ -9,7 +9,7 @@ router.put('/me', authMiddleware, updateProfile);
 router.get('/rankings', getRankings);
 router.get('/stats', getGlobalStats);
 router.get('/:id', getUserProfile);
-router.get('/', authMiddleware, roleMiddleware(['admin']), getUsers);
+router.get('/', authMiddleware, getUsers);
 router.post('/', authMiddleware, roleMiddleware(['admin']), createUser);
 router.patch('/:id/role', authMiddleware, roleMiddleware(['admin']), updateUserRole);
 router.patch('/:id/status', authMiddleware, roleMiddleware(['admin']), updateUserStatus);

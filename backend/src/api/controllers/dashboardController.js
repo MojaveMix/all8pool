@@ -17,6 +17,9 @@ const getDashboardStats = async (req, res) => {
     todayEnd.setHours(23, 59, 59, 999);
 
     // 1. Active Tables
+    const tables = await Table.findAll({ where: { poolHallId: hallId }, attributes: ['id'] });
+    const tableIds = tables.map(t => t.id);
+
     const activeTablesCount = await Table.count({
       where: { poolHallId: hallId, status: 'occupied' }
     });
@@ -25,18 +28,18 @@ const getDashboardStats = async (req, res) => {
     const todayBookingsCount = await Booking.count({
       where: {
         startTime: { [Op.between]: [todayStart, todayEnd] },
-        status: 'confirmed'
-      },
-      include: [{ model: Table, as: 'table', where: { poolHallId: hallId } }]
+        status: 'confirmed',
+        tableId: { [Op.in]: tableIds }
+      }
     });
 
     // 3. Today's Revenue
     const todayRevenue = await Booking.sum('totalPrice', {
       where: {
         startTime: { [Op.between]: [todayStart, todayEnd] },
-        status: 'completed'
-      },
-      include: [{ model: Table, as: 'table', where: { poolHallId: hallId } }]
+        status: 'completed',
+        tableId: { [Op.in]: tableIds }
+      }
     }) || 0;
 
     // 4. Active Matches
@@ -48,9 +51,9 @@ const getDashboardStats = async (req, res) => {
     const nextBooking = await Booking.findOne({
       where: {
         startTime: { [Op.gt]: new Date() },
-        status: 'confirmed'
+        status: 'confirmed',
+        tableId: { [Op.in]: tableIds }
       },
-      include: [{ model: Table, as: 'table', where: { poolHallId: hallId } }],
       order: [['startTime', 'ASC']]
     });
 
