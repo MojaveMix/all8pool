@@ -61,7 +61,6 @@ const BackofficeApp = () => {
       try {
         setHallsLoading(true);
         const res = await api.get('/pool-halls/my');
-        setMyHalls(res.data);
         
         const found = res.data.find((h: any) => h.id === hallId);
         if (!found) {
