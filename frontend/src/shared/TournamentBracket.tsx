@@ -1,5 +1,5 @@
-import React from 'react';
-import { Trophy, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Trophy, User, Maximize2, Minimize2 } from 'lucide-react';
 
 interface TournamentBracketProps {
   size: number;
@@ -7,6 +7,8 @@ interface TournamentBracketProps {
 }
 
 export const TournamentBracket: React.FC<TournamentBracketProps> = ({ size, players }) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   // Ensure size is a valid power of 2, default to 8 if not
   const tournamentSize = [8, 16, 32, 64].includes(size) ? size : 8;
   const numRounds = Math.log2(tournamentSize);
@@ -65,9 +67,9 @@ export const TournamentBracket: React.FC<TournamentBracketProps> = ({ size, play
     bracketData.push(roundMatches);
   }
 
-  return (
-    <div className="w-full overflow-x-auto py-8 select-none scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
-      <div className="flex gap-12 min-w-[800px] justify-between items-stretch px-4">
+  const bracketContent = (
+    <div className={`w-full overflow-x-auto py-8 select-none scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent ${isFullscreen ? 'min-h-[70vh] flex items-center' : ''}`}>
+      <div className="flex gap-12 min-w-[800px] justify-between items-stretch px-4 mx-auto">
         {bracketData.map((roundMatches, roundIndex) => {
           const roundName = getRoundName(roundIndex, numRounds);
           const isLastRound = roundIndex === numRounds - 1;
@@ -160,6 +162,45 @@ export const TournamentBracket: React.FC<TournamentBracketProps> = ({ size, play
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="relative group">
+      <button 
+        onClick={() => setIsFullscreen(!isFullscreen)}
+        className="absolute right-0 top-0 z-40 p-2 bg-gray-800/80 hover:bg-accent hover:text-primary text-gray-400 rounded-xl transition-all shadow-lg opacity-80 group-hover:opacity-100 flex items-center gap-2"
+        title={isFullscreen ? "Exit Fullscreen" : "View Fullscreen Bracket"}
+      >
+        {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+        {!isFullscreen && <span className="text-[10px] font-bold uppercase tracking-wider pr-1">Fullscreen</span>}
+      </button>
+
+      {isFullscreen ? (
+        <div className="fixed inset-0 z-[99999] bg-secondary/95 backdrop-blur-2xl flex flex-col p-4 md:p-8 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="flex justify-between items-center mb-6 shrink-0 bg-primary/40 p-4 rounded-2xl border border-gray-800">
+            <div>
+               <h2 className="text-xl md:text-3xl font-black italic text-white uppercase tracking-tight">
+                 Tournament Bracket <span className="text-accent ml-2">Arena View</span>
+               </h2>
+               <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Scroll horizontally to view all rounds</p>
+            </div>
+            <button 
+              onClick={() => setIsFullscreen(false)}
+              className="px-4 py-3 bg-gray-800 hover:bg-danger text-white rounded-xl font-bold uppercase tracking-wider transition-colors flex items-center gap-2 text-[10px] md:text-xs"
+            >
+              <Minimize2 size={16} /> <span className="hidden md:inline">Close Fullscreen</span>
+            </button>
+          </div>
+          <div className="flex-1 bg-primary/40 rounded-3xl border border-gray-800 p-2 md:p-8 overflow-auto shadow-2xl flex items-center justify-center">
+            {bracketContent}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-8">
+           {bracketContent}
+        </div>
+      )}
     </div>
   );
 };

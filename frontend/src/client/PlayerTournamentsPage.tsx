@@ -180,7 +180,7 @@ const PlayerTournamentsPage = () => {
 
                   <div className="flex-1 overflow-y-auto pr-2 space-y-8 scrollbar-thin">
                      <div>
-                        <h4 className="text-sm font-black italic text-accent tracking-widest uppercase mb-4 border-b border-gray-800 pb-2">Tournament Bracket (FIFA Style)</h4>
+                        <h4 className="text-sm font-black italic text-accent tracking-widest uppercase mb-4 border-b border-gray-800 pb-2">Tournament Bracket</h4>
                         <TournamentBracket size={selectedTournament.size} players={approvedPlayers} />
                      </div>
 

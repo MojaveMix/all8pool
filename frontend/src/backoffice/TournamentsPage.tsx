@@ -375,7 +375,7 @@ const TournamentDetails = ({ tournament, onBack, onRefresh, onEdit, onDelete, sh
         </div>
 
         <div className="mb-12 border-b border-gray-800 pb-8">
-          <h4 className="text-xl font-black italic text-accent uppercase tracking-tight mb-6">Tournament Bracket (FIFA Style)</h4>
+          <h4 className="text-xl font-black italic text-accent uppercase tracking-tight mb-6">Tournament Bracket</h4>
           <TournamentBracket size={tournament.size} players={approvedPlayers} />
         </div>
 
