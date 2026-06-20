@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Trophy, Users, Plus, ChevronRight, Star, Check, X, Search, Edit2, Trash2 } from 'lucide-react';
 import api from '../api';
 import CustomAlert from '../shared/CustomAlert';
+import { TournamentBracket } from '../shared/TournamentBracket';
 
 const TournamentsPage = () => {
   const [searchParams] = useSearchParams();
@@ -277,12 +278,16 @@ const TournamentCard = ({ tournament, onSelect }: any) => {
 
       <h3 className="text-2xl font-black italic text-white mb-2">{tournament.name}</h3>
       
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-wrap gap-4 mb-6">
         <div className="flex items-center gap-2 text-gray-500 text-sm font-bold">
           <Users size={16} /> {approvedCount}/{tournament.size} Players
         </div>
         <div className="flex items-center gap-2 text-accent text-sm font-bold">
           <Star size={16} /> Fee: ${tournament.entryFee}
+        </div>
+        <div className="flex items-center gap-2 text-warning text-sm font-bold">
+          <span className="w-2 h-2 rounded-full bg-warning animate-pulse" />
+          {tournament.size - approvedCount} Empty Places Left
         </div>
       </div>
 
@@ -365,8 +370,13 @@ const TournamentDetails = ({ tournament, onBack, onRefresh, onEdit, onDelete, sh
           </div>
           <h3 className="text-4xl font-black italic text-white mb-2 tracking-tighter uppercase pr-24">{tournament.name}</h3>
           <p className="text-accent font-bold tracking-[0.3em] text-xs uppercase">
-            {approvedPlayers.length} / {tournament.size} Players Registered
+            {approvedPlayers.length} / {tournament.size} Players Registered ({tournament.size - approvedPlayers.length} Empty Slots Remaining)
           </p>
+        </div>
+
+        <div className="mb-12 border-b border-gray-800 pb-8">
+          <h4 className="text-xl font-black italic text-accent uppercase tracking-tight mb-6">Tournament Bracket (FIFA Style)</h4>
+          <TournamentBracket size={tournament.size} players={approvedPlayers} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -401,7 +411,7 @@ const TournamentDetails = ({ tournament, onBack, onRefresh, onEdit, onDelete, sh
           <div className="space-y-6">
             <h4 className="text-xl font-black italic text-white uppercase tracking-tight flex items-center gap-2">
               <span className="bg-success/20 text-success px-3 py-1 rounded-full text-sm">{approvedPlayers.length}</span>
-              Approved Players
+              Approved Players & Slots
             </h4>
 
             {/* Manual Add */}
@@ -429,13 +439,22 @@ const TournamentDetails = ({ tournament, onBack, onRefresh, onEdit, onDelete, sh
               )}
             </div>
 
-            <div className="space-y-4 max-h-64 overflow-y-auto pr-4">
+            <div className="space-y-4 max-h-[350px] overflow-y-auto pr-4">
               {approvedPlayers.map((entry: any) => (
                 <div key={entry.id} className="bg-primary p-4 rounded-2xl border border-gray-800 flex justify-between items-center">
                   <div>
                     <p className="font-bold text-white">{entry.player?.name || 'Unknown User'}</p>
+                    <p className="text-xs text-gray-500">{entry.player?.email}</p>
                   </div>
                   <span className="text-xs text-success bg-success/10 px-2 py-1 rounded-md font-bold">APPROVED</span>
+                </div>
+              ))}
+              {Array.from({ length: Math.max(0, tournament.size - approvedPlayers.length) }).map((_, index) => (
+                <div key={`empty-${index}`} className="bg-primary/20 p-4 rounded-2xl border border-dashed border-gray-800 flex justify-between items-center opacity-60">
+                  <div>
+                    <p className="font-bold text-gray-500">Empty Slot #{approvedPlayers.length + index + 1}</p>
+                  </div>
+                  <span className="text-[10px] text-gray-500 border border-gray-800 px-2 py-1 rounded-md font-bold uppercase">AVAILABLE</span>
                 </div>
               ))}
             </div>
