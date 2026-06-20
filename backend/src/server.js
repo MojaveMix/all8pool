@@ -49,6 +49,7 @@ app.use('/api/matches', require('./api/routes/matchRoutes'));
 app.use('/api/dashboard', require('./api/routes/dashboardRoutes'));
 app.use('/api/rewards', require('./api/routes/rewardRoutes'));
 app.use('/api/owner-requests', require('./api/routes/ownerRequestRoutes'));
+app.use('/api/tournaments', require('./api/routes/tournamentRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

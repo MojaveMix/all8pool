@@ -17,6 +17,7 @@ import {
   PrivacyPage,
 } from "./info/InfoPages";
 import GlobalChallengeWidget from "./GlobalChallengeWidget";
+import NotFound from "../shared/NotFound";
 import { LogIn, LogOut, Menu, X, Bell, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,10 +45,12 @@ const ClientApp = () => {
               to="/"
               className="flex items-center gap-2 sm:gap-3 group shrink-0"
             >
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-                <div className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full shadow-inner" />
-              </div>
-              <h1 className="text-lg sm:text-2xl font-black italic tracking-tighter bg-gradient-to-r from-white to-emerald-300 bg-clip-text text-transparent group-hover:from-emerald-400 group-hover:to-white transition-all duration-500 hidden xs:block">
+                <img
+                  src="/img/logo.png"
+                  alt="All 8 Pool Logo"
+                  className="w-24  h-full object-cover scale-110"
+                />
+              <h1 className="text-lg sm:text-xl md:text-2xl font-black italic tracking-tighter bg-gradient-to-r from-white to-emerald-300 bg-clip-text text-transparent group-hover:from-emerald-400 group-hover:to-white transition-all duration-500 hidden xs:block">
                 ALL 8 POOL
               </h1>
             </Link>
@@ -196,6 +199,7 @@ const ClientApp = () => {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 
@@ -204,7 +208,21 @@ const ClientApp = () => {
 
       {/* Footer */}
       <footer className="relative border-t border-white/10 py-12 mt-20 bg-black/20 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
+        <div className="max-w-7xl mx-auto px-4 text-center space-y-6">
+          <div className="flex flex-col items-center justify-center space-y-3">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-0.5 border border-emerald-500/30 shadow-lg shadow-emerald-500/20 overflow-hidden group-hover:scale-105 transition-all duration-300">
+                <img
+                  src="/img/logo.png"
+                  alt="All 8 Pool Logo"
+                  className="w-full h-full object-cover scale-110"
+                />
+              </div>
+              <span className="text-lg font-black italic tracking-tighter bg-gradient-to-r from-white to-emerald-300 bg-clip-text text-transparent group-hover:from-emerald-400 group-hover:to-white transition-all duration-500">
+                ALL 8 POOL
+              </span>
+            </Link>
+          </div>
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-gray-400 text-xs sm:text-sm">
             <Link to="/about" className="hover:text-emerald-400 transition">
               About
@@ -266,6 +284,7 @@ const MobileNavLink = ({
 const NotificationBell = () => {
   const { user } = useAuth();
   const [challenges, setChallenges] = useState<any[]>([]);
+  const [tournamentNotifications, setTournamentNotifications] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -277,9 +296,37 @@ const NotificationBell = () => {
         (m: any) => m.player2Id === user.id && m.challengeStatus === 'pending'
       );
       setChallenges(incoming);
+
+      // Fetch tournaments and check user entry statuses
+      const tourneyRes = await api.get('/tournaments');
+      const dismissed = JSON.parse(localStorage.getItem('dismissedTourneyAlerts') || '[]');
+      const tourneyAlerts: any[] = [];
+      
+      tourneyRes.data.forEach((t: any) => {
+        const userEntry = t.players?.find((p: any) => p.playerId === user.id);
+        if (userEntry && (userEntry.status === 'approved' || userEntry.status === 'rejected')) {
+          const key = `${t.id}-${userEntry.status}`;
+          if (!dismissed.includes(key)) {
+            tourneyAlerts.push({
+              key,
+              tournamentId: t.id,
+              tournamentName: t.name,
+              status: userEntry.status
+            });
+          }
+        }
+      });
+      setTournamentNotifications(tourneyAlerts);
     } catch (err) {
       console.error('Error fetching notifications:', err);
     }
+  };
+
+  const dismissTourneyNotification = (key: string) => {
+    const dismissed = JSON.parse(localStorage.getItem('dismissedTourneyAlerts') || '[]');
+    dismissed.push(key);
+    localStorage.setItem('dismissedTourneyAlerts', JSON.stringify(dismissed));
+    setTournamentNotifications(prev => prev.filter(n => n.key !== key));
   };
 
   useEffect(() => {
@@ -301,6 +348,8 @@ const NotificationBell = () => {
     }
   };
 
+  const totalCount = challenges.length + tournamentNotifications.length;
+
   if (!user || user.role !== 'player') return null;
 
   return (
@@ -310,9 +359,9 @@ const NotificationBell = () => {
         className="relative p-2 text-gray-300 hover:text-accent hover:bg-white/5 rounded-full transition-all duration-300 flex items-center justify-center shrink-0"
       >
         <Bell size={20} />
-        {challenges.length > 0 && (
+        {totalCount > 0 && (
           <span className="absolute top-0 right-0 w-4 h-4 bg-accent text-primary text-[9px] font-black rounded-full flex items-center justify-center shadow-[0_0_8px_#00ff88]">
-            {challenges.length}
+            {totalCount}
           </span>
         )}
       </button>
@@ -331,12 +380,12 @@ const NotificationBell = () => {
               className="absolute right-0 mt-3 w-80 bg-secondary/95 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl z-50 p-4 space-y-3 overflow-hidden text-left"
             >
               <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-accent font-mono">Incoming Duels</span>
-                <span className="text-[10px] text-gray-500 font-mono font-bold">{challenges.length} Pending</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-accent font-mono">Gauntlet Alerts</span>
+                <span className="text-[10px] text-gray-500 font-mono font-bold">{totalCount} Pending</span>
               </div>
 
               <div className="max-h-60 overflow-y-auto space-y-3 pr-1">
-                {challenges.length > 0 ? (
+                {challenges.length > 0 && (
                   challenges.map((c) => (
                     <div key={c.id} className="bg-primary/40 border border-white/5 p-3 rounded-xl space-y-2 text-xs font-sans">
                       <div className="flex items-center gap-2">
@@ -374,9 +423,43 @@ const NotificationBell = () => {
                       </div>
                     </div>
                   ))
-                ) : (
+                )}
+
+                {/* Tournament Alerts Section */}
+                {tournamentNotifications.length > 0 && (
+                  <div className="border-t border-white/5 pt-3 mt-3 space-y-2">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-accent font-mono block">Tournament Updates</span>
+                    {tournamentNotifications.map((alert) => (
+                      <div key={alert.key} className="bg-primary/40 border border-white/5 p-3 rounded-xl space-y-2 text-xs">
+                        <div className="flex justify-between items-center">
+                          <span className="font-black text-white uppercase text-[9px] truncate max-w-[170px]">{alert.tournamentName}</span>
+                          <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border ${
+                            alert.status === 'approved' 
+                              ? 'text-success bg-success/5 border-success/15' 
+                              : 'text-danger bg-danger/5 border-danger/15'
+                          }`}>
+                            {alert.status}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-gray-400">
+                          {alert.status === 'approved' 
+                            ? 'Your registration has been approved!' 
+                            : 'Your registration request was declined.'}
+                        </p>
+                        <button
+                          onClick={() => dismissTourneyNotification(alert.key)}
+                          className="w-full py-1 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg text-[9px] font-mono font-black uppercase tracking-wider transition-all"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {challenges.length === 0 && tournamentNotifications.length === 0 && (
                   <div className="text-center py-6 text-gray-500 font-mono text-xs uppercase">
-                    No duels requested
+                    No new alerts
                   </div>
                 )}
               </div>

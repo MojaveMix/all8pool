@@ -6,6 +6,7 @@ const Match = require("./Match");
 const Tournament = require("./Tournament");
 const Reward = require("./Reward");
 const OwnerRequest = require("./OwnerRequest");
+const TournamentPlayer = require("./TournamentPlayer");
 
 // User <-> PoolHall (Owner)
 User.hasMany(PoolHall, { foreignKey: "ownerId", as: "poolHalls" });
@@ -127,6 +128,14 @@ Tournament.belongsTo(PoolHall, { foreignKey: "poolHallId", as: "poolHall" });
 PoolHall.hasMany(Reward, { foreignKey: "poolHallId", as: "rewards" });
 Reward.belongsTo(PoolHall, { foreignKey: "poolHallId", as: "poolHall" });
 
+// Tournament <-> TournamentPlayer
+Tournament.hasMany(TournamentPlayer, { foreignKey: "tournamentId", as: "players" });
+TournamentPlayer.belongsTo(Tournament, { foreignKey: "tournamentId", as: "tournament" });
+
+// User <-> TournamentPlayer
+User.hasMany(TournamentPlayer, { foreignKey: "playerId", as: "tournamentEntries" });
+TournamentPlayer.belongsTo(User, { foreignKey: "playerId", as: "player" });
+
 module.exports = {
   User,
   PoolHall,
@@ -136,4 +145,5 @@ module.exports = {
   Tournament,
   Reward,
   OwnerRequest,
+  TournamentPlayer,
 };

@@ -22,6 +22,8 @@ import CustomersPage from "./CustomersPage";
 import AnalyticsPage from "./AnalyticsPage";
 import SettingsPage from "./SettingsPage";
 import SystemAdminPage from "./SystemAdminPage";
+import NotFound from "../shared/NotFound";
+import LoadingSpinner from "../shared/LoadingSpinner";
 import {
   LayoutDashboard,
   LogOut,
@@ -44,6 +46,45 @@ const BackofficeApp = () => {
   const [searchParams] = useSearchParams();
   const hallId = searchParams.get("hallId");
   const { t } = useTranslation();
+  
+  const [myHalls, setMyHalls] = useState<any[]>([]);
+  const [hallsLoading, setHallsLoading] = useState(true);
+  const [errorType, setErrorType] = useState<'404' | '403' | null>(null);
+
+  useEffect(() => {
+    const verifyHall = async () => {
+      if (!user) return;
+      if (!hallId) {
+        setHallsLoading(false);
+        setErrorType(null);
+        return;
+      }
+      try {
+        setHallsLoading(true);
+        const res = await api.get('/pool-halls/my');
+        setMyHalls(res.data);
+        
+        const found = res.data.find((h: any) => h.id === hallId);
+        if (!found) {
+          try {
+            // Check if hall exists globally or is not found/unauthorized
+            await api.get(`/pool-halls/${hallId}`);
+            setErrorType('403');
+          } catch (err: any) {
+            setErrorType('404');
+          }
+        } else {
+          setErrorType(null);
+        }
+      } catch (err) {
+        console.error('Failed to verify hall permissions', err);
+        setErrorType('404');
+      } finally {
+        setHallsLoading(false);
+      }
+    };
+    verifyHall();
+  }, [user, hallId]);
 
   const handleLogout = () => {
     logout();
@@ -113,6 +154,56 @@ const BackofficeApp = () => {
     return window.location.pathname.includes(itemPath) && itemPath !== "";
   };
 
+  if (hallsLoading) {
+    return <LoadingSpinner fullScreen />;
+  }
+
+  // Render Access Denied for unauthorized halls (403)
+  if (errorType === '403') {
+    return (
+      <div className="min-h-screen bg-primary flex flex-col items-center justify-center text-center px-4">
+        <div className="bg-secondary rounded-[2.5rem] border border-gray-800 p-12 max-w-md w-full space-y-6 shadow-2xl">
+          <div className="w-16 h-16 bg-danger/10 border border-danger/20 rounded-full flex items-center justify-center text-danger text-2xl mx-auto font-mono">
+            ⚠️
+          </div>
+          <h3 className="text-2xl font-black italic text-white tracking-tight uppercase">ACCESS DENIED</h3>
+          <p className="text-gray-400 font-bold text-sm leading-relaxed uppercase tracking-wider">
+            You do not have permission to manage this pool hall. Access is restricted to authorized owners only.
+          </p>
+          <button 
+            onClick={() => navigate('/backoffice')}
+            className="w-full py-4 bg-accent text-primary rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-[1.02] transition-transform"
+          >
+            Return to Partner Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Not Found for invalid hallIds (404)
+  if (errorType === '404') {
+    return (
+      <div className="min-h-screen bg-primary flex flex-col items-center justify-center text-center px-4">
+        <div className="bg-secondary rounded-[2.5rem] border border-gray-800 p-12 max-w-md w-full space-y-6 shadow-2xl">
+          <div className="w-16 h-16 bg-warning/10 border border-warning/20 rounded-full flex items-center justify-center text-warning text-2xl mx-auto font-mono">
+            ❓
+          </div>
+          <h3 className="text-2xl font-black italic text-accent tracking-tight uppercase">HALL NOT FOUND</h3>
+          <p className="text-gray-400 font-bold text-sm leading-relaxed uppercase tracking-wider">
+            The requested pool hall does not exist. Please check the URL or selection.
+          </p>
+          <button 
+            onClick={() => navigate('/backoffice')}
+            className="w-full py-4 bg-accent text-primary rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-[1.02] transition-transform"
+          >
+            Return to Partner Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-primary flex text-white font-sans selection:bg-accent selection:text-primary">
       {/* Sidebar */}
@@ -123,8 +214,12 @@ const BackofficeApp = () => {
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => navigate("/backoffice")}
           >
-            <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(0,255,136,0.2)]">
-              <div className="w-5 h-5 bg-primary rounded-full shadow-[inset_0_0_5px_rgba(0,0,0,0.5)]" />
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-0.5 border border-accent/30 shadow-[0_0_20px_rgba(0,255,136,0.25)] overflow-hidden">
+              <img
+                src="/img/logo.png"
+                alt="All 8 Pool Logo"
+                className="w-full h-full object-cover scale-110"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-black text-white tracking-tighter italic leading-none">
@@ -288,6 +383,7 @@ const BackofficeApp = () => {
             path="/settings"
             element={hallId ? <SettingsPage /> : <Navigate to="/backoffice" />}
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>
@@ -296,8 +392,10 @@ const BackofficeApp = () => {
 
 const OwnerNotificationBell = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [challenges, setChallenges] = useState<any[]>([]);
   const [ownerHalls, setOwnerHalls] = useState<any[]>([]);
+  const [pendingTournaments, setPendingTournaments] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   
@@ -321,6 +419,30 @@ const OwnerNotificationBell = () => {
       );
       
       setChallenges(pendingOrganize);
+
+      // Fetch pending tournament player requests
+      let allPendingTourneyRequests: any[] = [];
+      for (const hallId of myHallIds) {
+        try {
+          const tourneyRes = await api.get(`/tournaments?poolHallId=${hallId}`);
+          tourneyRes.data.forEach((t: any) => {
+            const pending = t.players?.filter((p: any) => p.status === 'pending') || [];
+            pending.forEach((p: any) => {
+              allPendingTourneyRequests.push({
+                id: p.id,
+                tournamentId: t.id,
+                tournamentName: t.name,
+                playerName: p.player?.name,
+                playerEmail: p.player?.email,
+                hallId
+              });
+            });
+          });
+        } catch (err) {
+          console.error(`Failed to fetch tournaments for hall ${hallId}`, err);
+        }
+      }
+      setPendingTournaments(allPendingTourneyRequests);
 
       // Pre-select first available table for each challenge
       const initialTables: Record<string, string> = {};
@@ -361,6 +483,8 @@ const OwnerNotificationBell = () => {
     }
   };
 
+  const notificationCount = challenges.length + pendingTournaments.length;
+
   if (!user || (user.role !== 'owner' && user.role !== 'admin')) return null;
 
   return (
@@ -370,9 +494,9 @@ const OwnerNotificationBell = () => {
         className="relative p-2 text-gray-400 hover:text-accent hover:bg-white/5 rounded-full transition-all duration-300 flex items-center justify-center shrink-0"
       >
         <Bell size={18} />
-        {challenges.length > 0 && (
+        {notificationCount > 0 && (
           <span className="absolute top-0 right-0 w-4 h-4 bg-accent text-primary text-[9px] font-black rounded-full flex items-center justify-center shadow-[0_0_8px_#00ff88]">
-            {challenges.length}
+            {notificationCount}
           </span>
         )}
       </button>
@@ -392,15 +516,15 @@ const OwnerNotificationBell = () => {
               <div className="flex items-center justify-between border-b border-gray-800 pb-3">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent font-mono">Gauntlet Coordinator</span>
-                  <p className="text-[9px] text-gray-500 font-mono mt-0.5">Authorize accepted matches</p>
+                  <p className="text-[9px] text-gray-500 font-mono mt-0.5">Alerts & requests</p>
                 </div>
                 <span className="bg-accent/10 border border-accent/20 text-accent text-[9px] font-mono font-bold px-2 py-0.5 rounded-full">
-                  {challenges.length} Pending
+                  {notificationCount} Pending
                 </span>
               </div>
 
               <div className="max-h-72 overflow-y-auto space-y-3.5 pr-1">
-                {challenges.length > 0 ? (
+                {challenges.length > 0 &&
                   challenges.map((c) => {
                     const hall = ownerHalls.find(h => h.id === c.poolHallId);
                     const availableTables = hall?.tables?.filter((t: any) => t.status === 'available') || [];
@@ -473,10 +597,35 @@ const OwnerNotificationBell = () => {
                         </button>
                       </div>
                     );
-                  })
-                ) : (
+                  })}
+                {/* Tournament Registration Section */}
+                {pendingTournaments.length > 0 && (
+                  <div className="border-t border-gray-800 pt-3 mt-3 space-y-2">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-accent font-mono block">Tournament Requests</span>
+                    {pendingTournaments.map((req) => (
+                      <div key={req.id} className="bg-primary/50 border border-gray-800 p-3 rounded-2xl space-y-2 text-xs">
+                        <div className="flex justify-between items-center">
+                          <span className="font-black text-white uppercase text-[10px] truncate max-w-[150px]">{req.playerName}</span>
+                          <span className="text-[8px] text-accent bg-accent/5 px-1.5 py-0.5 rounded border border-accent/10 font-mono uppercase font-bold">JOIN REQ</span>
+                        </div>
+                        <p className="text-[9px] text-gray-400 font-mono">wants to join <strong className="text-white italic">{req.tournamentName}</strong></p>
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            navigate(`/backoffice/tournaments?hallId=${req.hallId}&tournamentId=${req.tournamentId}`);
+                          }}
+                          className="w-full py-2 bg-gray-800 text-white rounded-xl text-[9px] font-mono font-black uppercase tracking-widest hover:bg-gray-700 transition-all border border-gray-700"
+                        >
+                          Manage Tournaments
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {challenges.length === 0 && pendingTournaments.length === 0 && (
                   <div className="text-center py-10 text-gray-600 font-mono text-xs uppercase tracking-wider">
-                    No duels to authorize
+                    No new notifications
                   </div>
                 )}
               </div>
