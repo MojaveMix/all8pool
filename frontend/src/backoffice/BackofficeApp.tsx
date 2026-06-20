@@ -47,7 +47,6 @@ const BackofficeApp = () => {
   const hallId = searchParams.get("hallId");
   const { t } = useTranslation();
   
-  const [myHalls, setMyHalls] = useState<any[]>([]);
   const [hallsLoading, setHallsLoading] = useState(true);
   const [errorType, setErrorType] = useState<'404' | '403' | null>(null);
 
