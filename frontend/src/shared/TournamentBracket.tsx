@@ -68,8 +68,8 @@ export const TournamentBracket: React.FC<TournamentBracketProps> = ({ size, play
   }
 
   const bracketContent = (
-    <div className={`w-full overflow-x-auto py-8 select-none scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent ${isFullscreen ? 'min-h-[70vh] flex items-center' : ''}`}>
-      <div className="flex gap-12 min-w-[800px] justify-between items-stretch px-4 mx-auto">
+    <div className={`w-full overflow-auto py-8 select-none scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent ${isFullscreen ? 'h-full' : ''}`}>
+      <div className="flex gap-12 min-w-max justify-start items-stretch px-4 mx-auto pb-12">
         {bracketData.map((roundMatches, roundIndex) => {
           const roundName = getRoundName(roundIndex, numRounds);
           const isLastRound = roundIndex === numRounds - 1;
@@ -183,7 +183,7 @@ export const TournamentBracket: React.FC<TournamentBracketProps> = ({ size, play
                <h2 className="text-xl md:text-3xl font-black italic text-white uppercase tracking-tight">
                  Tournament Bracket <span className="text-accent ml-2">Arena View</span>
                </h2>
-               <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Scroll horizontally to view all rounds</p>
+               <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Scroll to view all rounds</p>
             </div>
             <button 
               onClick={() => setIsFullscreen(false)}
@@ -192,7 +192,7 @@ export const TournamentBracket: React.FC<TournamentBracketProps> = ({ size, play
               <Minimize2 size={16} /> <span className="hidden md:inline">Close Fullscreen</span>
             </button>
           </div>
-          <div className="flex-1 bg-primary/40 rounded-3xl border border-gray-800 p-2 md:p-8 overflow-auto shadow-2xl flex items-center justify-center">
+          <div className="flex-1 bg-primary/40 rounded-3xl border border-gray-800 p-4 md:p-8 overflow-auto shadow-2xl block">
             {bracketContent}
           </div>
         </div>
