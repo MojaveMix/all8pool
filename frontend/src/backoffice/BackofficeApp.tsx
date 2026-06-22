@@ -8,20 +8,9 @@ import {
 } from "react-router-dom";
 import { useAuth } from "../store/AuthContext";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../api";
-import HallManagement from "./HallManagement";
-import TableManagement from "./TableManagement";
-import DashboardOverview from "./DashboardOverview";
-import BookingsPage from "./BookingsPage";
-import LiveMatchesPage from "./LiveMatchesPage";
-import TournamentsPage from "./TournamentsPage";
-import FinancePage from "./FinancePage";
-import CustomersPage from "./CustomersPage";
-import AnalyticsPage from "./AnalyticsPage";
-import SettingsPage from "./SettingsPage";
-import SystemAdminPage from "./SystemAdminPage";
 import NotFound from "../shared/NotFound";
 import LoadingSpinner from "../shared/LoadingSpinner";
 import {
@@ -38,7 +27,22 @@ import {
   BarChart3,
   Bell,
   Check,
+  Menu,
+  X as XIcon,
 } from "lucide-react";
+
+const HallManagement = lazy(() => import("./HallManagement"));
+const TableManagement = lazy(() => import("./TableManagement"));
+const DashboardOverview = lazy(() => import("./DashboardOverview"));
+const BookingsPage = lazy(() => import("./BookingsPage"));
+const LiveMatchesPage = lazy(() => import("./LiveMatchesPage"));
+const TournamentsPage = lazy(() => import("./TournamentsPage"));
+const FinancePage = lazy(() => import("./FinancePage"));
+const CustomersPage = lazy(() => import("./CustomersPage"));
+const AnalyticsPage = lazy(() => import("./AnalyticsPage"));
+const SettingsPage = lazy(() => import("./SettingsPage"));
+const SystemAdminPage = lazy(() => import("./SystemAdminPage"));
+
 
 const BackofficeApp = () => {
   const { logout, user } = useAuth();
@@ -49,6 +53,12 @@ const BackofficeApp = () => {
   
   const [hallsLoading, setHallsLoading] = useState(true);
   const [errorType, setErrorType] = useState<'404' | '403' | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar on path change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [window.location.pathname]);
 
   useEffect(() => {
     const verifyHall = async () => {
@@ -204,13 +214,25 @@ const BackofficeApp = () => {
 
   return (
     <div className="min-h-screen bg-primary flex text-white font-sans selection:bg-accent selection:text-primary">
-      {/* Sidebar */}
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-      <aside className="w-72 bg-secondary border-r border-gray-800 flex flex-col sticky top-0 h-screen">
-        <div className="p-8">
+      {/* Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-secondary border-r border-gray-800 flex flex-col transition-transform duration-300 lg:static lg:translate-x-0 h-screen ${
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      }`}>
+        <div className="p-8 flex items-center justify-between">
           <div
             className="flex items-center gap-3 cursor-pointer"
-            onClick={() => navigate("/backoffice")}
+            onClick={() => {
+              navigate("/backoffice");
+              setSidebarOpen(false);
+            }}
           >
             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-0.5 border border-accent/30 shadow-[0_0_20px_rgba(0,255,136,0.25)] overflow-hidden">
               <img
@@ -228,6 +250,12 @@ const BackofficeApp = () => {
               </p>
             </div>
           </div>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg bg-primary border border-gray-800 text-gray-400 hover:text-white"
+          >
+            <XIcon size={18} />
+          </button>
         </div>
 
         <nav className="flex-1 px-4 space-y-1 mt-4 overflow-y-auto">
@@ -315,12 +343,20 @@ const BackofficeApp = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-12 overflow-auto bg-[radial-gradient(circle_at_top_right,_#1a1a1a,_#121212)]">
+      <main className="flex-1 p-6 md:p-12 overflow-auto bg-[radial-gradient(circle_at_top_right,_#1a1a1a,_#121212)]">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-gray-800 pb-6 shrink-0">
-          <div>
-            <h2 className="text-2xl font-black tracking-tight text-white uppercase italic font-mono bg-gradient-to-r from-white via-accent to-white bg-clip-text text-transparent">Partner Portal</h2>
-            <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-1">Lobby Control & System Operations</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2.5 rounded-xl bg-secondary border border-gray-800 text-gray-400 hover:text-white"
+            >
+              <Menu size={20} />
+            </button>
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-white uppercase italic font-mono bg-gradient-to-r from-white via-accent to-white bg-clip-text text-transparent">Partner Portal</h2>
+              <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-1">Lobby Control & System Operations</p>
+            </div>
           </div>
           <div className="flex items-center gap-4 self-end sm:self-auto">
             <OwnerNotificationBell />
@@ -334,55 +370,57 @@ const BackofficeApp = () => {
           </div>
         )}
 
-        <Routes>
-          <Route path="/" element={<HallManagement />} />
-          <Route path="/admin" element={user?.role === "admin" ? <SystemAdminPage /> : <Navigate to="/backoffice" />} />
-          <Route
-            path="/dashboard"
-            element={
-              hallId ? <DashboardOverview /> : <Navigate to="/backoffice" />
-            }
-          />
-          <Route
-            path="/tables"
-            element={
-              hallId ? <TableManagement /> : <Navigate to="/backoffice" />
-            }
-          />
-          <Route
-            path="/bookings"
-            element={hallId ? <BookingsPage /> : <Navigate to="/backoffice" />}
-          />
-          <Route
-            path="/matches"
-            element={
-              hallId ? <LiveMatchesPage /> : <Navigate to="/backoffice" />
-            }
-          />
-          <Route
-            path="/tournaments"
-            element={
-              hallId ? <TournamentsPage /> : <Navigate to="/backoffice" />
-            }
-          />
-          <Route
-            path="/finance"
-            element={hallId ? <FinancePage /> : <Navigate to="/backoffice" />}
-          />
-          <Route
-            path="/customers"
-            element={hallId ? <CustomersPage /> : <Navigate to="/backoffice" />}
-          />
-          <Route
-            path="/analytics"
-            element={hallId ? <AnalyticsPage /> : <Navigate to="/backoffice" />}
-          />
-          <Route
-            path="/settings"
-            element={hallId ? <SettingsPage /> : <Navigate to="/backoffice" />}
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<HallManagement />} />
+            <Route path="/admin" element={user?.role === "admin" ? <SystemAdminPage /> : <Navigate to="/backoffice" />} />
+            <Route
+              path="/dashboard"
+              element={
+                hallId ? <DashboardOverview /> : <Navigate to="/backoffice" />
+              }
+            />
+            <Route
+              path="/tables"
+              element={
+                hallId ? <TableManagement /> : <Navigate to="/backoffice" />
+              }
+            />
+            <Route
+              path="/bookings"
+              element={hallId ? <BookingsPage /> : <Navigate to="/backoffice" />}
+            />
+            <Route
+              path="/matches"
+              element={
+                hallId ? <LiveMatchesPage /> : <Navigate to="/backoffice" />
+              }
+            />
+            <Route
+              path="/tournaments"
+              element={
+                hallId ? <TournamentsPage /> : <Navigate to="/backoffice" />
+              }
+            />
+            <Route
+              path="/finance"
+              element={hallId ? <FinancePage /> : <Navigate to="/backoffice" />}
+            />
+            <Route
+              path="/customers"
+              element={hallId ? <CustomersPage /> : <Navigate to="/backoffice" />}
+            />
+            <Route
+              path="/analytics"
+              element={hallId ? <AnalyticsPage /> : <Navigate to="/backoffice" />}
+            />
+            <Route
+              path="/settings"
+              element={hallId ? <SettingsPage /> : <Navigate to="/backoffice" />}
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </main>
     </div>
   );
@@ -420,10 +458,21 @@ const OwnerNotificationBell = () => {
 
       // Fetch pending tournament player requests
       let allPendingTourneyRequests: any[] = [];
-      for (const hallId of myHallIds) {
-        try {
-          const tourneyRes = await api.get(`/tournaments?poolHallId=${hallId}`);
-          tourneyRes.data.forEach((t: any) => {
+      if (myHallIds.length > 0) {
+        const tourneyResults = await Promise.all(
+          myHallIds.map(async (hallId: string) => {
+            try {
+              const tourneyRes = await api.get(`/tournaments?poolHallId=${hallId}`);
+              return { hallId, tourneys: tourneyRes.data || [] };
+            } catch (err) {
+              console.error(`Failed to fetch tournaments for hall ${hallId}`, err);
+              return { hallId, tourneys: [] };
+            }
+          })
+        );
+
+        tourneyResults.forEach(({ hallId, tourneys }) => {
+          tourneys.forEach((t: any) => {
             const pending = t.players?.filter((p: any) => p.status === 'pending') || [];
             pending.forEach((p: any) => {
               allPendingTourneyRequests.push({
@@ -436,9 +485,7 @@ const OwnerNotificationBell = () => {
               });
             });
           });
-        } catch (err) {
-          console.error(`Failed to fetch tournaments for hall ${hallId}`, err);
-        }
+        });
       }
       setPendingTournaments(allPendingTourneyRequests);
 

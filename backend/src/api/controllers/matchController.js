@@ -1,4 +1,5 @@
 const { Match, Table, User, Booking, PoolHall } = require('../../infrastructure/database/models');
+const { Op } = require('sequelize');
 
 const updateUserStats = async (match) => {
   if (match.status !== 'finished') return;
@@ -220,10 +221,16 @@ const verifyMatch = async (req, res) => {
 const getMatches = async (req, res) => {
   // ... existing getMatches implementation ...
   try {
-    const { hallId, status } = req.query;
+    const { hallId, status, playerId } = req.query;
     const where = {};
     if (hallId) where.poolHallId = hallId;
     if (status) where.status = status;
+    if (playerId) {
+      where[Op.or] = [
+        { player1Id: playerId },
+        { player2Id: playerId }
+      ];
+    }
 
     const matches = await Match.findAll({
       where,

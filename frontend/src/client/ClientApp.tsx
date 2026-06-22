@@ -1,27 +1,28 @@
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useAuth } from "../store/AuthContext";
 import { useTranslation } from "react-i18next";
-import LandingPage from "./LandingPage";
-import HallDiscovery from "./HallDiscovery";
-import HallDetails from "./HallDetails";
-import RankingPage from "./RankingPage";
-import ProfilePage from "./ProfilePage";
-import RewardsPage from "./RewardsPage";
-import PlayerMatchesPage from "./PlayerMatchesPage";
-import PlayerTournamentsPage from "./PlayerTournamentsPage";
-import PlayersPage from "./PlayersPage";
-import {
-  AboutPage,
-  ContactPage,
-  TermsPage,
-  PrivacyPage,
-} from "./info/InfoPages";
-import GlobalChallengeWidget from "./GlobalChallengeWidget";
-import NotFound from "../shared/NotFound";
 import { LogIn, LogOut, Menu, X, Bell, Check } from "lucide-react";
-import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../api";
+import GlobalChallengeWidget from "./GlobalChallengeWidget";
+import NotFound from "../shared/NotFound";
+import LoadingSpinner from "../shared/LoadingSpinner";
+
+const LandingPage = lazy(() => import("./LandingPage"));
+const HallDiscovery = lazy(() => import("./HallDiscovery"));
+const HallDetails = lazy(() => import("./HallDetails"));
+const RankingPage = lazy(() => import("./RankingPage"));
+const ProfilePage = lazy(() => import("./ProfilePage"));
+const RewardsPage = lazy(() => import("./RewardsPage"));
+const PlayerMatchesPage = lazy(() => import("./PlayerMatchesPage"));
+const PlayerTournamentsPage = lazy(() => import("./PlayerTournamentsPage"));
+const PlayersPage = lazy(() => import("./PlayersPage"));
+const AboutPage = lazy(() => import("./info/InfoPages").then(m => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import("./info/InfoPages").then(m => ({ default: m.ContactPage })));
+const TermsPage = lazy(() => import("./info/InfoPages").then(m => ({ default: m.TermsPage })));
+const PrivacyPage = lazy(() => import("./info/InfoPages").then(m => ({ default: m.PrivacyPage })));
+
 
 const ClientApp = () => {
   const { user, logout } = useAuth();
@@ -184,23 +185,25 @@ const ClientApp = () => {
 
       {/* Main Content */}
       <main className="flex-grow relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/arena" element={<HallDiscovery />} />
-          <Route path="/hall/:id" element={<HallDetails />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/profile/:userId" element={<ProfilePage />} />
-          <Route path="/ranking" element={<RankingPage />} />
-          <Route path="/players" element={<PlayersPage />} />
-          <Route path="/rewards" element={<RewardsPage />} />
-          <Route path="/tournaments" element={<PlayerTournamentsPage />} />
-          <Route path="/matches" element={<PlayerMatchesPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/arena" element={<HallDiscovery />} />
+            <Route path="/hall/:id" element={<HallDetails />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
+            <Route path="/ranking" element={<RankingPage />} />
+            <Route path="/players" element={<PlayersPage />} />
+            <Route path="/rewards" element={<RewardsPage />} />
+            <Route path="/tournaments" element={<PlayerTournamentsPage />} />
+            <Route path="/matches" element={<PlayerMatchesPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </main>
 
       {/* Global Widget for Players */}

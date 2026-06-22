@@ -214,7 +214,7 @@ const LandingPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-8 pt-4"
+              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8 pt-4 w-full"
             >
               {user ? (
                 <Link
@@ -223,13 +223,13 @@ const LandingPage = () => {
                       ? "/backoffice"
                       : "/arena"
                   }
-                  className="group bg-accent text-primary px-10 sm:px-16 py-5 sm:py-7 rounded-[2rem] font-black uppercase tracking-tighter text-xl sm:text-2xl shadow-[0_0_60px_rgba(0,255,136,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center relative overflow-hidden whitespace-nowrap"
+                  className="group bg-accent text-primary px-6 sm:px-10 md:px-16 py-4 sm:py-5 md:py-7 rounded-xl sm:rounded-2xl md:rounded-[2rem] font-black uppercase tracking-tighter text-sm sm:text-lg md:text-2xl shadow-[0_0_60px_rgba(0,255,136,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center relative overflow-hidden whitespace-nowrap w-full sm:w-auto"
                 >
                   <span className="relative z-10 flex items-center gap-3 select-none">
                     <span>{t("landing.go_dashboard")}</span>
                     <ChevronRight
                       className="group-hover:translate-x-2 transition-transform shrink-0"
-                      size={24}
+                      size={20}
                     />
                   </span>
                 </Link>
@@ -237,12 +237,12 @@ const LandingPage = () => {
                 <>
                   <Link
                     to="/register"
-                    className="group bg-accent text-primary px-10 sm:px-16 py-5 sm:py-7 rounded-[2rem] font-black uppercase tracking-tighter text-xl sm:text-2xl shadow-[0_0_60px_rgba(0,255,136,0.4)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center relative overflow-hidden whitespace-nowrap"
+                    className="group bg-accent text-primary px-6 sm:px-10 md:px-16 py-4 sm:py-5 md:py-7 rounded-xl sm:rounded-2xl md:rounded-[2rem] font-black uppercase tracking-tighter text-sm sm:text-lg md:text-2xl shadow-[0_0_60px_rgba(0,255,136,0.4)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center relative overflow-hidden whitespace-nowrap w-full sm:w-auto"
                   >
                     <span className="relative z-10 flex items-center gap-3 select-none">
                       <span>{t("landing.join_arena")}</span>
                       <Play
-                        size={24}
+                        size={18}
                         fill="currentColor"
                         className="shrink-0"
                       />
@@ -255,7 +255,7 @@ const LandingPage = () => {
                   </Link>
                   <Link
                     to="/login"
-                    className="bg-white/5 border border-white/10 text-white px-10 sm:px-16 py-5 sm:py-7 rounded-[2rem] font-black uppercase tracking-tighter text-xl sm:text-2xl hover:bg-white/10 transition-colors backdrop-blur-md active:scale-95 flex items-center justify-center whitespace-nowrap"
+                    className="bg-white/5 border border-white/10 text-white px-6 sm:px-10 md:px-16 py-4 sm:py-5 md:py-7 rounded-xl sm:rounded-2xl md:rounded-[2rem] font-black uppercase tracking-tighter text-sm sm:text-lg md:text-2xl hover:bg-white/10 transition-colors backdrop-blur-md active:scale-95 flex items-center justify-center whitespace-nowrap w-full sm:w-auto"
                   >
                     <span className="select-none">{t("landing.player_login")}</span>
                   </Link>

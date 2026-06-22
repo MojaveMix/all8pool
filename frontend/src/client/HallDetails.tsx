@@ -77,9 +77,8 @@ const HallDetails = () => {
 
   const fetchHall = async () => {
     try {
-      const res = await api.get("/pool-halls");
-      const found = res.data.find((h: any) => h.id === id);
-      setHall(found);
+      const res = await api.get(`/pool-halls/${id}`);
+      setHall(res.data);
     } catch (err) {
       console.error(err);
     }

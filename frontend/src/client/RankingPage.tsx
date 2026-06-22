@@ -283,13 +283,15 @@ const RankingPage = () => {
       )}
 
       {/* List Section */}
-      <div className="bg-secondary/30 rounded-[3rem] p-10 border border-white/5">
-        <div className="flex items-center gap-4 mb-10 px-4">
-           <Medal className="text-accent" size={24} />
-           <h3 className="text-2xl font-black italic uppercase text-white tracking-tighter">Global Leaderboard</h3>
-        </div>
+      <div className="relative">
+        <div className={!user ? "filter blur-md select-none pointer-events-none" : ""}>
+          <div className="bg-secondary/30 rounded-[3rem] p-10 border border-white/5">
+            <div className="flex items-center gap-4 mb-10 px-4">
+               <Medal className="text-accent" size={24} />
+               <h3 className="text-2xl font-black italic uppercase text-white tracking-tighter">Global Leaderboard</h3>
+            </div>
 
-        <div className="space-y-4">
+            <div className="space-y-4">
           {rest.map((player, index) => (
             <div key={player.id} className="flex items-center gap-6 p-6 bg-primary/40 rounded-3xl border border-white/5 hover:border-accent/30 transition-all group">
               <div className="w-12 text-center font-black italic text-gray-700 text-2xl group-hover:text-accent transition-colors">#{index + 4}</div>
@@ -352,6 +354,31 @@ const RankingPage = () => {
         </div>
       </div>
     </div>
+        {!user && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm rounded-[3rem] p-6 text-center select-none animate-in fade-in duration-300">
+            <div className="bg-[#181c29]/95 border border-white/10 p-8 rounded-3xl max-w-sm shadow-2xl space-y-6 pointer-events-auto">
+              <div className="w-12 h-12 bg-accent/10 border border-accent/20 rounded-full flex items-center justify-center text-accent mx-auto font-mono">
+                🔒
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-lg font-black uppercase italic tracking-tighter text-white">Leaderboard Locked</h4>
+                <p className="text-[10px] font-bold text-gray-400 leading-relaxed uppercase tracking-wider">
+                  Join the All 8 Pool arena to view the full player rankings directory, points, coins, and win rates.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <Link to="/login" className="flex-1 py-3 text-center bg-accent text-primary rounded-xl font-black uppercase text-xs tracking-wider hover:scale-[1.02] transition-transform">
+                  Login
+                </Link>
+                <Link to="/register" className="flex-1 py-3 text-center bg-white/5 border border-white/10 text-white rounded-xl font-black uppercase text-xs tracking-wider hover:bg-white/10 transition-colors">
+                  Register
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
@@ -389,13 +416,13 @@ const PodiumPosition = ({ player, rank, color, bgColor, height, stars, isGold, t
       <div className={`w-full ${height} ${bgColor} rounded-t-[3rem] border-x-2 border-t-2 border-white/10 flex flex-col items-center pt-8 space-y-2 group-hover:border-accent/40 transition-colors shadow-2xl relative overflow-hidden`}>
          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
          <span className={`text-6xl font-black italic ${color}`}>#{rank}</span>
-         <div className="text-center relative z-10">
+         <div className={`text-center relative z-10 ${!currentUser ? "filter blur-sm select-none pointer-events-none" : ""}`}>
             <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">Points</p>
             <p className="text-xl font-black text-white italic flex items-center justify-center gap-1">
               <Zap size={16} className="text-accent" /> {player.points.toLocaleString()}
             </p>
          </div>
-         <div className="text-center relative z-10 pt-2 opacity-50">
+         <div className={`text-center relative z-10 pt-2 opacity-50 ${!currentUser ? "filter blur-sm select-none pointer-events-none" : ""}`}>
             <p className="text-[8px] font-black text-gray-600 uppercase tracking-[0.3em]">{t('profile.coins')}</p>
             <p className="text-sm font-black text-yellow-500 italic flex items-center justify-center gap-1">
               <Coins size={12} /> {player.virtualMoney.toLocaleString()}

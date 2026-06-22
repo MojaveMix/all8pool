@@ -256,49 +256,74 @@ const PlayersPage = () => {
           <LoadingSpinner message={t('common.loading')} />
         </div>
       ) : filteredPlayers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredPlayers.map((player) => (
-            <div key={player.id} className="bg-secondary/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 hover:border-accent/30 transition-all group relative overflow-hidden">
-               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-[50px] pointer-events-none group-hover:bg-accent/10 transition-colors" />
-               
-               <div className="flex flex-col items-center text-center space-y-4">
-                  <Link to={`/profile/${player.id}`} className="w-24 h-24 bg-primary rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform shadow-xl">
-                     {player.avatar ? (
-                       <img src={player.avatar} className="w-full h-full object-cover" />
-                     ) : (
-                       <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-3xl text-primary uppercase select-none">
-                         {player.name ? player.name[0] : 'P'}
+        <div className="relative">
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${!user ? "filter blur-md select-none pointer-events-none" : ""}`}>
+            {filteredPlayers.map((player) => (
+              <div key={player.id} className="bg-secondary/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 hover:border-accent/30 transition-all group relative overflow-hidden">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-[50px] pointer-events-none group-hover:bg-accent/10 transition-colors" />
+                 
+                 <div className="flex flex-col items-center text-center space-y-4">
+                    <Link to={`/profile/${player.id}`} className="w-24 h-24 bg-primary rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform shadow-xl">
+                       {player.avatar ? (
+                         <img src={player.avatar} alt="" className="w-full h-full object-cover" />
+                       ) : (
+                         <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-3xl text-primary uppercase select-none">
+                           {player.name ? player.name[0] : 'P'}
+                         </div>
+                       )}
+                    </Link>
+
+                    <div>
+                       <Link to={`/profile/${player.id}`} className="text-xl font-black italic text-white uppercase group-hover:text-accent transition-colors block mb-1">{player.name}</Link>
+                       <div className="flex justify-center">{renderStars(player.rating)}</div>
+                    </div>
+
+                    <div className="grid grid-cols-2 w-full gap-3 py-4 border-y border-white/5">
+                       <div>
+                          <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Points</p>
+                          <p className="text-sm font-black text-white italic">{player.points.toLocaleString()}</p>
                        </div>
-                     )}
+                       <div>
+                          <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Win Rate</p>
+                          <p className="text-sm font-black text-accent italic">{((player.wins / (player.wins + player.losses || 1)) * 100).toFixed(0)}%</p>
+                       </div>
+                    </div>
+
+                    {user?.id !== player.id && user?.role === 'player' && (
+                       <button 
+                         onClick={() => setSelectedPlayer(player)}
+                         className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:scale-105 transition-all"
+                       >
+                          <Zap size={14} /> Send Challenge
+                       </button>
+                    )}
+                 </div>
+              </div>
+            ))}
+          </div>
+          {!user && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm rounded-[2rem] p-6 text-center select-none animate-in fade-in duration-300">
+              <div className="bg-[#181c29]/95 border border-white/10 p-8 rounded-3xl max-w-sm shadow-2xl space-y-6 pointer-events-auto">
+                <div className="w-12 h-12 bg-accent/10 border border-accent/20 rounded-full flex items-center justify-center text-accent mx-auto font-mono">
+                  🔒
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-black uppercase italic tracking-tighter text-white">Directory Locked</h4>
+                  <p className="text-[10px] font-bold text-gray-400 leading-relaxed uppercase tracking-wider">
+                    Join the All 8 Pool arena to unlock the player directory, ratings, wins, and direct challenge options.
+                  </p>
+                </div>
+                <div className="flex gap-4">
+                  <Link to="/login" className="flex-1 py-3 text-center bg-accent text-primary rounded-xl font-black uppercase text-xs tracking-wider hover:scale-[1.02] transition-transform">
+                    Login
                   </Link>
-
-                  <div>
-                     <Link to={`/profile/${player.id}`} className="text-xl font-black italic text-white uppercase group-hover:text-accent transition-colors block mb-1">{player.name}</Link>
-                     <div className="flex justify-center">{renderStars(player.rating)}</div>
-                  </div>
-
-                  <div className="grid grid-cols-2 w-full gap-3 py-4 border-y border-white/5">
-                     <div>
-                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Points</p>
-                        <p className="text-sm font-black text-white italic">{player.points.toLocaleString()}</p>
-                     </div>
-                     <div>
-                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Win Rate</p>
-                        <p className="text-sm font-black text-accent italic">{((player.wins / (player.wins + player.losses || 1)) * 100).toFixed(0)}%</p>
-                     </div>
-                  </div>
-
-                  {user?.id !== player.id && user?.role === 'player' && (
-                     <button 
-                       onClick={() => setSelectedPlayer(player)}
-                       className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:scale-105 transition-all"
-                     >
-                        <Zap size={14} /> Send Challenge
-                     </button>
-                  )}
-               </div>
+                  <Link to="/register" className="flex-1 py-3 text-center bg-white/5 border border-white/10 text-white rounded-xl font-black uppercase text-xs tracking-wider hover:bg-white/10 transition-colors">
+                    Register
+                  </Link>
+                </div>
+              </div>
             </div>
-          ))}
+          )}
         </div>
       ) : (
         <div className="text-center py-20 bg-secondary/50 rounded-[3rem] border border-dashed border-gray-800">

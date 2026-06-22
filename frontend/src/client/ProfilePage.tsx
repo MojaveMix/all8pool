@@ -16,7 +16,7 @@ import {
   Zap,
   Camera,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import LoadingSpinner from "../shared/LoadingSpinner";
 
 interface UserProfile {
@@ -40,6 +40,20 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [matches, setMatches] = useState<any[]>([]);
+  const [loadingMatches, setLoadingMatches] = useState(true);
+
+  const fetchMatches = async (targetId: string) => {
+    try {
+      setLoadingMatches(true);
+      const res = await api.get(`/matches?playerId=${targetId}`);
+      setMatches(res.data);
+    } catch (err) {
+      console.error("Failed to fetch player matches:", err);
+    } finally {
+      setLoadingMatches(false);
+    }
+  };
 
   const isOwnProfile = !userId || (authUser && userId === authUser.id);
 
@@ -67,6 +81,9 @@ const ProfilePage = () => {
       const endpoint = isOwnProfile ? "/users/me" : `/users/${userId}`;
       const res = await api.get(endpoint);
       setProfile(res.data);
+      if (res.data?.id) {
+        fetchMatches(res.data.id);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -186,7 +203,7 @@ const ProfilePage = () => {
               </p>
             </div>
 
-            <div className="flex flex-wrap justify-center md:justify-start gap-4">
+            <div className={`flex flex-wrap justify-center md:justify-start gap-4 ${!authUser ? "filter blur-md select-none pointer-events-none" : ""}`}>
               <div className="bg-accent/10 text-accent px-4 py-2 rounded-xl border border-accent/20 flex items-center gap-2">
                 <Trophy size={18} />
                 <span className="font-black italic text-xl">
@@ -210,7 +227,7 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <div className="pt-2">
+            <div className={`pt-2 ${!authUser ? "filter blur-md select-none pointer-events-none" : ""}`}>
               <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">
                 Reputation & Skill
               </p>
@@ -221,59 +238,214 @@ const ProfilePage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard
-          icon={<TrendingUp className="text-accent" />}
-          label={t('profile.win_rate')}
-          value={`${winRate}%`}
-          subValue="Match Performance"
-        />
-        <StatCard
-          icon={<Star className="text-yellow-400" />}
-          label={t('profile.mastery')}
-          value={parseFloat(profile.rating.toString()).toFixed(1)}
-          subValue="Out of 5.0"
-        />
-        {isOwnProfile ? (
+      <div className="relative">
+        <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${!authUser ? "filter blur-md select-none pointer-events-none" : ""}`}>
           <StatCard
-            icon={
-              <AlertCircle
-                className={
-                  (profile.unpaidCount || 0) > 0
-                    ? "text-red-500"
-                    : "text-gray-500"
-                }
-              />
-            }
-            label={t('profile.payment_status')}
-            value={profile.unpaidCount || 0}
-            subValue="Unpaid Penalties"
+            icon={<TrendingUp className="text-accent" />}
+            label={t('profile.win_rate')}
+            value={`${winRate}%`}
+            subValue="Match Performance"
           />
-        ) : (
           <StatCard
-            icon={<Medal className="text-accent" />}
-            label="Status"
-            value="Active"
-            subValue="Verified Player"
+            icon={<Star className="text-yellow-400" />}
+            label={t('profile.mastery')}
+            value={parseFloat(profile.rating.toString()).toFixed(1)}
+            subValue="Out of 5.0"
           />
+          {isOwnProfile ? (
+            <StatCard
+              icon={
+                <AlertCircle
+                  className={
+                    (profile.unpaidCount || 0) > 0
+                      ? "text-red-500"
+                      : "text-gray-500"
+                  }
+                />
+              }
+              label={t('profile.payment_status')}
+              value={profile.unpaidCount || 0}
+              subValue="Unpaid Penalties"
+            />
+          ) : (
+            <StatCard
+              icon={<Medal className="text-accent" />}
+              label="Status"
+              value="Active"
+              subValue="Verified Player"
+            />
+          )}
+        </div>
+        {!authUser && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm rounded-[2rem] p-6 text-center select-none">
+            <div className="bg-[#181c29]/95 border border-white/10 p-8 rounded-3xl max-w-sm shadow-2xl space-y-6 pointer-events-auto">
+              <div className="w-12 h-12 bg-accent/10 border border-accent/20 rounded-full flex items-center justify-center text-accent mx-auto font-mono">
+                🔒
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-lg font-black uppercase italic tracking-tighter text-white">Metrics Locked</h4>
+                <p className="text-[10px] font-bold text-gray-400 leading-relaxed uppercase tracking-wider">
+                  Join the All 8 Pool arena to view detailed player win rates, mastery points, and status rankings.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <Link to="/login" className="flex-1 py-3 text-center bg-accent text-primary rounded-xl font-black uppercase text-xs tracking-wider hover:scale-[1.02] transition-transform">
+                  Login
+                </Link>
+                <Link to="/register" className="flex-1 py-3 text-center bg-white/5 border border-white/10 text-white rounded-xl font-black uppercase text-xs tracking-wider hover:bg-white/10 transition-colors">
+                  Register
+                </Link>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
       {/* Recent Matches */}
-      <div className="bg-secondary/30 rounded-[2rem] p-8 border border-white/5">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl font-black italic uppercase text-white flex items-center gap-3">
-            <Calendar className="text-accent" />
-            {t('profile.history')}
-          </h3>
-        </div>
+      <div className="relative">
+        <div className={!authUser ? "filter blur-md select-none pointer-events-none" : ""}>
+          <div className="bg-secondary/30 rounded-[2rem] p-8 border border-white/5">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-2xl font-black italic uppercase text-white flex items-center gap-3">
+                <Calendar className="text-accent" />
+                {t('profile.history')}
+              </h3>
+            </div>
         <div className="space-y-4">
-          <p className="text-center py-10 text-gray-500 font-bold uppercase tracking-widest text-xs border-2 border-dashed border-white/5 rounded-2xl">
-            {isOwnProfile
-              ? "No recent match data recorded yet."
-              : `No recent matches found for ${profile.name}.`}
-          </p>
+          {loadingMatches ? (
+            <div className="py-10 text-center text-xs font-mono text-gray-500 uppercase tracking-widest animate-pulse">
+              Loading matches...
+            </div>
+          ) : matches.length === 0 ? (
+            <p className="text-center py-10 text-gray-500 font-bold uppercase tracking-widest text-xs border-2 border-dashed border-white/5 rounded-2xl">
+              {isOwnProfile
+                ? "No recent match data recorded yet."
+                : `No recent matches found for ${profile.name}.`}
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {matches.map((m) => {
+                const isP1 = m.player1Id === profile.id;
+                const opponentId = isP1 ? m.player2Id : m.player1Id;
+                const opponentName = isP1 
+                  ? (m.player2?.name || m.player2Name || "Anonymous Rival") 
+                  : (m.player1?.name || m.player1Name || "Anonymous Rival");
+                
+                const playerScore = isP1 ? (m.score1 || 0) : (m.score2 || 0);
+                const opponentScore = isP1 ? (m.score2 || 0) : (m.score1 || 0);
+                
+                let statusBadge = null;
+                if (m.status === 'finished') {
+                  if (playerScore > opponentScore) {
+                    statusBadge = (
+                      <span className="bg-success/15 border border-success/30 text-success text-[10px] font-black uppercase px-2.5 py-1 rounded-lg">
+                        Win
+                      </span>
+                    );
+                  } else if (playerScore < opponentScore) {
+                    statusBadge = (
+                      <span className="bg-danger/15 border border-danger/30 text-danger text-[10px] font-black uppercase px-2.5 py-1 rounded-lg">
+                        Loss
+                      </span>
+                    );
+                  } else {
+                    statusBadge = (
+                      <span className="bg-white/10 border border-white/20 text-gray-300 text-[10px] font-black uppercase px-2.5 py-1 rounded-lg">
+                        Draw
+                      </span>
+                    );
+                  }
+                } else if (m.status === 'live') {
+                  statusBadge = (
+                    <span className="bg-red-500/15 border border-red-500/30 text-red-500 text-[10px] font-black uppercase px-2.5 py-1 rounded-lg flex items-center gap-1.5 animate-pulse">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      Live
+                    </span>
+                  );
+                } else {
+                  statusBadge = (
+                    <span className="bg-accent/15 border border-accent/30 text-accent text-[10px] font-black uppercase px-2.5 py-1 rounded-lg">
+                      Upcoming
+                    </span>
+                  );
+                }
+
+                return (
+                  <div key={m.id} className="bg-secondary/40 border border-white/5 hover:border-white/10 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center border border-white/10 shrink-0 select-none">
+                        🏆
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">VS</span>
+                          {opponentId ? (
+                            <Link to={`/profile/${opponentId}`} className="text-sm font-black uppercase text-accent hover:text-white transition-colors">
+                              {opponentName}
+                            </Link>
+                          ) : (
+                            <span className="text-sm font-black uppercase text-white">{opponentName}</span>
+                          )}
+                        </div>
+                        <div className="text-[10px] text-gray-400 font-mono mt-1 space-y-0.5">
+                          <div>📍 {m.poolHall?.name || "Unknown Arena"} ({m.poolHall?.city || "Unknown City"})</div>
+                          {m.startTime && (
+                            <div>📅 {new Date(m.startTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
+                      {m.stake > 0 && (
+                        <div className="text-left sm:text-right shrink-0">
+                          <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Stake</p>
+                          <p className="text-xs font-mono font-bold text-yellow-500">{m.stake} Pts</p>
+                        </div>
+                      )}
+                      
+                      <div className="text-right shrink-0 min-w-[70px]">
+                        <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Score</p>
+                        <p className="text-lg font-black italic text-white tracking-tight">
+                          {playerScore} - {opponentScore}
+                        </p>
+                      </div>
+                      
+                      <div className="shrink-0">
+                        {statusBadge}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
+      </div>
+    </div>
+        {!authUser && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm rounded-[2rem] p-6 text-center select-none">
+            <div className="bg-[#181c29]/95 border border-white/10 p-8 rounded-3xl max-w-sm shadow-2xl space-y-6 pointer-events-auto">
+              <div className="w-12 h-12 bg-accent/10 border border-accent/20 rounded-full flex items-center justify-center text-accent mx-auto font-mono">
+                🔒
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-lg font-black uppercase italic tracking-tighter text-white">History Locked</h4>
+                <p className="text-[10px] font-bold text-gray-400 leading-relaxed uppercase tracking-wider">
+                  Join the All 8 Pool arena to view detailed player match histories, stakes, and battle records.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <Link to="/login" className="flex-1 py-3 text-center bg-accent text-primary rounded-xl font-black uppercase text-xs tracking-wider hover:scale-[1.02] transition-transform">
+                  Login
+                </Link>
+                <Link to="/register" className="flex-1 py-3 text-center bg-white/5 border border-white/10 text-white rounded-xl font-black uppercase text-xs tracking-wider hover:bg-white/10 transition-colors">
+                  Register
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

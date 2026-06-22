@@ -89,9 +89,27 @@ const updatePoolHall = async (req, res) => {
   }
 };
 
+const getPoolHallById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const poolHall = await PoolHall.findByPk(id, {
+      include: [{ model: Table, as: 'tables' }],
+    });
+    if (!poolHall) {
+      return res.status(404).json({ message: 'Pool Hall not found' });
+    }
+    res.json(poolHall);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 module.exports = {
   createPoolHall,
   getMyPoolHalls,
   getAllPoolHalls,
   updatePoolHall,
+  getPoolHallById,
 };
+
