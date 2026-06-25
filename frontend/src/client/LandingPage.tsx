@@ -28,7 +28,7 @@ import {
   Target,
   LineChart,
   MessageSquare,
-  CheckCircle
+  CheckCircle,
 } from "lucide-react";
 
 const LandingPage = () => {
@@ -44,22 +44,44 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, rankingsRes, matchesRes, finishedRes, challengesRes] = await Promise.all([
-          api.get("/users/stats"),
-          api.get("/users/rankings"),
-          api.get("/matches?status=live"),
-          api.get("/matches?status=finished"),
-          api.get("/matches?status=open")
-        ]);
-        
+        const [statsRes, rankingsRes, matchesRes, finishedRes, challengesRes] =
+          await Promise.all([
+            api.get("/users/stats"),
+            api.get("/users/rankings"),
+            api.get("/matches?status=live"),
+            api.get("/matches?status=finished"),
+            api.get("/matches?status=open"),
+          ]);
+
         setStats(statsRes.data);
         if (rankingsRes.data && rankingsRes.data.length > 0) {
           setTopPlayers(rankingsRes.data.slice(0, 3));
         } else {
           setTopPlayers([
-            { id: 101, name: "Efren 'Bata'", rating: 5.0, points: 15200, wins: 120, losses: 15 },
-            { id: 102, name: "Shane Van Boening", rating: 4.8, points: 14850, wins: 110, losses: 20 },
-            { id: 103, name: "Jayson Shaw", rating: 4.7, points: 14100, wins: 105, losses: 25 }
+            {
+              id: 101,
+              name: "Efren 'Bata'",
+              rating: 5.0,
+              points: 15200,
+              wins: 120,
+              losses: 15,
+            },
+            {
+              id: 102,
+              name: "Shane Van Boening",
+              rating: 4.8,
+              points: 14850,
+              wins: 110,
+              losses: 20,
+            },
+            {
+              id: 103,
+              name: "Jayson Shaw",
+              rating: 4.7,
+              points: 14100,
+              wins: 105,
+              losses: 25,
+            },
           ]);
         }
 
@@ -67,8 +89,24 @@ const LandingPage = () => {
           setLiveMatches(matchesRes.data.slice(0, 3));
         } else {
           setLiveMatches([
-            { id: 1, player1: { name: "Alex 'The Shark'" }, player2: { name: "John Doe" }, poolHall: { name: "Elite Billiards" }, score1: 3, score2: 2, stake: 50 },
-            { id: 2, player1: { name: "Sarah Connor" }, player2: { name: "Mike Tyson" }, poolHall: { name: "Rack 'Em Up" }, score1: 0, score2: 1, stake: 100 },
+            {
+              id: 1,
+              player1: { name: "Alex 'The Shark'" },
+              player2: { name: "John Doe" },
+              poolHall: { name: "Elite Billiards" },
+              score1: 3,
+              score2: 2,
+              stake: 50,
+            },
+            {
+              id: 2,
+              player1: { name: "Sarah Connor" },
+              player2: { name: "Mike Tyson" },
+              poolHall: { name: "Rack 'Em Up" },
+              score1: 0,
+              score2: 1,
+              stake: 100,
+            },
           ]);
         }
 
@@ -76,31 +114,58 @@ const LandingPage = () => {
           setOpenChallenges(challengesRes.data.slice(0, 3));
         } else {
           setOpenChallenges([
-            { id: 3, player1: { name: "GhostBreak" }, poolHall: { name: "The Arena" }, stake: 200, status: "open" },
-            { id: 4, player1: { name: "ProHustler" }, poolHall: { name: "Diamond Club" }, stake: 0, status: "open" }
+            {
+              id: 3,
+              player1: { name: "GhostBreak" },
+              poolHall: { name: "The Arena" },
+              stake: 200,
+              status: "open",
+            },
+            {
+              id: 4,
+              player1: { name: "ProHustler" },
+              poolHall: { name: "Diamond Club" },
+              stake: 0,
+              status: "open",
+            },
           ]);
         }
 
         if (finishedRes.data && finishedRes.data.length > 0) {
-           const processedWins = finishedRes.data.map((m: any) => {
-             const p1Score = m.score1 || 0;
-             const p2Score = m.score2 || 0;
-             const p1Name = m.player1?.name || m.player1Name || "Player 1";
-             const p2Name = m.player2?.name || m.player2Name || "Player 2";
-             
-             if (p1Score > p2Score) return { winner: p1Name, loser: p2Name, score: `${p1Score}-${p2Score}`, pts: 50 };
-             return { winner: p2Name, loser: p1Name, score: `${p2Score}-${p1Score}`, pts: 50 };
-           });
-           setRecentWinners(processedWins.slice(0, 4));
-        } else {
-           setRecentWinners([
-             { winner: "LegendaryCue", loser: "FastBreak", score: "5-2", pts: 50 },
-             { winner: "PoolPrince", loser: "Shark", score: "8-4", pts: 50 },
-             { winner: "Shadow", loser: "Rookie99", score: "3-0", pts: 50 },
-             { winner: "MasterMind", loser: "8Baller", score: "7-6", pts: 50 },
-           ]);
-        }
+          const processedWins = finishedRes.data.map((m: any) => {
+            const p1Score = m.score1 || 0;
+            const p2Score = m.score2 || 0;
+            const p1Name = m.player1?.name || m.player1Name || "Player 1";
+            const p2Name = m.player2?.name || m.player2Name || "Player 2";
 
+            if (p1Score > p2Score)
+              return {
+                winner: p1Name,
+                loser: p2Name,
+                score: `${p1Score}-${p2Score}`,
+                pts: 50,
+              };
+            return {
+              winner: p2Name,
+              loser: p1Name,
+              score: `${p2Score}-${p1Score}`,
+              pts: 50,
+            };
+          });
+          setRecentWinners(processedWins.slice(0, 4));
+        } else {
+          setRecentWinners([
+            {
+              winner: "LegendaryCue",
+              loser: "FastBreak",
+              score: "5-2",
+              pts: 50,
+            },
+            { winner: "PoolPrince", loser: "Shark", score: "8-4", pts: 50 },
+            { winner: "Shadow", loser: "Rookie99", score: "3-0", pts: 50 },
+            { winner: "MasterMind", loser: "8Baller", score: "7-6", pts: 50 },
+          ]);
+        }
       } catch (err) {
         console.error("Error fetching landing page data:", err);
       } finally {
@@ -126,8 +191,6 @@ const LandingPage = () => {
       spotsLeft: 3,
     },
   ];
-
-
 
   const steps = [
     {
@@ -155,7 +218,7 @@ const LandingPage = () => {
   return (
     <div className="space-y-0 overflow-hidden pb-32 relative">
       {/* Hero Section with Live Action Feed */}
-      <section className="relative min-h-[80vh] flex items-center justify-center pt-24 pb-20">
+      <section className="relative z-10 min-h-[80vh] flex items-center justify-center pt-24 pb-20">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,255,136,0.15)_0%,_transparent_70%)]" />
 
         {/* Animated Background Elements */}
@@ -187,8 +250,14 @@ const LandingPage = () => {
             >
               <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-400 flex items-center gap-1.5">
-                <Flame size={12} className="inline mr-1 text-yellow-400 animate-pulse" />
-                {t("landing.live_activity", { matches: liveMatches.length, challenges: openChallenges.length })}
+                <Flame
+                  size={12}
+                  className="inline mr-1 text-yellow-400 animate-pulse"
+                />
+                {t("landing.live_activity", {
+                  matches: liveMatches.length,
+                  challenges: openChallenges.length,
+                })}
               </span>
             </motion.div>
 
@@ -257,7 +326,9 @@ const LandingPage = () => {
                     to="/login"
                     className="bg-white/5 border border-white/10 text-white px-6 sm:px-10 md:px-16 py-4 sm:py-5 md:py-7 rounded-xl sm:rounded-2xl md:rounded-[2rem] font-black uppercase tracking-tighter text-sm sm:text-lg md:text-2xl hover:bg-white/10 transition-colors backdrop-blur-md active:scale-95 flex items-center justify-center whitespace-nowrap w-full sm:w-auto"
                   >
-                    <span className="select-none">{t("landing.player_login")}</span>
+                    <span className="select-none">
+                      {t("landing.player_login")}
+                    </span>
                   </Link>
                 </>
               )}
@@ -311,7 +382,7 @@ const LandingPage = () => {
                   {t("landing.live_results_feed")}
                 </h3>
               </div>
-              
+
               <div className="space-y-4">
                 {recentWinners.map((win, idx) => (
                   <div
@@ -319,7 +390,7 @@ const LandingPage = () => {
                     className="flex items-center gap-4 p-3 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 hover:border-accent/30 transition-all group"
                   >
                     <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center border border-white/10 text-accent font-black shadow-lg shrink-0">
-                      {win.winner ? win.winner[0] : 'P'}
+                      {win.winner ? win.winner[0] : "P"}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-black uppercase text-white truncate group-hover:text-accent transition-colors">
@@ -330,8 +401,12 @@ const LandingPage = () => {
                       </p>
                     </div>
                     <div className="text-right flex flex-col justify-center shrink-0">
-                      <p className="text-xs font-black italic text-white">{win.score}</p>
-                      <p className="text-[10px] text-accent font-black tracking-widest">+{win.pts}</p>
+                      <p className="text-xs font-black italic text-white">
+                        {win.score}
+                      </p>
+                      <p className="text-[10px] text-accent font-black tracking-widest">
+                        +{win.pts}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -342,14 +417,17 @@ const LandingPage = () => {
       </section>
 
       {/* Hall of Fame / Rankings Section */}
-      <section className="px-4 max-w-7xl mx-auto space-y-16 py-24 border-y border-white/5">
+      <section className="relative z-10 px-4 max-w-7xl mx-auto space-y-16 py-24 border-y border-white/5">
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
             <Medal size={20} />
             {t("landing.climb_rankings")}
           </div>
           <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter leading-none">
-            {t("landing.leaderboard_title_prefix")} <span className="text-accent">{t("landing.leaderboard_title_highlight")}</span>
+            {t("landing.leaderboard_title_prefix")}{" "}
+            <span className="text-accent">
+              {t("landing.leaderboard_title_highlight")}
+            </span>
           </h2>
           <p className="text-gray-400 text-sm font-bold max-w-2xl mx-auto">
             {t("landing.leaderboard_desc")}
@@ -384,7 +462,7 @@ const LandingPage = () => {
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-3xl md:text-4xl text-primary uppercase select-none">
-                        {player.name ? player.name[0] : 'P'}
+                        {player.name ? player.name[0] : "P"}
                       </div>
                     )}
                   </div>
@@ -474,8 +552,7 @@ const LandingPage = () => {
       </section>
 
       {/* Live Matches & Challenges Section */}
-      <section className="px-4 max-w-7xl mx-auto space-y-12 py-24 bg-gradient-to-b from-transparent to-secondary/10">
-        
+      <section className="relative z-10 px-4 max-w-7xl mx-auto space-y-12 py-24 bg-gradient-to-b from-transparent to-secondary/10">
         {/* Active Open Challenges */}
         <div className="mb-20">
           <div className="flex items-center justify-between mb-8">
@@ -497,7 +574,8 @@ const LandingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {openChallenges.map((challenge) => {
-              const p1Name = challenge.player1?.name || challenge.player1Name || "Anonymous";
+              const p1Name =
+                challenge.player1?.name || challenge.player1Name || "Anonymous";
               const hallName = challenge.poolHall?.name || "The Arena";
               return (
                 <motion.div
@@ -506,22 +584,31 @@ const LandingPage = () => {
                   className="bg-secondary/60 backdrop-blur-xl border border-yellow-500/20 rounded-[2rem] p-8 space-y-6 relative overflow-hidden group shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-[50px] pointer-events-none" />
-                  
+
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                       <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center text-xl font-black border border-white/10 group-hover:border-yellow-500/50 transition-colors">
-                          {p1Name[0]}
-                       </div>
-                       <div>
-                         <p className="text-sm font-black uppercase tracking-widest">{p1Name}</p>
-                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1 mt-1">
-                           <MapPin size={12} className="text-yellow-500" /> {hallName}
-                         </p>
-                       </div>
+                      <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center text-xl font-black border border-white/10 group-hover:border-yellow-500/50 transition-colors">
+                        {p1Name[0]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-black uppercase tracking-widest">
+                          {p1Name}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1 mt-1">
+                          <MapPin size={12} className="text-yellow-500" />{" "}
+                          {hallName}
+                        </p>
+                      </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{t("landing.stake")}</p>
-                      <p className="text-lg font-black italic text-yellow-500">{challenge.stake > 0 ? `${challenge.stake} PTS` : t("landing.free")}</p>
+                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">
+                        {t("landing.stake")}
+                      </p>
+                      <p className="text-lg font-black italic text-yellow-500">
+                        {challenge.stake > 0
+                          ? `${challenge.stake} PTS`
+                          : t("landing.free")}
+                      </p>
                     </div>
                   </div>
 
@@ -556,10 +643,15 @@ const LandingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {liveMatches.map((match) => {
-              const p1Name = match.player1?.name || match.player1Name || "Player 1";
-              const p2Name = match.player2?.name || match.player2Name || "Player 2";
+              const p1Name =
+                match.player1?.name || match.player1Name || "Player 1";
+              const p2Name =
+                match.player2?.name || match.player2Name || "Player 2";
               const hallName = match.poolHall?.name || "The Arena";
-              const matchType = match.stake > 0 ? t("landing.stake_pts", { points: match.stake }) : t("landing.friendly_match");
+              const matchType =
+                match.stake > 0
+                  ? t("landing.stake_pts", { points: match.stake })
+                  : t("landing.friendly_match");
 
               return (
                 <motion.div
@@ -582,12 +674,18 @@ const LandingPage = () => {
                         {p1Name}
                       </p>
                     </div>
-                    
+
                     <div className="px-2 md:px-4 shrink-0 flex flex-col items-center space-y-3">
                       <div className="flex items-center justify-center gap-3 bg-primary/40 px-4 py-2 rounded-2xl border border-white/5 shadow-inner">
-                        <span className="text-3xl md:text-4xl font-black italic text-white drop-shadow-md">{match.score1 || 0}</span>
-                        <span className="text-[10px] font-black italic text-accent uppercase tracking-widest">VS</span>
-                        <span className="text-3xl md:text-4xl font-black italic text-white drop-shadow-md">{match.score2 || 0}</span>
+                        <span className="text-3xl md:text-4xl font-black italic text-white drop-shadow-md">
+                          {match.score1 || 0}
+                        </span>
+                        <span className="text-[10px] font-black italic text-accent uppercase tracking-widest">
+                          VS
+                        </span>
+                        <span className="text-3xl md:text-4xl font-black italic text-white drop-shadow-md">
+                          {match.score2 || 0}
+                        </span>
                       </div>
                       <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
                         <div className="w-1/2 h-full bg-accent animate-shimmer" />
@@ -648,7 +746,7 @@ const LandingPage = () => {
               >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-lg font-black border border-white/10 text-accent shadow-lg group-hover:border-accent/40 transition-colors">
-                    {win.winner ? win.winner[0] : 'P'}
+                    {win.winner ? win.winner[0] : "P"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-black uppercase text-white truncate group-hover:text-accent transition-colors">
@@ -659,15 +757,23 @@ const LandingPage = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="pt-4 border-t border-white/5 flex items-center justify-between">
                   <div>
-                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-0.5">SCORE</p>
-                    <p className="text-xl font-black italic text-white leading-none">{win.score}</p>
+                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-0.5">
+                      SCORE
+                    </p>
+                    <p className="text-xl font-black italic text-white leading-none">
+                      {win.score}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-0.5">POINTS</p>
-                    <p className="text-xl font-black italic text-accent leading-none">+{win.pts}</p>
+                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-0.5">
+                      POINTS
+                    </p>
+                    <p className="text-xl font-black italic text-accent leading-none">
+                      +{win.pts}
+                    </p>
                   </div>
                 </div>
               </motion.div>
@@ -677,13 +783,15 @@ const LandingPage = () => {
       </section>
 
       {/* Tournaments - Large Cards with Urgency */}
-      <section className="relative py-20">
+      <section className="relative z-10 py-20">
         <div className="absolute inset-0 bg-accent/5 -skew-y-2 pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 space-y-16">
           <div className="text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6">
             <h2 className="text-6xl md:text-9xl font-black italic uppercase tracking-tighter leading-none">
               {t("landing.sanctioned")} <br />
-              <span className="text-yellow-500">{t("landing.tournaments")}.</span>
+              <span className="text-yellow-500">
+                {t("landing.tournaments")}.
+              </span>
             </h2>
             <Link
               to="/tournaments"
@@ -756,25 +864,40 @@ const LandingPage = () => {
       </section>
 
       {/* Why Choose Us - Comparison */}
-      <section className="px-4 max-w-7xl mx-auto py-24 space-y-16">
+      <section className="relative z-10 px-4 max-w-7xl mx-auto py-24 space-y-16">
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
             <Crown size={20} />
             {t("landing.why_choose_us")}
           </div>
           <h2 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none">
-            {t("landing.the_difference_prefix")} <span className="text-accent">{t("landing.the_difference_highlight")}</span>
+            {t("landing.the_difference_prefix")}{" "}
+            <span className="text-accent">
+              {t("landing.the_difference_highlight")}
+            </span>
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {[
-            { feature: t("landing.features_list.verified_players"), value: "✓" },
-            { feature: t("landing.features_list.realtime_rankings"), value: "✓" },
+            {
+              feature: t("landing.features_list.verified_players"),
+              value: "✓",
+            },
+            {
+              feature: t("landing.features_list.realtime_rankings"),
+              value: "✓",
+            },
             { feature: t("landing.features_list.instant_payouts"), value: "✓" },
-            { feature: t("landing.features_list.fairplay_guarantee"), value: "✓" },
+            {
+              feature: t("landing.features_list.fairplay_guarantee"),
+              value: "✓",
+            },
             { feature: t("landing.features_list.tournaments_247"), value: "✓" },
-            { feature: t("landing.features_list.global_leaderboard"), value: "✓" },
+            {
+              feature: t("landing.features_list.global_leaderboard"),
+              value: "✓",
+            },
           ].map((item, idx) => (
             <motion.div
               key={idx}
@@ -798,7 +921,7 @@ const LandingPage = () => {
       </section>
 
       {/* Quick Start Section - How to Get Started */}
-      <section className="bg-secondary/40 border-y border-white/5 py-20 px-4">
+      <section className="relative z-10 bg-secondary/40 border-y border-white/5 py-20 px-4">
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
@@ -806,7 +929,10 @@ const LandingPage = () => {
               {t("landing.get_started_fast")}
             </div>
             <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none">
-              {t("landing.join_steps_prefix")} <span className="text-accent">{t("landing.join_steps_highlight")}</span>
+              {t("landing.join_steps_prefix")}{" "}
+              <span className="text-accent">
+                {t("landing.join_steps_highlight")}
+              </span>
             </h2>
           </div>
 
@@ -857,14 +983,17 @@ const LandingPage = () => {
       </section>
 
       {/* Beginner Benefits Section */}
-      <section className="px-4 max-w-7xl mx-auto py-20 space-y-14">
+      <section className="relative z-10 px-4 max-w-7xl mx-auto py-20 space-y-14">
         <div className="text-center space-y-3">
           <div className="flex items-center justify-center gap-3 text-accent font-black uppercase tracking-[0.5em] text-xs">
             <Star size={18} />
             {t("landing.perfect_for_beginners")}
           </div>
           <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none">
-            {t("landing.winning_journey_prefix")} <span className="text-accent">{t("landing.winning_journey_highlight")}</span>
+            {t("landing.winning_journey_prefix")}{" "}
+            <span className="text-accent">
+              {t("landing.winning_journey_highlight")}
+            </span>
           </h2>
           <p className="text-gray-400 text-sm font-bold max-w-2xl mx-auto">
             {t("landing.winning_journey_desc")}
@@ -918,7 +1047,7 @@ const LandingPage = () => {
       </section>
 
       {/* Hall Owner CTA - Register Your Hall */}
-      <section className="px-4 max-w-7xl mx-auto py-24 border-t border-white/5">
+      <section className="relative z-10 px-4 max-w-7xl mx-auto py-24 border-t border-white/5">
         <div className="bg-[radial-gradient(circle_at_top_right,_rgba(0,255,136,0.1),_transparent)] bg-secondary/50 rounded-[5rem] p-16 md:p-32 border border-white/10 relative overflow-hidden shadow-2xl">
           <div className="absolute -left-20 -bottom-20 opacity-5 -rotate-12">
             <ShieldCheck size={500} />
@@ -933,7 +1062,9 @@ const LandingPage = () => {
                 </div>
                 <h2 className="text-6xl md:text-8xl font-black italic uppercase leading-[0.8] tracking-tighter">
                   {t("landing.owner_cta.register_title_prefix")} <br />
-                  <span className="text-accent">{t("landing.owner_cta.register_title_highlight")}</span>
+                  <span className="text-accent">
+                    {t("landing.owner_cta.register_title_highlight")}
+                  </span>
                 </h2>
                 <p className="text-gray-400 text-xl font-bold uppercase tracking-widest leading-relaxed max-w-lg opacity-80">
                   {t("landing.owner_cta.desc")}
@@ -943,22 +1074,35 @@ const LandingPage = () => {
                 to="/apply-owner"
                 className="inline-flex items-center gap-6 bg-white text-primary px-16 py-6 rounded-[2rem] font-black uppercase tracking-tighter text-2xl hover:scale-105 active:scale-95 transition-all shadow-2xl"
               >
-                {t("landing.owner_cta.start_registration")} <ArrowRight size={28} />
+                {t("landing.owner_cta.start_registration")}{" "}
+                <ArrowRight size={28} />
               </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              <OwnerFeature icon={<TrendingUp />} title={t("landing.owner_cta.analytics")} />
-              <OwnerFeature icon={<Calendar />} title={t("landing.owner_cta.booking")} />
-              <OwnerFeature icon={<Users />} title={t("landing.owner_cta.crm")} />
-              <OwnerFeature icon={<Trophy />} title={t("landing.owner_cta.exposure")} />
+              <OwnerFeature
+                icon={<TrendingUp />}
+                title={t("landing.owner_cta.analytics")}
+              />
+              <OwnerFeature
+                icon={<Calendar />}
+                title={t("landing.owner_cta.booking")}
+              />
+              <OwnerFeature
+                icon={<Users />}
+                title={t("landing.owner_cta.crm")}
+              />
+              <OwnerFeature
+                icon={<Trophy />}
+                title={t("landing.owner_cta.exposure")}
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* Final Call to Action */}
-      <section className="text-center py-40 relative px-4">
+      <section className="relative z-10 text-center py-40 px-4">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[80vw] h-[80vw] bg-accent/5 blur-[150px] rounded-full" />
 
         <motion.div
@@ -968,7 +1112,11 @@ const LandingPage = () => {
           className="space-y-16"
         >
           <h2 className="text-[12vw] font-black italic uppercase tracking-tighter leading-none select-none">
-            {t("landing.take_your_cue_prefix")} <span className="text-accent italic">{t("landing.take_your_cue_highlight")}</span> {t("landing.take_your_cue_suffix")}
+            {t("landing.take_your_cue_prefix")}{" "}
+            <span className="text-accent italic">
+              {t("landing.take_your_cue_highlight")}
+            </span>{" "}
+            {t("landing.take_your_cue_suffix")}
           </h2>
           <div className="space-y-4">
             <Link
@@ -978,7 +1126,9 @@ const LandingPage = () => {
               {t("landing.enter_arena")}
             </Link>
             <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">
-              {t("landing.join_players_now", { count: stats.players.toLocaleString() })}
+              {t("landing.join_players_now", {
+                count: stats.players.toLocaleString(),
+              })}
             </p>
           </div>
         </motion.div>
@@ -1004,8 +1154,6 @@ const QuickStat = ({ icon, label, value, color, className = "" }: any) => (
     </div>
   </div>
 );
-
-
 
 const OwnerFeature = ({ icon, title }: any) => (
   <div className="p-8 bg-primary/40 rounded-[2.5rem] border border-white/5 space-y-4 group hover:border-accent/30 transition-colors">

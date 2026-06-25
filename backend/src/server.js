@@ -1,11 +1,12 @@
-const express = require('express');
-const cors = require('cors');
-const http = require('http');
-const { Server } = require('socket.io');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
+const helmet = require("helmet");
+require("dotenv").config();
 
-const { sequelize, connectDB } = require('./infrastructure/database/database');
-const models = require('./infrastructure/database/models');
+const { sequelize, connectDB } = require("./infrastructure/database/database");
+const models = require("./infrastructure/database/models");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,60 +18,64 @@ connectDB();
 
 // Sync Database (In production, use migrations)
 // if (process.env.NODE_ENV !== 'production') {
-  sequelize.sync({ alter: true }).then(async () => {
-    console.log('Database synced');
-    try {
-      // Force tableId to be nullable because alter: true sometimes fails with foreign keys in MySQL
-      await sequelize.query("ALTER TABLE Matches MODIFY tableId CHAR(36) BINARY NULL;");
-      console.log('Schema fixed: tableId is now nullable');
-    } catch (err) {
-      // If it fails, it might already be correct or table name is different
-      console.log('Note: Manual schema fix attempt completed.');
-    }
-  });
+sequelize.sync({ alter: true }).then(async () => {
+  console.log("Database synced");
+  try {
+    // Force tableId to be nullable because alter: true sometimes fails with foreign keys in MySQL
+    await sequelize.query(
+      "ALTER TABLE Matches MODIFY tableId CHAR(36) BINARY NULL;",
+    );
+    console.log("Schema fixed: tableId is now nullable");
+  } catch (err) {
+    // If it fails, it might already be correct or table name is different
+    console.log("Note: Manual schema fix attempt completed.");
+  }
+});
 // }
 const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+  },
 });
 
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+
 // Routes
-app.use('/api/auth', require('./api/routes/authRoutes'));
-app.use('/api/users', require('./api/routes/userRoutes'));
-app.use('/api/pool-halls', require('./api/routes/poolHallRoutes'));
-app.use('/api/tables', require('./api/routes/tableRoutes'));
-app.use('/api/bookings', require('./api/routes/bookingRoutes'));
-app.use('/api/matches', require('./api/routes/matchRoutes'));
-app.use('/api/dashboard', require('./api/routes/dashboardRoutes'));
-app.use('/api/rewards', require('./api/routes/rewardRoutes'));
-app.use('/api/owner-requests', require('./api/routes/ownerRequestRoutes'));
-app.use('/api/tournaments', require('./api/routes/tournamentRoutes'));
+app.use("/api/auth", require("./api/routes/authRoutes"));
+app.use("/api/users", require("./api/routes/userRoutes"));
+app.use("/api/pool-halls", require("./api/routes/poolHallRoutes"));
+app.use("/api/tables", require("./api/routes/tableRoutes"));
+app.use("/api/bookings", require("./api/routes/bookingRoutes"));
+app.use("/api/matches", require("./api/routes/matchRoutes"));
+app.use("/api/dashboard", require("./api/routes/dashboardRoutes"));
+app.use("/api/rewards", require("./api/routes/rewardRoutes"));
+app.use("/api/owner-requests", require("./api/routes/ownerRequestRoutes"));
+app.use("/api/tournaments", require("./api/routes/tournamentRoutes"));
 
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
-    message: 'An unexpected error occurred',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined 
+  res.status(500).json({
+    message: "An unexpected error occurred",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
 
 // Routes Placeholder
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'All 8 Pool API is running' });
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", message: "All 8 Pool API is running" });
 });
 
 // Socket.io connection
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-  
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 });
 

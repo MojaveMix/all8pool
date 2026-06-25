@@ -40,24 +40,26 @@ const ClientApp = () => {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 sm:h-20">
+          <div className="flex justify-between items-center h-16 sm:h-20 gap-4">
             {/* Logo - responsive image and text */}
             <Link
               to="/"
               className="flex items-center gap-2 sm:gap-3 group shrink-0"
             >
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-0.5 border border-emerald-500/30 shadow-lg shadow-emerald-500/20 overflow-hidden group-hover:scale-105 transition-all duration-300 shrink-0">
                 <img
                   src="/img/logo.png"
                   alt="All 8 Pool Logo"
-                  className="w-24  h-full object-cover scale-110"
+                  className="w-full h-full object-cover scale-110"
                 />
+              </div>
               <h1 className="text-lg sm:text-xl md:text-2xl font-black italic tracking-tighter bg-gradient-to-r from-white to-emerald-300 bg-clip-text text-transparent group-hover:from-emerald-400 group-hover:to-white transition-all duration-500 hidden xs:block">
                 ALL 8 POOL
               </h1>
             </Link>
 
             {/* Desktop Menu - responsive links */}
-            <div className="hidden md:flex items-center gap-6 lg:gap-8">
+            <div className="hidden lg:flex items-center gap-6 xl:gap-8">
               <NavLink to="/arena">{t("nav.discover")}</NavLink>
               <NavLink to="/matches">{t("nav.matches")}</NavLink>
               <NavLink to="/players">Players</NavLink>
@@ -67,7 +69,7 @@ const ClientApp = () => {
             </div>
 
             {/* Desktop User Area */}
-            <div className="hidden md:flex items-center gap-4 lg:gap-6">
+            <div className="hidden lg:flex items-center gap-4 xl:gap-6">
               {user ? (
                 <UserMenu
                   user={user}
@@ -86,7 +88,7 @@ const ClientApp = () => {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center gap-3">
+            <div className="lg:hidden flex items-center gap-3">
               <NotificationBell />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -100,7 +102,7 @@ const ClientApp = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-black/80 backdrop-blur-xl border-t border-white/10 py-4 px-4 flex flex-col gap-3">
+          <div className="lg:hidden bg-black/80 backdrop-blur-xl border-t border-white/10 py-4 px-4 flex flex-col gap-3">
             <MobileNavLink to="/arena" onClick={() => setMobileMenuOpen(false)}>
               {t("nav.discover")}
             </MobileNavLink>
@@ -485,11 +487,11 @@ const UserMenu = ({
   navigate: (path: string) => void;
   t: any;
 }) => (
-  <div className="flex items-center gap-3 lg:gap-4">
+  <div className="flex items-center gap-2 xl:gap-4">
     {(user.role === "owner" || user.role === "admin") && (
       <Link
         to="/backoffice"
-        className="text-xs lg:text-sm font-black uppercase tracking-widest text-emerald-400 hover:text-white transition-colors border border-emerald-400/30 px-2 py-1 lg:px-3 lg:py-1.5 rounded-lg bg-emerald-400/10 backdrop-blur-sm"
+        className="text-[10px] xl:text-xs font-black uppercase tracking-widest text-emerald-400 hover:text-white transition-colors border border-emerald-400/30 px-2 py-1 xl:px-3 xl:py-1.5 rounded-lg bg-emerald-400/10 backdrop-blur-sm shrink-0"
       >
         {t("nav.backoffice")}
       </Link>
@@ -497,7 +499,7 @@ const UserMenu = ({
     <NotificationBell />
     <Link
       to="/profile"
-      className="flex items-center gap-1.5 lg:gap-2 bg-white/10 backdrop-blur-sm pl-1.5 pr-3 py-1.5 lg:pl-2 lg:pr-4 lg:py-2 rounded-full border border-white/20 hover:border-emerald-400/50 transition-all shrink-0"
+      className="flex items-center gap-1 xl:gap-2 bg-white/10 backdrop-blur-sm pl-1 pr-2 py-1 xl:pl-2 xl:pr-4 xl:py-2 rounded-full border border-white/20 hover:border-emerald-400/50 transition-all shrink-0"
     >
       {user.avatar ? (
         <img
@@ -510,16 +512,16 @@ const UserMenu = ({
           {user.name ? user.name[0] : 'P'}
         </div>
       )}
-      <span className="text-xs lg:text-sm font-bold truncate max-w-[100px]">{user.name}</span>
+      <span className="text-[10px] xl:text-xs font-bold truncate max-w-[80px] xl:max-w-[100px]">{user.name}</span>
     </Link>
     <button
       onClick={() => {
         logout();
         navigate("/login");
       }}
-      className="p-1.5 lg:p-2 text-gray-300 hover:text-red-400 transition-colors"
+      className="p-1 xl:p-2 text-gray-300 hover:text-red-400 transition-colors shrink-0"
     >
-      <LogOut size={20} />
+      <LogOut size={18} />
     </button>
   </div>
 );

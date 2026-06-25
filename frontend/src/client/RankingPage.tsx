@@ -227,7 +227,7 @@ const RankingPage = () => {
 
       {/* Podium Section */}
       {topThree.length > 0 && (
-        <div className="flex flex-col md:flex-row items-end justify-center gap-8 md:gap-4 pt-20">
+        <div className="flex flex-col md:flex-row items-center md:items-end justify-center gap-8 md:gap-4 pt-10 md:pt-20">
           {/* Silver - 2nd */}
           {topThree[1] && (
             <div className="order-2 md:order-1 flex-1 max-w-[280px] w-full group">
@@ -247,7 +247,7 @@ const RankingPage = () => {
           
           {/* Gold - 1st */}
           {topThree[0] && (
-            <div className="order-1 md:order-2 flex-1 max-w-[320px] w-full -translate-y-10 group">
+            <div className="order-1 md:order-2 flex-1 max-w-[320px] w-full md:-translate-y-10 group">
                <PodiumPosition 
                 player={topThree[0]} 
                 rank={1} 
@@ -285,63 +285,86 @@ const RankingPage = () => {
       {/* List Section */}
       <div className="relative">
         <div className={!user ? "filter blur-md select-none pointer-events-none" : ""}>
-          <div className="bg-secondary/30 rounded-[3rem] p-10 border border-white/5">
-            <div className="flex items-center gap-4 mb-10 px-4">
+          <div className="bg-secondary/30 rounded-2xl sm:rounded-[3rem] p-4 sm:p-10 border border-white/5">
+            <div className="flex items-center gap-4 mb-6 sm:mb-10 px-2 sm:px-4">
                <Medal className="text-accent" size={24} />
-               <h3 className="text-2xl font-black italic uppercase text-white tracking-tighter">Global Leaderboard</h3>
+               <h3 className="text-xl sm:text-2xl font-black italic uppercase text-white tracking-tighter">Global Leaderboard</h3>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
           {rest.map((player, index) => (
-            <div key={player.id} className="flex items-center gap-6 p-6 bg-primary/40 rounded-3xl border border-white/5 hover:border-accent/30 transition-all group">
-              <div className="w-12 text-center font-black italic text-gray-700 text-2xl group-hover:text-accent transition-colors">#{index + 4}</div>
+            <div key={player.id} className="flex items-center gap-3 sm:gap-6 p-4 sm:p-6 bg-primary/40 rounded-3xl border border-white/5 hover:border-accent/30 transition-all group">
+              <div className="w-8 sm:w-12 text-center font-black italic text-gray-700 text-lg sm:text-2xl group-hover:text-accent transition-colors">#{index + 4}</div>
               
-              <Link to={`/profile/${player.id}`} className="w-14 h-14 bg-secondary rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform">
+              <Link to={`/profile/${player.id}`} className="w-12 h-12 sm:w-14 sm:h-14 bg-secondary rounded-xl sm:rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform shrink-0">
                 {player.avatar ? (
                   <img src={player.avatar} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-lg text-primary uppercase select-none">
+                  <div className="w-full h-full bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center font-black italic text-base sm:text-lg text-primary uppercase select-none">
                     {player.name ? player.name[0] : 'P'}
                   </div>
                 )}
               </Link>
 
-              <div className="flex-1">
-                <Link to={`/profile/${player.id}`} className="text-xl font-black italic text-white uppercase group-hover:text-accent transition-colors block">{player.name}</Link>
-                {renderStars(player.rating)}
+              <div className="flex-grow min-w-0">
+                <Link to={`/profile/${player.id}`} className="text-base sm:text-xl font-black italic text-white uppercase group-hover:text-accent transition-colors block truncate">{player.name}</Link>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                  {renderStars(player.rating)}
+                  {/* Mobile inline stats summary */}
+                  <div className="flex md:hidden items-center gap-1.5 text-[10px] text-gray-400 font-mono">
+                    <span>•</span>
+                    <span className="flex items-center gap-0.5 text-white">
+                      <Zap size={10} className="text-accent" />
+                      {player.points.toLocaleString()}
+                    </span>
+                    <span>•</span>
+                    <span className="text-accent font-bold">{parseFloat(player.rating.toString()).toFixed(1)}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="hidden md:flex gap-10 text-right pr-4 items-center">
+              {/* Desktop/Tablet Stats Area */}
+              <div className="hidden md:flex gap-3 lg:gap-6 xl:gap-10 text-right pr-2 lg:pr-4 items-center shrink-0">
                  <div className="space-y-1">
                     <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Points</p>
-                    <p className="text-xl font-black text-white italic flex items-center justify-end gap-1">
-                      <Zap size={14} className="text-accent" /> {player.points.toLocaleString()}
+                    <p className="text-sm lg:text-base xl:text-xl font-black text-white italic flex items-center justify-end gap-1">
+                      <Zap size={12} className="text-accent" /> {player.points.toLocaleString()}
                     </p>
                  </div>
-                 <div className="space-y-1 text-yellow-500">
+                 <div className="space-y-1 text-yellow-500 hidden xl:block">
                     <p className="text-[8px] font-black uppercase tracking-widest">{t('profile.coins')}</p>
-                    <p className="text-xl font-black italic flex items-center justify-end gap-1">
-                      <Coins size={14} /> {player.virtualMoney.toLocaleString()}
+                    <p className="text-sm lg:text-base xl:text-xl font-black italic flex items-center justify-end gap-1">
+                      <Coins size={12} /> {player.virtualMoney.toLocaleString()}
                     </p>
                  </div>
                  <div className="space-y-1">
                     <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{t('profile.mastery')}</p>
-                    <p className="text-xl font-black text-accent italic">{parseFloat(player.rating.toString()).toFixed(1)}</p>
+                    <p className="text-sm lg:text-base xl:text-xl font-black text-accent italic">{parseFloat(player.rating.toString()).toFixed(1)}</p>
                  </div>
-                 <div className="space-y-1">
+                 <div className="space-y-1 hidden lg:block">
                     <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Palmares</p>
-                    <p className="text-xl font-black text-white italic">{player.wins} <span className="text-[10px] text-gray-600 uppercase not-italic">{t('profile.wins')}</span></p>
+                    <p className="text-sm lg:text-base xl:text-xl font-black text-white italic">{player.wins} <span className="text-[10px] text-gray-600 uppercase not-italic">{t('profile.wins')}</span></p>
                  </div>
                  
                  {user?.id !== player.id && user?.role === 'player' && (
                     <button 
                       onClick={() => setSelectedPlayer(player)}
-                      className="bg-accent/10 text-accent p-3 rounded-2xl border border-accent/20 hover:bg-accent hover:text-primary transition-all shadow-lg shadow-accent/5 group/btn"
+                      className="bg-accent/10 text-accent p-2 lg:p-3 rounded-xl lg:rounded-2xl border border-accent/20 hover:bg-accent hover:text-primary transition-all shadow-lg shadow-accent/5 group/btn"
                     >
-                       <Zap size={20} className="group-hover/btn:animate-pulse" />
+                       <Zap size={18} className="group-hover/btn:animate-pulse" />
                     </button>
                  )}
               </div>
+
+              {/* Mobile challenge action button */}
+              {user?.id !== player.id && user?.role === 'player' && (
+                <button 
+                  onClick={() => setSelectedPlayer(player)}
+                  className="flex md:hidden bg-accent/10 text-accent p-2.5 rounded-xl border border-accent/20 hover:bg-accent hover:text-primary transition-all shrink-0"
+                >
+                   <Zap size={16} />
+                </button>
+              )}
             </div>
           ))}
 
@@ -355,7 +378,7 @@ const RankingPage = () => {
       </div>
     </div>
         {!user && (
-          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm rounded-[3rem] p-6 text-center select-none animate-in fade-in duration-300">
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm rounded-2xl sm:rounded-[3rem] p-6 text-center select-none animate-in fade-in duration-300">
             <div className="bg-[#181c29]/95 border border-white/10 p-8 rounded-3xl max-w-sm shadow-2xl space-y-6 pointer-events-auto">
               <div className="w-12 h-12 bg-accent/10 border border-accent/20 rounded-full flex items-center justify-center text-accent mx-auto font-mono">
                 🔒
